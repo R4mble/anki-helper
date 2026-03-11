@@ -55,6 +55,15 @@
         .btn-blue { background: var(--blue); font-weight: 700; }
         .btn-red { background: var(--red); font-weight: 700; }
         .btn-orange { background: var(--orange); font-weight: 700; }
+        .btn-small { font-size: 12px; padding: 8px 10px; }
+        .btn-mini { font-size: 11px; padding: 6px 10px; min-height: 40px; }
+        .btn-tall { min-height: 72px; font-size: 24px; }
+        .btn-giant { min-height: 84px; font-size: 28px; font-weight: 700; }
+        .bg-red { background: #ef4444; }
+        .bg-orange { background: #f97316; }
+        .bg-blue { background: #3b82f6; }
+        .bg-green { background: #22c55e; color: #052e16; }
+        .bg-gray { background: #64748b; }
         .panel {
             background: rgba(17, 24, 39, 0.88);
             border: 1px solid var(--line);
@@ -90,15 +99,28 @@
             font-size: 13px;
         }
         .hidden { display: none; }
-        .remote-grid {
+        .grid.mode-anki {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 10px;
         }
-        .remote-grid .btn { padding: 15px 10px; font-size: 16px; }
+        .span-2 { grid-column: span 2; }
+        .cmd-btn {
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            cursor: pointer;
+            min-height: 60px;
+        }
+        .tool-separator {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px dashed var(--line);
+        }
         @media (max-width: 840px) {
             h1 { font-size: 24px; }
-            .remote-grid { grid-template-columns: 1fr; }
+            .grid.mode-anki { grid-template-columns: 1fr; }
+            .span-2 { grid-column: span 1; }
         }
     </style>
 </head>
@@ -150,6 +172,31 @@
         </div>
 
         <div class="panel">
+            <h3>制卡工具区</h3>
+            <div class="row">
+                <button id="clipboardToggleBtn" class="btn" onclick="toggleClipboardMonitor()">开启剪贴板图片监控</button>
+                <button id="captureToggleBtn" class="btn btn-blue" onclick="toggleCaptureHotkey()">开启音频图片录制（F4）</button>
+            </div>
+            <div class="tool-separator row">
+                <div style="flex:1;min-width:200px;">
+                    <label for="cleanDeckInput">牌组名</label>
+                    <input id="cleanDeckInput" placeholder="例如：#Listening::English::Audio" />
+                </div>
+                <div style="flex:1;min-width:160px;">
+                    <label for="cleanFieldInput">字段名</label>
+                    <input id="cleanFieldInput" placeholder="例如：例句文本" />
+                </div>
+            </div>
+            <div class="row">
+                <div style="flex:1;min-width:260px;">
+                    <label for="cleanSubstringInput">要删除的字符串</label>
+                    <input id="cleanSubstringInput" placeholder="输入要移除的文本片段" />
+                </div>
+                <button class="btn btn-red" onclick="removeSubstringFromDeckField()">执行删除</button>
+            </div>
+        </div>
+
+        <div class="panel">
             <h3>操作日志</h3>
             <div id="statusLog" class="status">准备就绪。</div>
         </div>
@@ -158,25 +205,22 @@
     <div id="remoteView" class="hidden">
         <div class="panel">
             <h3>Anki 手机遥控器</h3>
-            <div class="remote-grid">
-                <button class="btn btn-blue" onclick="remoteShowQuestion()">显示问题</button>
-                <button class="btn btn-primary" onclick="remoteShowAnswer()">显示答案</button>
-                <button class="btn btn-red" onclick="remoteAnswer(1)">Again (1)</button>
-                <button class="btn btn-orange" onclick="remoteAnswer(2)">Hard (2)</button>
-                <button class="btn" style="background:#14b8a6;font-weight:700;" onclick="remoteAnswer(3)">Good (3)</button>
-                <button class="btn" style="background:#22c55e;color:#052e16;font-weight:700;" onclick="remoteAnswer(4)">Easy (4)</button>
-                <button class="btn" onclick="remoteUndo()">撤销</button>
-                <button class="btn btn-blue" onclick="fetchCurrentCard()">刷新卡片信息</button>
-            </div>
-            <div style="margin-top:12px;" id="remoteCardInfo" class="status">点击按钮开始遥控。</div>
-        </div>
-
-        <div class="panel">
-            <h3>快速切牌组复习</h3>
-            <label for="remoteDeckInput">牌组名称</label>
-            <input id="remoteDeckInput" placeholder="例如：韩语::句子" />
-            <div class="row" style="margin-top:10px;">
-                <button class="btn btn-primary" onclick="remoteDeckReview()">进入该牌组复习</button>
+            <div id="anki-panel" class="grid mode-anki">
+                <button onclick="cmd('1')" class="cmd-btn bg-red btn-tall span-2">
+                    重来
+                </button>
+                <button onclick="cmd('2')" class="cmd-btn bg-orange btn-tall span-2">
+                    困难
+                </button>
+                <button onclick="cmd('R')" class="cmd-btn bg-blue btn-tall span-2">
+                    回放
+                </button>
+                <button onclick="cmd('space')" class="cmd-btn bg-green span-2 btn-giant">
+                    翻面
+                </button>
+                <button onclick="cmd('anki_undo')" class="cmd-btn bg-gray btn-mini span-2">
+                    撤销
+                </button>
             </div>
         </div>
     </div>
@@ -215,9 +259,9 @@
                 </div>
             </div>
             <div class="row">
-                <div style="flex:1;min-width:260px;">
-                    <label for="settingSyncCron">自动同步 Cron</label>
-                    <input id="settingSyncCron" />
+                <div style="flex:1;min-width:320px;">
+                    <label for="settingSyncTime">自动同步时间（默认 19:30）</label>
+                    <input id="settingSyncTime" type="time" value="19:30" />
                 </div>
                 <div style="flex:1;min-width:260px;">
                     <label for="settingSyncEnabled">自动同步开关（true/false）</label>
@@ -225,7 +269,6 @@
                 </div>
             </div>
             <div class="row">
-                <button class="btn btn-primary" onclick="saveSettings()">保存设置</button>
                 <button class="btn btn-blue" onclick="loadSettings()">重新加载</button>
             </div>
             <div id="settingsInfo" class="status">正在读取配置...</div>
@@ -251,6 +294,10 @@
         return data;
     }
 
+    let settingsSaveTimer = null;
+    let settingsSaving = false;
+    let captureHotkeyEnabled = false;
+
     function switchView(view) {
         const views = {
             dashboard: document.getElementById('dashboardView'),
@@ -273,6 +320,26 @@
         return v || '例句发音';
     }
 
+    function cronToTimeText(cronExpr) {
+        const raw = String(cronExpr || '').trim();
+        const parts = raw.split(/\s+/);
+        if (parts.length < 2) return '19:30';
+        const minute = Number(parts[0]);
+        const hour = Number(parts[1]);
+        if (!Number.isInteger(hour) || !Number.isInteger(minute)) return '19:30';
+        if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return '19:30';
+        return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+    }
+
+    function timeTextToCron(timeText) {
+        const text = String(timeText || '').trim();
+        const matched = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(text);
+        if (!matched) return '30 19 * * *';
+        const hour = Number(matched[1]);
+        const minute = Number(matched[2]);
+        return `${minute} ${hour} * * *`;
+    }
+
     async function fetchCurrentCard() {
         try {
             const data = await api(`/api/current-card?fieldName=${encodeURIComponent(getFieldName())}`);
@@ -287,10 +354,6 @@ cardId: ${card.cardId}
 noteId: ${card.noteId}
 ${audioText}
 fields: ${fields}`;
-            const remoteCardEl = document.getElementById('remoteCardInfo');
-            if (remoteCardEl) {
-                remoteCardEl.textContent = text;
-            }
             log('已刷新当前卡片信息。');
         } catch (error) {
             log(`刷新当前卡片失败: ${error.message}`);
@@ -310,6 +373,19 @@ fields: ${fields}`;
         }
     }
 
+    async function refreshClipboardMonitorStatus() {
+        try {
+            const data = await api('/api/clipboard-monitor');
+            const btn = document.getElementById('clipboardToggleBtn');
+            if (btn) {
+                btn.textContent = data.enabled ? '关闭剪贴板图片监控' : '开启剪贴板图片监控';
+                btn.className = data.enabled ? 'btn btn-red' : 'btn';
+            }
+        } catch (error) {
+            log(`读取剪贴板监控状态失败: ${error.message}`);
+        }
+    }
+
     async function toggleSilentAudioLoop() {
         try {
             const current = await api('/api/audio/silence-loop');
@@ -323,6 +399,32 @@ fields: ${fields}`;
         } catch (error) {
             log(`切换静音循环失败: ${error.message}`);
         }
+    }
+
+    async function toggleClipboardMonitor() {
+        try {
+            const current = await api('/api/clipboard-monitor');
+            const data = await api('/api/clipboard-monitor', 'POST', { enabled: !current.enabled });
+            log(data.message);
+            await refreshClipboardMonitorStatus();
+        } catch (error) {
+            log(`切换剪贴板监控失败: ${error.message}`);
+        }
+    }
+
+    function refreshCaptureToggleStatus() {
+        const btn = document.getElementById('captureToggleBtn');
+        if (!btn) return;
+        btn.textContent = captureHotkeyEnabled
+            ? '关闭音频图片录制（F4）'
+            : '开启音频图片录制（F4）';
+        btn.className = captureHotkeyEnabled ? 'btn btn-red' : 'btn btn-blue';
+    }
+
+    function toggleCaptureHotkey() {
+        captureHotkeyEnabled = !captureHotkeyEnabled;
+        refreshCaptureToggleStatus();
+        log(captureHotkeyEnabled ? 'F4 录制已开启（按 F4 触发截图+录音+更新最新卡片）。' : 'F4 录制已关闭。');
     }
 
     async function trimCurrentAudio(startSeconds, endSeconds) {
@@ -377,52 +479,13 @@ fields: ${fields}`;
         }
     }
 
-    async function remoteShowQuestion() {
+    async function cmd(command) {
         try {
-            await api('/api/remote/show-question', 'POST');
-            log('遥控: 显示问题');
+            const data = await api('/api/remote/cmd', 'POST', { command });
+            log(`遥控: ${data.message}`);
             await fetchCurrentCard();
         } catch (error) {
             log(`遥控失败: ${error.message}`);
-        }
-    }
-
-    async function remoteShowAnswer() {
-        try {
-            await api('/api/remote/show-answer', 'POST');
-            log('遥控: 显示答案');
-        } catch (error) {
-            log(`遥控失败: ${error.message}`);
-        }
-    }
-
-    async function remoteAnswer(ease) {
-        try {
-            await api('/api/remote/answer', 'POST', { ease });
-            log(`遥控: 提交评分 ${ease}`);
-            await fetchCurrentCard();
-        } catch (error) {
-            log(`遥控失败: ${error.message}`);
-        }
-    }
-
-    async function remoteUndo() {
-        try {
-            await api('/api/remote/undo', 'POST');
-            log('遥控: 撤销成功');
-            await fetchCurrentCard();
-        } catch (error) {
-            log(`撤销失败: ${error.message}`);
-        }
-    }
-
-    async function remoteDeckReview() {
-        try {
-            const deck = document.getElementById('remoteDeckInput').value.trim();
-            await api('/api/remote/deck-review', 'POST', { deck });
-            log(`已进入牌组复习: ${deck}`);
-        } catch (error) {
-            log(`切换牌组失败: ${error.message}`);
         }
     }
 
@@ -436,8 +499,11 @@ fields: ${fields}`;
             document.getElementById('settingTrimStart').value = s.defaultTrimStartSeconds ?? '';
             document.getElementById('settingTrimEnd').value = s.defaultTrimEndSeconds ?? '';
             document.getElementById('settingAmplify').value = s.defaultAmplifyFactor ?? '';
-            document.getElementById('settingSyncCron').value = s.defaultSyncCron || '';
+            document.getElementById('settingSyncTime').value = cronToTimeText(s.defaultSyncCron || '30 19 * * *');
             document.getElementById('settingSyncEnabled').value = String(s.syncEnabled);
+            if (document.getElementById('cleanFieldInput') && !document.getElementById('cleanFieldInput').value) {
+                document.getElementById('cleanFieldInput').value = s.targetField || '';
+            }
             document.getElementById('settingsInfo').textContent = `server: ${data.server.host}:${data.server.port}
 backup目录(固定): ${data.backupDir}
 配置文件已加载。`;
@@ -449,27 +515,74 @@ backup目录(固定): ${data.backupDir}
     }
 
     async function saveSettings() {
+        if (settingsSaving) return;
+        settingsSaving = true;
         try {
+            const syncTimeText = document.getElementById('settingSyncTime').value.trim() || '19:30';
             const payload = {
                 ankiConnectUrl: document.getElementById('settingAnkiConnectUrl').value.trim(),
                 mediaDir: document.getElementById('settingMediaDir').value.trim(),
+                mediaDirMac: document.getElementById('settingMediaDir').value.trim(),
+                mediaDirWindows: 'C:\\Users\\user\\AppData\\Roaming\\Anki2\\账户 1\\collection.media',
                 targetField: document.getElementById('settingTargetField').value.trim(),
                 defaultTrimStartSeconds: Number(document.getElementById('settingTrimStart').value.trim()),
                 defaultTrimEndSeconds: Number(document.getElementById('settingTrimEnd').value.trim()),
                 defaultAmplifyFactor: Number(document.getElementById('settingAmplify').value.trim()),
-                defaultSyncCron: document.getElementById('settingSyncCron').value.trim(),
+                defaultSyncCron: timeTextToCron(syncTimeText),
                 syncEnabled: document.getElementById('settingSyncEnabled').value.trim() === 'true',
             };
             const data = await api('/api/settings', 'POST', payload);
-            document.getElementById('settingsInfo').textContent = `保存成功。
+            document.getElementById('settingsInfo').textContent = `自动保存成功。
+time: ${syncTimeText}
 syncEnabled: ${data.syncScheduler.enabled}
 cron: ${data.syncScheduler.cron}
 nextRunAt: ${data.syncScheduler.nextRunAt || 'null'}`;
-            log('设置已保存。');
-            await loadSettings();
         } catch (error) {
-            document.getElementById('settingsInfo').textContent = `保存失败: ${error.message}`;
-            log(`保存设置失败: ${error.message}`);
+            document.getElementById('settingsInfo').textContent = `自动保存失败: ${error.message}`;
+        } finally {
+            settingsSaving = false;
+        }
+    }
+
+    function queueAutoSaveSettings() {
+        if (settingsSaveTimer) clearTimeout(settingsSaveTimer);
+        settingsSaveTimer = setTimeout(() => {
+            saveSettings();
+        }, 500);
+    }
+
+    function bindAutoSaveSettings() {
+        const ids = [
+            'settingAnkiConnectUrl',
+            'settingMediaDir',
+            'settingTargetField',
+            'settingTrimStart',
+            'settingTrimEnd',
+            'settingAmplify',
+            'settingSyncTime',
+            'settingSyncEnabled',
+        ];
+        ids.forEach((id) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.addEventListener('input', queueAutoSaveSettings);
+            el.addEventListener('change', queueAutoSaveSettings);
+        });
+    }
+
+    async function removeSubstringFromDeckField() {
+        try {
+            const deck = document.getElementById('cleanDeckInput').value.trim();
+            const fieldName = document.getElementById('cleanFieldInput').value.trim();
+            const substring = document.getElementById('cleanSubstringInput').value;
+            const data = await api('/api/anki/remove-substring', 'POST', {
+                deck,
+                fieldName,
+                substring,
+            });
+            log(data.message);
+        } catch (error) {
+            log(`批量清理失败: ${error.message}`);
         }
     }
 
@@ -478,8 +591,18 @@ nextRunAt: ${data.syncScheduler.nextRunAt || 'null'}`;
         if (mode === 'remote') switchView('remote');
         else if (mode === 'settings') switchView('settings');
         else switchView('dashboard');
+        refreshCaptureToggleStatus();
+        window.addEventListener('keydown', (event) => {
+            if (!captureHotkeyEnabled) return;
+            if (event.key === 'F4') {
+                event.preventDefault();
+                captureLatestNow();
+            }
+        });
+        bindAutoSaveSettings();
         await loadSettings();
         await refreshSilentAudioLoopStatus();
+        await refreshClipboardMonitorStatus();
         await fetchCurrentCard();
     })();
 </script>
