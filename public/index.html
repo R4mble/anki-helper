@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Anki Helper</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+        :root {
+            --bg: #0b1220;
+            --panel: #111827;
+            --panel2: #1f2937;
+            --line: #334155;
+            --text: #e5e7eb;
+            --muted: #9ca3af;
+            --green: #22c55e;
+            --blue: #3b82f6;
+            --red: #ef4444;
+            --orange: #f97316;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: var(--text);
+            background: linear-gradient(180deg, #020617 0%, var(--bg) 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        h1 { margin: 0; font-size: 28px; }
+        .tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn {
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            background: var(--panel2);
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn:hover { opacity: 0.93; }
+        .btn-primary { background: var(--green); color: #052e16; font-weight: 700; }
+        .btn-blue { background: var(--blue); font-weight: 700; }
+        .btn-red { background: var(--red); font-weight: 700; }
+        .btn-orange { background: var(--orange); font-weight: 700; }
+        .panel {
+            background: rgba(17, 24, 39, 0.88);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        .panel h3 { margin: 0 0 12px; }
+        .row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+        .quick-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+        .quick-buttons .btn { min-width: 68px; }
+        label {
+            display: block;
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+        input {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #020617;
+            color: var(--text);
+            padding: 10px;
+        }
+        .status {
+            white-space: pre-wrap;
+            background: #020617;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 12px;
+            min-height: 72px;
+            font-size: 13px;
+        }
+        .hidden { display: none; }
+        .remote-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .remote-grid .btn { padding: 15px 10px; font-size: 16px; }
+        @media (max-width: 840px) {
+            h1 { font-size: 24px; }
+            .remote-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Anki Helper</h1>
+        <div class="tabs">
+            <button class="btn btn-blue" onclick="switchView('dashboard')">桌面控制台</button>
+            <button class="btn btn-primary" onclick="switchView('remote')">手机遥控器</button>
+            <button class="btn" onclick="switchView('settings')">设置</button>
+        </div>
+    </div>
+
+    <div id="dashboardView">
+        <div class="panel">
+            <h3>音频工具（裁剪 + 放大）</h3>
+            <div class="row">
+                <div style="flex:1;min-width:220px;">
+                    <label for="fieldNameInput">音频字段名</label>
+                    <input id="fieldNameInput" value="例句发音" />
+                </div>
+                <div style="flex:1;min-width:220px;">
+                    <label for="amplifyFactorInput">放大量级（factor）</label>
+                    <input id="amplifyFactorInput" value="4" />
+                </div>
+            </div>
+            <div class="row">
+                <button class="btn btn-primary" onclick="amplifyCurrentAudio()">执行音量放大</button>
+                <button class="btn btn-red" onclick="restoreCurrentAudio()">恢复原音频</button>
+                <button id="silenceToggleBtn" class="btn btn-blue" onclick="toggleSilentAudioLoop()">开启静音音频循环</button>
+            </div>
+            <label>去掉开头（点击直接裁剪）</label>
+            <div class="quick-buttons" style="margin-bottom: 12px;">
+                <button class="btn btn-orange" onclick="quickTrimStart(0.1)">0.1s</button>
+                <button class="btn btn-orange" onclick="quickTrimStart(0.2)">0.2s</button>
+                <button class="btn btn-orange" onclick="quickTrimStart(0.3)">0.3s</button>
+                <button class="btn btn-orange" onclick="quickTrimStart(0.4)">0.4s</button>
+                <button class="btn btn-orange" onclick="quickTrimStart(0.5)">0.5s</button>
+            </div>
+            <label>去掉结尾（点击直接裁剪）</label>
+            <div class="quick-buttons">
+                <button class="btn btn-orange" onclick="quickTrimEnd(0.1)">0.1s</button>
+                <button class="btn btn-orange" onclick="quickTrimEnd(0.2)">0.2s</button>
+                <button class="btn btn-orange" onclick="quickTrimEnd(0.3)">0.3s</button>
+                <button class="btn btn-orange" onclick="quickTrimEnd(0.4)">0.4s</button>
+                <button class="btn btn-orange" onclick="quickTrimEnd(0.5)">0.5s</button>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3>操作日志</h3>
+            <div id="statusLog" class="status">准备就绪。</div>
+        </div>
+    </div>
+
+    <div id="remoteView" class="hidden">
+        <div class="panel">
+            <h3>Anki 手机遥控器</h3>
+            <div class="remote-grid">
+                <button class="btn btn-blue" onclick="remoteShowQuestion()">显示问题</button>
+                <button class="btn btn-primary" onclick="remoteShowAnswer()">显示答案</button>
+                <button class="btn btn-red" onclick="remoteAnswer(1)">Again (1)</button>
+                <button class="btn btn-orange" onclick="remoteAnswer(2)">Hard (2)</button>
+                <button class="btn" style="background:#14b8a6;font-weight:700;" onclick="remoteAnswer(3)">Good (3)</button>
+                <button class="btn" style="background:#22c55e;color:#052e16;font-weight:700;" onclick="remoteAnswer(4)">Easy (4)</button>
+                <button class="btn" onclick="remoteUndo()">撤销</button>
+                <button class="btn btn-blue" onclick="fetchCurrentCard()">刷新卡片信息</button>
+            </div>
+            <div style="margin-top:12px;" id="remoteCardInfo" class="status">点击按钮开始遥控。</div>
+        </div>
+
+        <div class="panel">
+            <h3>快速切牌组复习</h3>
+            <label for="remoteDeckInput">牌组名称</label>
+            <input id="remoteDeckInput" placeholder="例如：韩语::句子" />
+            <div class="row" style="margin-top:10px;">
+                <button class="btn btn-primary" onclick="remoteDeckReview()">进入该牌组复习</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="settingsView" class="hidden">
+        <div class="panel">
+            <h3>个性化配置</h3>
+            <div class="row">
+                <div style="flex:1;min-width:280px;">
+                    <label for="settingAnkiConnectUrl">AnkiConnect 地址</label>
+                    <input id="settingAnkiConnectUrl" />
+                </div>
+                <div style="flex:1;min-width:280px;">
+                    <label for="settingMediaDir">Anki 媒体库绝对路径</label>
+                    <input id="settingMediaDir" />
+                </div>
+            </div>
+            <div class="row">
+                <div style="flex:1;min-width:220px;">
+                    <label for="settingTargetField">默认音频字段名</label>
+                    <input id="settingTargetField" />
+                </div>
+            </div>
+            <div class="row">
+                <div style="flex:1;min-width:160px;">
+                    <label for="settingTrimStart">默认去头秒数</label>
+                    <input id="settingTrimStart" />
+                </div>
+                <div style="flex:1;min-width:160px;">
+                    <label for="settingTrimEnd">默认去尾秒数</label>
+                    <input id="settingTrimEnd" />
+                </div>
+                <div style="flex:1;min-width:160px;">
+                    <label for="settingAmplify">默认放大量级</label>
+                    <input id="settingAmplify" />
+                </div>
+            </div>
+            <div class="row">
+                <div style="flex:1;min-width:260px;">
+                    <label for="settingSyncCron">自动同步 Cron</label>
+                    <input id="settingSyncCron" />
+                </div>
+                <div style="flex:1;min-width:260px;">
+                    <label for="settingSyncEnabled">自动同步开关（true/false）</label>
+                    <input id="settingSyncEnabled" />
+                </div>
+            </div>
+            <div class="row">
+                <button class="btn btn-primary" onclick="saveSettings()">保存设置</button>
+                <button class="btn btn-blue" onclick="loadSettings()">重新加载</button>
+            </div>
+            <div id="settingsInfo" class="status">正在读取配置...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function log(msg) {
+        const now = new Date().toLocaleTimeString();
+        const el = document.getElementById('statusLog');
+        el.textContent = `[${now}] ${msg}\n${el.textContent}`;
+    }
+
+    async function api(path, method = 'GET', body) {
+        const response = await fetch(path, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: body ? JSON.stringify(body) : undefined,
+        });
+        const data = await response.json();
+        if (!data.ok) throw new Error(data.error || '请求失败');
+        return data;
+    }
+
+    function switchView(view) {
+        const views = {
+            dashboard: document.getElementById('dashboardView'),
+            remote: document.getElementById('remoteView'),
+            settings: document.getElementById('settingsView'),
+        };
+        Object.values(views).forEach(v => v.classList.add('hidden'));
+        views[view].classList.remove('hidden');
+        if (view === 'remote') {
+            history.replaceState(null, '', '/?mode=remote');
+        } else if (view === 'settings') {
+            history.replaceState(null, '', '/?mode=settings');
+        } else {
+            history.replaceState(null, '', '/');
+        }
+    }
+
+    function getFieldName() {
+        const v = document.getElementById('fieldNameInput').value.trim();
+        return v || '例句发音';
+    }
+
+    async function fetchCurrentCard() {
+        try {
+            const data = await api(`/api/current-card?fieldName=${encodeURIComponent(getFieldName())}`);
+            const card = data.card;
+            const audioText = data.audio && !data.audio.error
+                ? `音频: ${data.audio.filename} (字段: ${data.audio.fieldName})`
+                : `音频: ${data.audio?.error || '无'}`;
+            const fields = Object.keys(card.fields || {}).slice(0, 8).join(', ');
+            const text = `deck: ${card.deckName}
+model: ${card.modelName}
+cardId: ${card.cardId}
+noteId: ${card.noteId}
+${audioText}
+fields: ${fields}`;
+            const remoteCardEl = document.getElementById('remoteCardInfo');
+            if (remoteCardEl) {
+                remoteCardEl.textContent = text;
+            }
+            log('已刷新当前卡片信息。');
+        } catch (error) {
+            log(`刷新当前卡片失败: ${error.message}`);
+        }
+    }
+
+    async function refreshSilentAudioLoopStatus() {
+        try {
+            const data = await api('/api/audio/silence-loop');
+            const btn = document.getElementById('silenceToggleBtn');
+            if (btn) {
+                btn.textContent = data.enabled ? '关闭静音音频循环' : '开启静音音频循环';
+                btn.className = data.enabled ? 'btn btn-red' : 'btn btn-blue';
+            }
+        } catch (error) {
+            log(`读取静音循环状态失败: ${error.message}`);
+        }
+    }
+
+    async function toggleSilentAudioLoop() {
+        try {
+            const current = await api('/api/audio/silence-loop');
+            const data = await api('/api/audio/silence-loop', 'POST', {
+                enabled: !current.enabled,
+                durationSeconds: 1,
+                gapMs: 150,
+            });
+            log(data.message + '（用于激活蓝牙音频节点）');
+            await refreshSilentAudioLoopStatus();
+        } catch (error) {
+            log(`切换静音循环失败: ${error.message}`);
+        }
+    }
+
+    async function trimCurrentAudio(startSeconds, endSeconds) {
+        const payload = {
+            fieldName: getFieldName(),
+            startSeconds,
+            endSeconds,
+        };
+        const data = await api('/api/audio/trim-current', 'POST', payload);
+        return data;
+    }
+
+    async function quickTrimStart(seconds) {
+        try {
+            const data = await trimCurrentAudio(seconds, 0);
+            log(`${data.message}（去头 ${seconds}s）`);
+        } catch (error) {
+            log(`去头裁剪失败: ${error.message}`);
+        }
+    }
+
+    async function quickTrimEnd(seconds) {
+        try {
+            const data = await trimCurrentAudio(0, seconds);
+            log(`${data.message}（去尾 ${seconds}s）`);
+        } catch (error) {
+            log(`去尾裁剪失败: ${error.message}`);
+        }
+    }
+
+    async function amplifyCurrentAudio() {
+        try {
+            const factor = Number(document.getElementById('amplifyFactorInput').value.trim());
+            const data = await api('/api/audio/amplify-current', 'POST', {
+                fieldName: getFieldName(),
+                factor,
+            });
+            log(`${data.message}（factor=${factor}）`);
+        } catch (error) {
+            log(`放大失败: ${error.message}`);
+        }
+    }
+
+    async function restoreCurrentAudio() {
+        try {
+            const data = await api('/api/audio/restore-current', 'POST', {
+                fieldName: getFieldName(),
+            });
+            log(data.message);
+        } catch (error) {
+            log(`恢复失败: ${error.message}`);
+        }
+    }
+
+    async function remoteShowQuestion() {
+        try {
+            await api('/api/remote/show-question', 'POST');
+            log('遥控: 显示问题');
+            await fetchCurrentCard();
+        } catch (error) {
+            log(`遥控失败: ${error.message}`);
+        }
+    }
+
+    async function remoteShowAnswer() {
+        try {
+            await api('/api/remote/show-answer', 'POST');
+            log('遥控: 显示答案');
+        } catch (error) {
+            log(`遥控失败: ${error.message}`);
+        }
+    }
+
+    async function remoteAnswer(ease) {
+        try {
+            await api('/api/remote/answer', 'POST', { ease });
+            log(`遥控: 提交评分 ${ease}`);
+            await fetchCurrentCard();
+        } catch (error) {
+            log(`遥控失败: ${error.message}`);
+        }
+    }
+
+    async function remoteUndo() {
+        try {
+            await api('/api/remote/undo', 'POST');
+            log('遥控: 撤销成功');
+            await fetchCurrentCard();
+        } catch (error) {
+            log(`撤销失败: ${error.message}`);
+        }
+    }
+
+    async function remoteDeckReview() {
+        try {
+            const deck = document.getElementById('remoteDeckInput').value.trim();
+            await api('/api/remote/deck-review', 'POST', { deck });
+            log(`已进入牌组复习: ${deck}`);
+        } catch (error) {
+            log(`切换牌组失败: ${error.message}`);
+        }
+    }
+
+    async function loadSettings() {
+        try {
+            const data = await api('/api/settings');
+            const s = data.settings;
+            document.getElementById('settingAnkiConnectUrl').value = s.ankiConnectUrl || '';
+            document.getElementById('settingMediaDir').value = s.mediaDir || '';
+            document.getElementById('settingTargetField').value = s.targetField || '';
+            document.getElementById('settingTrimStart').value = s.defaultTrimStartSeconds ?? '';
+            document.getElementById('settingTrimEnd').value = s.defaultTrimEndSeconds ?? '';
+            document.getElementById('settingAmplify').value = s.defaultAmplifyFactor ?? '';
+            document.getElementById('settingSyncCron').value = s.defaultSyncCron || '';
+            document.getElementById('settingSyncEnabled').value = String(s.syncEnabled);
+            document.getElementById('settingsInfo').textContent = `server: ${data.server.host}:${data.server.port}
+backup目录(固定): ${data.backupDir}
+配置文件已加载。`;
+            document.getElementById('fieldNameInput').value = s.targetField || '例句发音';
+            document.getElementById('amplifyFactorInput').value = s.defaultAmplifyFactor ?? 4;
+        } catch (error) {
+            document.getElementById('settingsInfo').textContent = `读取配置失败: ${error.message}`;
+        }
+    }
+
+    async function saveSettings() {
+        try {
+            const payload = {
+                ankiConnectUrl: document.getElementById('settingAnkiConnectUrl').value.trim(),
+                mediaDir: document.getElementById('settingMediaDir').value.trim(),
+                targetField: document.getElementById('settingTargetField').value.trim(),
+                defaultTrimStartSeconds: Number(document.getElementById('settingTrimStart').value.trim()),
+                defaultTrimEndSeconds: Number(document.getElementById('settingTrimEnd').value.trim()),
+                defaultAmplifyFactor: Number(document.getElementById('settingAmplify').value.trim()),
+                defaultSyncCron: document.getElementById('settingSyncCron').value.trim(),
+                syncEnabled: document.getElementById('settingSyncEnabled').value.trim() === 'true',
+            };
+            const data = await api('/api/settings', 'POST', payload);
+            document.getElementById('settingsInfo').textContent = `保存成功。
+syncEnabled: ${data.syncScheduler.enabled}
+cron: ${data.syncScheduler.cron}
+nextRunAt: ${data.syncScheduler.nextRunAt || 'null'}`;
+            log('设置已保存。');
+            await loadSettings();
+        } catch (error) {
+            document.getElementById('settingsInfo').textContent = `保存失败: ${error.message}`;
+            log(`保存设置失败: ${error.message}`);
+        }
+    }
+
+    (async function init() {
+        const mode = new URLSearchParams(location.search).get('mode');
+        if (mode === 'remote') switchView('remote');
+        else if (mode === 'settings') switchView('settings');
+        else switchView('dashboard');
+        await loadSettings();
+        await refreshSilentAudioLoopStatus();
+        await fetchCurrentCard();
+    })();
+</script>
+</body>
+</html>
