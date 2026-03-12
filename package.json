@@ -1,12 +1,24 @@
 {
+  "bin": "web_app.js",
   "scripts": {
-    "start:web": "node web_app.js"
+    "start:web": "node web_app.js",
+    "build:mac": "pkg . --targets node18-macos-x64 --output dist/anki-helper-macos",
+    "build:win": "pkg . --targets node18-win-x64 --output dist/anki-helper-win.exe",
+    "build:all": "npm run build:mac && npm run build:win"
   },
   "dependencies": {
-    "axios": "^1.13.2",
     "express": "^5.1.0",
     "fluent-ffmpeg": "^2.1.3",
     "fs-extra": "^11.3.3",
     "node-schedule": "^2.1.1"
+  },
+  "devDependencies": {
+    "pkg": "^5.8.1"
+  },
+  "pkg": {
+    "assets": [
+      "public/**/*",
+      "app_default_setting.json"
+    ]
   }
 }

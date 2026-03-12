@@ -89,6 +89,21 @@
             color: var(--text);
             padding: 10px;
         }
+        .switch-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+        .switch-row input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #22c55e;
+            padding: 0;
+            border-radius: 4px;
+        }
         .status {
             white-space: pre-wrap;
             background: #020617;
@@ -264,8 +279,11 @@
                     <input id="settingSyncTime" type="time" value="19:30" />
                 </div>
                 <div style="flex:1;min-width:260px;">
-                    <label for="settingSyncEnabled">自动同步开关（true/false）</label>
-                    <input id="settingSyncEnabled" />
+                    <label>自动同步开关</label>
+                    <div class="switch-row">
+                        <input id="settingSyncEnabled" type="checkbox" />
+                        <span id="settingSyncEnabledText">已关闭</span>
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -500,7 +518,8 @@ fields: ${fields}`;
             document.getElementById('settingTrimEnd').value = s.defaultTrimEndSeconds ?? '';
             document.getElementById('settingAmplify').value = s.defaultAmplifyFactor ?? '';
             document.getElementById('settingSyncTime').value = cronToTimeText(s.defaultSyncCron || '30 19 * * *');
-            document.getElementById('settingSyncEnabled').value = String(s.syncEnabled);
+            document.getElementById('settingSyncEnabled').checked = Boolean(s.syncEnabled);
+            document.getElementById('settingSyncEnabledText').textContent = s.syncEnabled ? '已开启' : '已关闭';
             if (document.getElementById('cleanFieldInput') && !document.getElementById('cleanFieldInput').value) {
                 document.getElementById('cleanFieldInput').value = s.targetField || '';
             }
@@ -529,9 +548,10 @@ backup目录(固定): ${data.backupDir}
                 defaultTrimEndSeconds: Number(document.getElementById('settingTrimEnd').value.trim()),
                 defaultAmplifyFactor: Number(document.getElementById('settingAmplify').value.trim()),
                 defaultSyncCron: timeTextToCron(syncTimeText),
-                syncEnabled: document.getElementById('settingSyncEnabled').value.trim() === 'true',
+                syncEnabled: document.getElementById('settingSyncEnabled').checked,
             };
             const data = await api('/api/settings', 'POST', payload);
+            document.getElementById('settingSyncEnabledText').textContent = data.syncScheduler.enabled ? '已开启' : '已关闭';
             document.getElementById('settingsInfo').textContent = `自动保存成功。
 time: ${syncTimeText}
 syncEnabled: ${data.syncScheduler.enabled}
@@ -568,6 +588,12 @@ nextRunAt: ${data.syncScheduler.nextRunAt || 'null'}`;
             el.addEventListener('input', queueAutoSaveSettings);
             el.addEventListener('change', queueAutoSaveSettings);
         });
+        const syncToggle = document.getElementById('settingSyncEnabled');
+        if (syncToggle) {
+            syncToggle.addEventListener('change', () => {
+                document.getElementById('settingSyncEnabledText').textContent = syncToggle.checked ? '已开启' : '已关闭';
+            });
+        }
     }
 
     async function removeSubstringFromDeckField() {

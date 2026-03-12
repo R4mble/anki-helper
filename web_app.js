@@ -4,16 +4,17 @@ const os = require('os');
 const fs = require('fs-extra');
 const { execFile, spawn } = require('child_process');
 const crypto = require('crypto');
-const axios = require('axios');
 const ffmpeg = require('fluent-ffmpeg');
 const schedule = require('node-schedule');
 
+const APP_DIR = process.pkg ? path.dirname(process.execPath) : __dirname;
+const BUNDLED_DEFAULT_SETTINGS_FILE = path.join(__dirname, 'app_default_setting.json');
 const PORT = Number(process.env.PORT || 3333);
 const HOST = process.env.HOST || '0.0.0.0';
-const DEFAULT_SETTINGS_FILE = path.join(__dirname, 'app_default_setting.json');
-const SETTINGS_FILE = path.join(__dirname, 'app_settings.json');
-const BACKUP_DIR = path.join(__dirname, 'backup');
-const RUNTIME_DIR = path.join(__dirname, '.runtime');
+const DEFAULT_SETTINGS_FILE = path.join(APP_DIR, 'app_default_setting.json');
+const SETTINGS_FILE = path.join(APP_DIR, 'app_settings.json');
+const BACKUP_DIR = path.join(APP_DIR, 'backup');
+const RUNTIME_DIR = path.join(APP_DIR, '.runtime');
 const DEFAULT_SETTINGS_TEMPLATE = {
     ankiConnectUrl: 'http://127.0.0.1:8765',
     mediaDir:
@@ -77,6 +78,10 @@ function sanitizeSettings(input) {
 
 async function loadDefaultSettings() {
     if (!(await fs.pathExists(DEFAULT_SETTINGS_FILE))) {
+        if (process.pkg && (await fs.pathExists(BUNDLED_DEFAULT_SETTINGS_FILE))) {
+            await fs.copy(BUNDLED_DEFAULT_SETTINGS_FILE, DEFAULT_SETTINGS_FILE);
+            return fs.readJson(DEFAULT_SETTINGS_FILE);
+        }
         await fs.writeJson(DEFAULT_SETTINGS_FILE, DEFAULT_SETTINGS_TEMPLATE, { spaces: 2 });
         return { ...DEFAULT_SETTINGS_TEMPLATE };
     }
@@ -475,18 +480,26 @@ function getLocalNetworkIp() {
 
 async function invoke(action, params = {}) {
     try {
-        const response = await axios.post(settings.ankiConnectUrl, {
-            action,
-            version: 6,
-            params,
+        const resp = await fetch(settings.ankiConnectUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action,
+                version: 6,
+                params,
+            }),
         });
-        if (response.data.error) {
-            throw new Error(response.data.error);
+        const response = await resp.json();
+        if (response.error) {
+            throw new Error(response.error);
         }
-        return response.data.result;
+        return response.result;
     } catch (error) {
+        const isConnRefused =
+            error.code === 'ECONNREFUSED' ||
+            (typeof error.message === 'string' && error.message.includes('ECONNREFUSED'));
         const msg =
-            error.code === 'ECONNREFUSED'
+            isConnRefused
                 ? '无法连接 AnkiConnect，请确认 Anki 已启动并安装 AnkiConnect。'
                 : `AnkiConnect 请求失败: ${error.message}`;
         throw new Error(msg);
