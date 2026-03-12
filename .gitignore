@@ -1,6 +1,7 @@
 node_modules/
 .runtime/
 backup/
+dist/
 
 app_settings.json
 
