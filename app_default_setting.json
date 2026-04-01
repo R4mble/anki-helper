@@ -11,5 +11,6 @@
   "syncEnabled": true,
   "latestCardImageField": "例句图片",
   "latestCardAudioField": "例句发音",
-  "clipboardMonitorEnabled": false
+  "clipboardMonitorEnabled": false,
+  "subtitleSearchDir": ""
 }

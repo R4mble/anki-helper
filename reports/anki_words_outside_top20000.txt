@@ -1,0 +1,2129 @@
+1	splitsville	anki_count=2	rank=N/A
+2	down the drain	anki_count=2	rank=N/A
+3	step up	anki_count=2	rank=N/A
+4	rock bottom	anki_count=1	rank=N/A
+5	capital offence/crime	anki_count=1	rank=N/A
+6	steering wheel	anki_count=1	rank=N/A
+7	let/get somebody off the hook	anki_count=1	rank=N/A
+8	take the stink off	anki_count=1	rank=N/A
+9	beat around the bush	anki_count=1	rank=N/A
+10	fiscal year	anki_count=1	rank=N/A
+11	make amends	anki_count=1	rank=N/A
+12	break in	anki_count=1	rank=N/A
+13	not see eye to eye with somebody (on something)	anki_count=1	rank=N/A
+14	Ivy League	anki_count=1	rank=N/A
+15	take to	anki_count=1	rank=N/A
+16	counter-intuitive	anki_count=1	rank=N/A
+17	rest assured (that…)	anki_count=1	rank=N/A
+18	went up in flames	anki_count=1	rank=N/A
+19	take care of somebody/something	anki_count=1	rank=N/A
+20	septic tank	anki_count=1	rank=N/A
+21	slumber party	anki_count=1	rank=N/A
+22	wee hours	anki_count=1	rank=N/A
+23	on the lookout	anki_count=1	rank=N/A
+24	running sore	anki_count=1	rank=N/A
+25	upside down	anki_count=1	rank=N/A
+26	top out	anki_count=1	rank=N/A
+27	be a good thing (that)…	anki_count=1	rank=N/A
+28	top that	anki_count=1	rank=N/A
+29	thaw out	anki_count=1	rank=N/A
+30	dump out	anki_count=1	rank=N/A
+31	smoosh	anki_count=1	rank=N/A
+32	sweeping victory	anki_count=1	rank=N/A
+33	dibs	anki_count=1	rank=N/A
+34	visual aid	anki_count=1	rank=N/A
+35	tip the balance/scales	anki_count=1	rank=N/A
+36	hollow out	anki_count=1	rank=N/A
+37	get/take a grip (on yourself)	anki_count=1	rank=N/A
+38	strip mall	anki_count=1	rank=N/A
+39	lay into	anki_count=1	rank=N/A
+40	mellow out	anki_count=1	rank=N/A
+41	buy off	anki_count=1	rank=N/A
+42	chime in	anki_count=1	rank=N/A
+43	nailed on	anki_count=1	rank=N/A
+44	exsanguination	anki_count=1	rank=N/A
+45	fill in	anki_count=1	rank=N/A
+46	call upon	anki_count=1	rank=N/A
+47	boxer shorts	anki_count=1	rank=N/A
+48	weed out	anki_count=1	rank=N/A
+49	black out	anki_count=1	rank=N/A
+50	stand down	anki_count=1	rank=N/A
+51	give out	anki_count=1	rank=N/A
+52	play out	anki_count=1	rank=N/A
+53	read into	anki_count=1	rank=N/A
+54	rub one out	anki_count=1	rank=N/A
+55	double entendre	anki_count=1	rank=N/A
+56	jumbotron	anki_count=1	rank=N/A
+57	the can	anki_count=1	rank=N/A
+58	bogart	anki_count=1	rank=N/A
+59	repurpose	anki_count=1	rank=N/A
+60	on the line	anki_count=1	rank=N/A
+61	glance over	anki_count=1	rank=N/A
+62	prenup	anki_count=1	rank=N/A
+63	hook up	anki_count=1	rank=N/A
+64	eager beaver	anki_count=1	rank=N/A
+65	have a fit	anki_count=1	rank=N/A
+66	snap out of	anki_count=1	rank=N/A
+67	plantar	anki_count=1	rank=N/A
+68	smack-dab	anki_count=1	rank=N/A
+69	stick out	anki_count=1	rank=N/A
+70	spit up	anki_count=1	rank=N/A
+71	ground rules	anki_count=1	rank=N/A
+72	string bean	anki_count=1	rank=N/A
+73	back down	anki_count=1	rank=N/A
+74	hairspray	anki_count=1	rank=N/A
+75	muppet	anki_count=1	rank=N/A
+76	sort out	anki_count=1	rank=N/A
+77	petri dish	anki_count=1	rank=N/A
+78	hateable	anki_count=1	rank=N/A
+79	chastity belt	anki_count=1	rank=N/A
+80	talk about…	anki_count=1	rank=N/A
+81	descend on	anki_count=1	rank=N/A
+82	catch up	anki_count=1	rank=N/A
+83	up to	anki_count=1	rank=N/A
+84	blend in	anki_count=1	rank=N/A
+85	fall for	anki_count=1	rank=N/A
+86	bright and early	anki_count=1	rank=N/A
+87	fish out	anki_count=1	rank=N/A
+88	tab.	anki_count=1	rank=N/A
+89	bring down	anki_count=1	rank=N/A
+90	amp up	anki_count=1	rank=N/A
+91	plug out	anki_count=1	rank=N/A
+92	spot-on	anki_count=1	rank=N/A
+93	hold back	anki_count=1	rank=N/A
+94	headshrinker	anki_count=1	rank=N/A
+95	defining moment	anki_count=1	rank=N/A
+96	in force	anki_count=1	rank=N/A
+97	shut down	anki_count=1	rank=N/A
+98	arch-rival	anki_count=1	rank=N/A
+99	dig deep	anki_count=1	rank=N/A
+100	bear the brunt	anki_count=1	rank=N/A
+101	lister	anki_count=1	rank=N/A
+102	cough up	anki_count=1	rank=N/A
+103	put a pin in	anki_count=1	rank=N/A
+104	roll out	anki_count=1	rank=N/A
+105	manky	anki_count=1	rank=N/A
+106	red tape	anki_count=1	rank=N/A
+107	come off it	anki_count=1	rank=N/A
+108	black site	anki_count=1	rank=N/A
+109	meat grinder	anki_count=1	rank=N/A
+110	curry favor	anki_count=1	rank=N/A
+111	play along	anki_count=1	rank=N/A
+112	foreign affairs	anki_count=1	rank=N/A
+113	ground troops	anki_count=1	rank=N/A
+114	walking wounded	anki_count=1	rank=N/A
+115	sneak up	anki_count=1	rank=N/A
+116	roll with the punches	anki_count=1	rank=N/A
+117	under the rug	anki_count=1	rank=N/A
+118	grow a pair	anki_count=1	rank=N/A
+119	easy-peasy	anki_count=1	rank=N/A
+120	dekko	anki_count=1	rank=N/A
+121	fudger	anki_count=1	rank=N/A
+122	Atlantic	anki_count=1	rank=N/A
+123	in the clear	anki_count=1	rank=N/A
+124	cat burglar	anki_count=1	rank=N/A
+125	legit	anki_count=1	rank=N/A
+126	cut-price	anki_count=1	rank=N/A
+127	snarf	anki_count=1	rank=N/A
+128	gastronomically	anki_count=1	rank=N/A
+129	tit for tat	anki_count=1	rank=N/A
+130	Chernobyl	anki_count=1	rank=N/A
+131	spill the beans	anki_count=1	rank=N/A
+132	shoot up	anki_count=1	rank=N/A
+133	on a whim	anki_count=1	rank=N/A
+134	descend into	anki_count=1	rank=N/A
+135	revved up	anki_count=1	rank=N/A
+136	libellous	anki_count=1	rank=N/A
+137	the projects	anki_count=1	rank=N/A
+138	leatherneck	anki_count=1	rank=N/A
+139	hot mic	anki_count=1	rank=N/A
+140	de facto	anki_count=1	rank=N/A
+141	stage-manage	anki_count=1	rank=N/A
+142	spitting image	anki_count=1	rank=N/A
+143	drop in	anki_count=1	rank=N/A
+144	booty call	anki_count=1	rank=N/A
+145	fight off	anki_count=1	rank=N/A
+146	horsemen	anki_count=1	rank=N/A
+147	brain-teaser	anki_count=1	rank=N/A
+148	buck up	anki_count=1	rank=N/A
+149	lay to rest	anki_count=1	rank=N/A
+150	be dense	anki_count=1	rank=N/A
+151	confide in	anki_count=1	rank=N/A
+152	be rolling in money/dough/cash/it	anki_count=1	rank=N/A
+153	low profile	anki_count=1	rank=N/A
+154	crash cart	anki_count=1	rank=N/A
+155	hung-up	anki_count=1	rank=N/A
+156	snow cone	anki_count=1	rank=N/A
+157	take somebody for a ride	anki_count=1	rank=N/A
+158	track and field	anki_count=1	rank=N/A
+159	level with	anki_count=1	rank=N/A
+160	a tad	anki_count=1	rank=N/A
+161	Does wonders (for)	anki_count=1	rank=N/A
+162	curl up	anki_count=1	rank=N/A
+163	barkeeper	anki_count=1	rank=N/A
+164	precipitated by	anki_count=1	rank=N/A
+165	pump up	anki_count=1	rank=N/A
+166	in the pack	anki_count=1	rank=N/A
+167	lay off	anki_count=1	rank=N/A
+168	lay up	anki_count=1	rank=N/A
+169	strike down	anki_count=1	rank=N/A
+170	step in	anki_count=1	rank=N/A
+171	on the go	anki_count=1	rank=N/A
+172	live up to	anki_count=1	rank=N/A
+173	back-burner	anki_count=1	rank=N/A
+174	stomp on	anki_count=1	rank=N/A
+175	get your head around	anki_count=1	rank=N/A
+176	rough patch	anki_count=1	rank=N/A
+177	make no bones	anki_count=1	rank=N/A
+178	writhing around	anki_count=1	rank=N/A
+179	auburn hair	anki_count=1	rank=N/A
+180	abide by	anki_count=1	rank=N/A
+181	face value	anki_count=1	rank=N/A
+182	loom large	anki_count=1	rank=N/A
+183	building block	anki_count=1	rank=N/A
+184	rope in	anki_count=1	rank=N/A
+185	date back	anki_count=1	rank=N/A
+186	run it up the flagpole	anki_count=1	rank=N/A
+187	milk something	anki_count=1	rank=N/A
+188	body mass	anki_count=1	rank=N/A
+189	shore up	anki_count=1	rank=N/A
+190	keen on	anki_count=1	rank=N/A
+191	pitch in	anki_count=1	rank=N/A
+192	bone to pick	anki_count=1	rank=N/A
+193	a blast	anki_count=1	rank=N/A
+194	A fair degree of	anki_count=1	rank=N/A
+195	foster home	anki_count=1	rank=N/A
+196	lie awake	anki_count=1	rank=N/A
+197	arteritis	anki_count=1	rank=N/A
+198	hold up	anki_count=1	rank=N/A
+199	chip in	anki_count=1	rank=N/A
+200	enamoured	anki_count=1	rank=N/A
+201	baptism of fire	anki_count=1	rank=N/A
+202	back out	anki_count=1	rank=N/A
+203	oodles of	anki_count=1	rank=N/A
+204	(waiting) in the wings	anki_count=1	rank=N/A
+205	crack open	anki_count=1	rank=N/A
+206	apices	anki_count=1	rank=N/A
+207	fanny pack	anki_count=1	rank=N/A
+208	washed up	anki_count=1	rank=N/A
+209	hang on	anki_count=1	rank=N/A
+210	petty cash	anki_count=1	rank=N/A
+211	revel in	anki_count=1	rank=N/A
+212	fintech	anki_count=1	rank=N/A
+213	act up	anki_count=1	rank=N/A
+214	boiled sweet	anki_count=1	rank=N/A
+215	track record	anki_count=1	rank=N/A
+216	make a point	anki_count=1	rank=N/A
+217	discuss your differences	anki_count=1	rank=N/A
+218	kerfuffle	anki_count=1	rank=N/A
+219	ceasefire	anki_count=1	rank=N/A
+220	push back	anki_count=1	rank=N/A
+221	temporal lobe	anki_count=1	rank=N/A
+222	play ball	anki_count=1	rank=N/A
+223	stay the course	anki_count=1	rank=N/A
+224	trickle down	anki_count=1	rank=N/A
+225	flip the script	anki_count=1	rank=N/A
+226	woke	anki_count=1	rank=N/A
+227	Alpha Centauri	anki_count=1	rank=N/A
+228	bulletin board	anki_count=1	rank=N/A
+229	nip at	anki_count=1	rank=N/A
+230	draw blood	anki_count=1	rank=N/A
+231	food-borne	anki_count=1	rank=N/A
+232	press conference	anki_count=1	rank=N/A
+233	go out on a limb	anki_count=1	rank=N/A
+234	poppyseed	anki_count=1	rank=N/A
+235	anything but	anki_count=1	rank=N/A
+236	a primo	anki_count=1	rank=N/A
+237	reframe	anki_count=1	rank=N/A
+238	the new black	anki_count=1	rank=N/A
+239	put away	anki_count=1	rank=N/A
+240	get off	anki_count=1	rank=N/A
+241	a handful of something	anki_count=1	rank=N/A
+242	land a blow, punch	anki_count=1	rank=N/A
+243	shufti	anki_count=1	rank=N/A
+244	tox screen	anki_count=1	rank=N/A
+245	have a lot on its plate	anki_count=1	rank=N/A
+246	teeniest	anki_count=1	rank=N/A
+247	cop a feel	anki_count=1	rank=N/A
+248	in sync	anki_count=1	rank=N/A
+249	Stool samples	anki_count=1	rank=N/A
+250	point of order	anki_count=1	rank=N/A
+251	file an appeal	anki_count=1	rank=N/A
+252	beyond the pale	anki_count=1	rank=N/A
+253	at hand	anki_count=1	rank=N/A
+254	bumper stickers	anki_count=1	rank=N/A
+255	respiratory arrest	anki_count=1	rank=N/A
+256	doggy paddle	anki_count=1	rank=N/A
+257	strike me as	anki_count=1	rank=N/A
+258	pitch woo	anki_count=1	rank=N/A
+259	substance abuse	anki_count=1	rank=N/A
+260	shout down	anki_count=1	rank=N/A
+261	aspire to	anki_count=1	rank=N/A
+262	cinder block	anki_count=1	rank=N/A
+263	the kicker	anki_count=1	rank=N/A
+264	on the off chance	anki_count=1	rank=N/A
+265	burn/raze something to the ground	anki_count=1	rank=N/A
+266	throw rug	anki_count=1	rank=N/A
+267	soothing your conscience	anki_count=1	rank=N/A
+268	tall tale	anki_count=1	rank=N/A
+269	rattle off	anki_count=1	rank=N/A
+270	get on the lot	anki_count=1	rank=N/A
+271	bunk bed	anki_count=1	rank=N/A
+272	sclera	anki_count=1	rank=N/A
+273	lay down	anki_count=1	rank=N/A
+274	flunkey	anki_count=1	rank=N/A
+275	lay out	anki_count=1	rank=N/A
+276	narrow spec	anki_count=1	rank=N/A
+277	all over the map	anki_count=1	rank=N/A
+278	In the vain hope	anki_count=1	rank=N/A
+279	lined up	anki_count=1	rank=N/A
+280	self-mutilate	anki_count=1	rank=N/A
+281	Mucor	anki_count=1	rank=N/A
+282	writing on the wall	anki_count=1	rank=N/A
+283	foul language	anki_count=1	rank=N/A
+284	bone marrow	anki_count=1	rank=N/A
+285	wear off	anki_count=1	rank=N/A
+286	Is it still too subtle	anki_count=1	rank=N/A
+287	cootie	anki_count=1	rank=N/A
+288	​Straw poll​​	anki_count=1	rank=N/A
+289	lop off	anki_count=1	rank=N/A
+290	pussyfoot	anki_count=1	rank=N/A
+291	fend off	anki_count=1	rank=N/A
+292	lap-dog	anki_count=1	rank=N/A
+293	speak to	anki_count=1	rank=N/A
+294	mood swing	anki_count=1	rank=N/A
+295	wind sprint	anki_count=1	rank=N/A
+296	Rise to power	anki_count=1	rank=N/A
+297	slap on	anki_count=1	rank=N/A
+298	tub of lard	anki_count=1	rank=N/A
+299	at fault	anki_count=1	rank=N/A
+300	vibe with	anki_count=1	rank=N/A
+301	as ... goes	anki_count=1	rank=N/A
+302	gopher work	anki_count=1	rank=N/A
+303	two weeks' notice	anki_count=1	rank=N/A
+304	goosebumps	anki_count=1	rank=N/A
+305	muddle through	anki_count=1	rank=N/A
+306	bust one's ass	anki_count=1	rank=N/A
+307	passes it off as	anki_count=1	rank=N/A
+308	double down	anki_count=1	rank=N/A
+309	quibble over	anki_count=1	rank=N/A
+310	stretched over	anki_count=1	rank=N/A
+311	swear off	anki_count=1	rank=N/A
+312	ring up	anki_count=1	rank=N/A
+313	mitral valve	anki_count=1	rank=N/A
+314	take the heat	anki_count=1	rank=N/A
+315	free pass	anki_count=1	rank=N/A
+316	Odds are	anki_count=1	rank=N/A
+317	hyperdynamic	anki_count=1	rank=N/A
+318	fat cat	anki_count=1	rank=N/A
+319	at stake	anki_count=1	rank=N/A
+320	take a hit off	anki_count=1	rank=N/A
+321	appears to	anki_count=1	rank=N/A
+322	lend itself to	anki_count=1	rank=N/A
+323	up and at'em	anki_count=1	rank=N/A
+324	upward mobility	anki_count=1	rank=N/A
+325	carry away	anki_count=1	rank=N/A
+326	willow bark	anki_count=1	rank=N/A
+327	in awe of	anki_count=1	rank=N/A
+328	opt out	anki_count=1	rank=N/A
+329	Tissue characterization	anki_count=1	rank=N/A
+330	pull some strings	anki_count=1	rank=N/A
+331	bounce his grandkids on his lap	anki_count=1	rank=N/A
+332	pull a stunt	anki_count=1	rank=N/A
+333	nip (something) in the bud	anki_count=1	rank=N/A
+334	kept down	anki_count=1	rank=N/A
+335	buff his numbers	anki_count=1	rank=N/A
+336	shove off	anki_count=1	rank=N/A
+337	play doctor	anki_count=1	rank=N/A
+338	decent chance	anki_count=1	rank=N/A
+339	Take it easy on	anki_count=1	rank=N/A
+340	hyper drive	anki_count=1	rank=N/A
+341	Prize value goes down with every clue.	anki_count=1	rank=N/A
+342	25 grand a pop	anki_count=1	rank=N/A
+343	on account of	anki_count=1	rank=N/A
+344	a long shot	anki_count=1	rank=N/A
+345	up against something/somebody	anki_count=1	rank=N/A
+346	facelift	anki_count=1	rank=N/A
+347	somebody&#x27;s strong suit	anki_count=1	rank=N/A
+348	rat-accomplice	anki_count=1	rank=N/A
+349	tie the knot	anki_count=1	rank=N/A
+350	cuffed and shackled	anki_count=1	rank=N/A
+351	Death Row	anki_count=1	rank=N/A
+352	chain of command	anki_count=1	rank=N/A
+353	be wrecked	anki_count=1	rank=N/A
+354	social climber	anki_count=1	rank=N/A
+355	My offer's withdrawn	anki_count=1	rank=N/A
+356	subject myself (to)	anki_count=1	rank=N/A
+357	pigheadedness	anki_count=1	rank=N/A
+358	turn in	anki_count=1	rank=N/A
+359	be content with	anki_count=1	rank=N/A
+360	that&#x27;s a wrap	anki_count=1	rank=N/A
+361	scrub up	anki_count=1	rank=N/A
+362	pass off	anki_count=1	rank=N/A
+363	turn against	anki_count=1	rank=N/A
+364	athlete's foot	anki_count=1	rank=N/A
+365	Wouldn't stand next to them in a rainstorm	anki_count=1	rank=N/A
+366	fair share	anki_count=1	rank=N/A
+367	drum up	anki_count=1	rank=N/A
+368	hi def	anki_count=1	rank=N/A
+369	bend over backwards	anki_count=1	rank=N/A
+370	make up	anki_count=1	rank=N/A
+371	cuddle up	anki_count=1	rank=N/A
+372	hit the sack	anki_count=1	rank=N/A
+373	sign off	anki_count=1	rank=N/A
+374	in the first place	anki_count=1	rank=N/A
+375	on the ropes	anki_count=1	rank=N/A
+376	Sounds like a cheat to me	anki_count=1	rank=N/A
+377	runny nose	anki_count=1	rank=N/A
+378	bp cuff	anki_count=1	rank=N/A
+379	mumbo jumbo	anki_count=1	rank=N/A
+380	dying on principle	anki_count=1	rank=N/A
+381	threw him	anki_count=1	rank=N/A
+382	in vitro	anki_count=1	rank=N/A
+383	bedside manner	anki_count=1	rank=N/A
+384	roller coaster	anki_count=1	rank=N/A
+385	fill a prescription	anki_count=1	rank=N/A
+386	have a moment	anki_count=1	rank=N/A
+387	smoke out	anki_count=1	rank=N/A
+388	setlist	anki_count=1	rank=N/A
+389	shove it	anki_count=1	rank=N/A
+390	wean off	anki_count=1	rank=N/A
+391	dollar sign	anki_count=1	rank=N/A
+392	cling to	anki_count=1	rank=N/A
+393	Cheese it	anki_count=1	rank=N/A
+394	splash out	anki_count=1	rank=N/A
+395	The big hand points to the minutes	anki_count=1	rank=N/A
+396	worked up	anki_count=1	rank=N/A
+397	hair of the dog	anki_count=1	rank=N/A
+398	weaker pitches	anki_count=1	rank=N/A
+399	will be the charm	anki_count=1	rank=N/A
+400	on thin ice	anki_count=1	rank=N/A
+401	bleeding disorder	anki_count=1	rank=N/A
+402	eat away at	anki_count=1	rank=N/A
+403	walk all over	anki_count=1	rank=N/A
+404	crank up	anki_count=1	rank=N/A
+405	get a roll on it	anki_count=1	rank=N/A
+406	Smell what someone is cooking	anki_count=1	rank=N/A
+407	bumps and bruises	anki_count=1	rank=N/A
+408	exercise wil	anki_count=1	rank=N/A
+409	opting out	anki_count=1	rank=N/A
+410	turn around	anki_count=1	rank=N/A
+411	sissy bar	anki_count=1	rank=N/A
+412	shed a tear	anki_count=1	rank=N/A
+413	on the same page	anki_count=1	rank=N/A
+414	vaso-spasm	anki_count=1	rank=N/A
+415	broke off	anki_count=1	rank=N/A
+416	Frisbee catches	anki_count=1	rank=N/A
+417	lines of	anki_count=1	rank=N/A
+418	kvell	anki_count=1	rank=N/A
+419	short of	anki_count=1	rank=N/A
+420	large intestine	anki_count=1	rank=N/A
+421	cut someone some slack	anki_count=1	rank=N/A
+422	laced with	anki_count=1	rank=N/A
+423	So i jumped him	anki_count=1	rank=N/A
+424	bounce ideas off	anki_count=1	rank=N/A
+425	hyperdrive	anki_count=1	rank=N/A
+426	overachiever	anki_count=1	rank=N/A
+427	piling upon	anki_count=1	rank=N/A
+428	real estate	anki_count=1	rank=N/A
+429	ream out	anki_count=1	rank=N/A
+430	come up for	anki_count=1	rank=N/A
+431	fellate	anki_count=1	rank=53635
+432	blabbermouth	anki_count=1	rank=53029
+433	twat	anki_count=1	rank=51405
+434	frag	anki_count=1	rank=49752
+435	capybara	anki_count=1	rank=49440
+436	armoured	anki_count=1	rank=49020
+437	footsie	anki_count=1	rank=48427
+438	balderdash	anki_count=1	rank=48238
+439	smarty-pants	anki_count=1	rank=48058
+440	nookie	anki_count=1	rank=47339
+441	caterwaul	anki_count=1	rank=46968
+442	strumming	anki_count=1	rank=46592
+443	drug-addled	anki_count=1	rank=45755
+444	juiced	anki_count=1	rank=45485
+445	plastique	anki_count=1	rank=45243
+446	psyched	anki_count=1	rank=45021
+447	unappetizing	anki_count=1	rank=44758
+448	myocytes	anki_count=1	rank=44616
+449	attaboy	anki_count=1	rank=44479
+450	gunrunner	anki_count=1	rank=44465
+451	reassume	anki_count=1	rank=43931
+452	chuffed	anki_count=1	rank=43763
+453	riddled	anki_count=1	rank=43751
+454	dreamboat	anki_count=1	rank=42355
+455	savour	anki_count=1	rank=42273
+456	whop	anki_count=1	rank=41426
+457	uninformative	anki_count=1	rank=40809
+458	flatulent	anki_count=1	rank=40630
+459	clotting	anki_count=1	rank=39898
+460	underfed	anki_count=1	rank=39868
+461	temporize	anki_count=1	rank=39605
+462	wuss	anki_count=1	rank=39258
+463	harbour	anki_count=1	rank=39095
+464	nestled	anki_count=1	rank=38951
+465	unhinged	anki_count=1	rank=38524
+466	nuttiness	anki_count=1	rank=38331
+467	menses	anki_count=1	rank=38286
+468	unprompted	anki_count=1	rank=37991
+469	ingrate	anki_count=1	rank=37959
+470	bait-and-switch	anki_count=1	rank=37585
+471	segmental	anki_count=1	rank=37528
+472	glitterati	anki_count=1	rank=37464
+473	tripwire	anki_count=1	rank=36941
+474	bollocks	anki_count=1	rank=36605
+475	mewling	anki_count=1	rank=36205
+476	indisposed	anki_count=1	rank=35847
+477	mafioso	anki_count=1	rank=35396
+478	shitload	anki_count=1	rank=35110
+479	liven	anki_count=1	rank=35018
+480	high-maintenance	anki_count=1	rank=34989
+481	top-shelf	anki_count=1	rank=34929
+482	sensationalist	anki_count=1	rank=34903
+483	dispositive	anki_count=1	rank=34851
+484	hypoxic	anki_count=1	rank=34457
+485	rashly	anki_count=1	rank=34388
+486	aluminium	anki_count=1	rank=34310
+487	emasculate	anki_count=1	rank=34297
+488	protectiveness	anki_count=1	rank=33918
+489	warpath	anki_count=1	rank=33873
+490	dodgy	anki_count=1	rank=33480
+491	plastered	anki_count=1	rank=33155
+492	thusly	anki_count=1	rank=33070
+493	dispensable	anki_count=1	rank=33028
+494	narc	anki_count=1	rank=32981
+495	disinclination	anki_count=1	rank=32956
+496	gristle	anki_count=1	rank=32756
+497	warfarin	anki_count=1	rank=32711
+498	guppy	anki_count=1	rank=32672
+499	ad-lib	anki_count=1	rank=32600
+500	resolved	anki_count=1	rank=32359
+501	tattle	anki_count=1	rank=32293
+502	saltine	anki_count=1	rank=32117
+503	pre-ordained	anki_count=1	rank=32091
+504	backhanded	anki_count=1	rank=31933
+505	two-bit	anki_count=1	rank=31923
+506	choreographed	anki_count=1	rank=31903
+507	cuckold	anki_count=2	rank=31788
+508	doppelganger	anki_count=1	rank=31737
+509	co-sign	anki_count=1	rank=31723
+510	helical	anki_count=1	rank=31465
+511	snobbish	anki_count=1	rank=31256
+512	intubate	anki_count=1	rank=31106
+513	barista	anki_count=1	rank=31007
+514	glutton	anki_count=1	rank=30374
+515	coitus	anki_count=1	rank=30312
+516	febrile	anki_count=1	rank=30211
+517	disheartening	anki_count=1	rank=30200
+518	infiltrator	anki_count=1	rank=30176
+519	egress	anki_count=1	rank=30040
+520	bulimic	anki_count=1	rank=29780
+521	laudatory	anki_count=1	rank=29647
+522	jammed	anki_count=1	rank=29629
+523	life-altering	anki_count=1	rank=29469
+524	frumpy	anki_count=1	rank=29439
+525	catnip	anki_count=1	rank=29289
+526	bafflement	anki_count=1	rank=29286
+527	unbuckle	anki_count=1	rank=29247
+528	besmirch	anki_count=1	rank=29138
+529	glaringly	anki_count=1	rank=29118
+530	calloused	anki_count=2	rank=29110
+531	booger	anki_count=1	rank=29103
+532	prude	anki_count=1	rank=29008
+533	hemorrhaging	anki_count=1	rank=28814
+534	outrank	anki_count=1	rank=28779
+535	kowtow	anki_count=1	rank=28693
+536	axiomatic	anki_count=1	rank=28349
+537	broad-spectrum	anki_count=1	rank=28333
+538	zinger	anki_count=1	rank=28037
+539	sloppiness	anki_count=1	rank=27932
+540	claret	anki_count=1	rank=27808
+541	pedantic	anki_count=1	rank=27799
+542	catchphrase	anki_count=1	rank=27755
+543	miasma	anki_count=1	rank=27655
+544	barf	anki_count=1	rank=27435
+545	ravishing	anki_count=1	rank=27343
+546	anticlimactic	anki_count=1	rank=27263
+547	spunk	anki_count=1	rank=27050
+548	hallucinogen	anki_count=1	rank=26981
+549	slacker	anki_count=1	rank=26903
+550	remitting	anki_count=1	rank=26892
+551	self-righteousness	anki_count=1	rank=26884
+552	shiv	anki_count=1	rank=26819
+553	decapitation	anki_count=1	rank=26791
+554	pumice	anki_count=1	rank=26698
+555	buxom	anki_count=1	rank=26565
+556	cesspool	anki_count=1	rank=26537
+557	work-up	anki_count=1	rank=26519
+558	whiny	anki_count=1	rank=26437
+559	staph	anki_count=1	rank=26113
+560	scalper	anki_count=1	rank=26007
+561	euthanize	anki_count=1	rank=25952
+562	heads-up	anki_count=1	rank=25944
+563	scrotum	anki_count=1	rank=25862
+564	humdrum	anki_count=1	rank=25847
+565	runt	anki_count=1	rank=25711
+566	biopics	anki_count=1	rank=25675
+567	bigwig	anki_count=1	rank=25650
+568	jaw-dropping	anki_count=1	rank=25634
+569	answerable	anki_count=1	rank=25472
+570	hand-wringing	anki_count=1	rank=25393
+571	truant	anki_count=1	rank=25332
+572	flan	anki_count=1	rank=25330
+573	blighted	anki_count=1	rank=25325
+574	centenarian	anki_count=1	rank=25306
+575	archeology	anki_count=1	rank=25171
+576	watered-down	anki_count=1	rank=25112
+577	gnarly	anki_count=1	rank=25086
+578	clumsiness	anki_count=1	rank=25032
+579	enema	anki_count=1	rank=25010
+580	intimidated	anki_count=1	rank=24986
+581	insipid	anki_count=1	rank=24970
+582	hooked	anki_count=1	rank=24960
+583	grovel	anki_count=1	rank=24859
+584	demotion	anki_count=1	rank=24822
+585	dandruff	anki_count=1	rank=24819
+586	garden-variety	anki_count=1	rank=24774
+587	oedipal	anki_count=1	rank=24726
+588	nimbly	anki_count=1	rank=24713
+589	undying	anki_count=1	rank=24564
+590	sanctimonious	anki_count=1	rank=24542
+591	rewire	anki_count=1	rank=24485
+592	cryogenic	anki_count=1	rank=24462
+593	rubbing	anki_count=1	rank=24370
+594	inquiring	anki_count=1	rank=24338
+595	putrid	anki_count=1	rank=24328
+596	knickers	anki_count=1	rank=24322
+597	mournfully	anki_count=1	rank=24292
+598	endoscopy	anki_count=1	rank=24258
+599	leprechaun	anki_count=1	rank=24241
+600	defame	anki_count=1	rank=24234
+601	ventilate	anki_count=1	rank=24103
+602	pitted	anki_count=1	rank=24070
+603	raving	anki_count=1	rank=24061
+604	canonize	anki_count=1	rank=24047
+605	tilapia	anki_count=1	rank=24016
+606	hospitalized	anki_count=1	rank=23969
+607	gonorrhea	anki_count=1	rank=23962
+608	semiotics	anki_count=1	rank=23949
+609	riddance	anki_count=1	rank=23947
+610	amalgamation	anki_count=1	rank=23940
+611	vocally	anki_count=1	rank=23926
+612	droll	anki_count=1	rank=23900
+613	depreciate	anki_count=1	rank=23886
+614	monogram	anki_count=1	rank=23792
+615	perp	anki_count=1	rank=23687
+616	cookie-cutter	anki_count=1	rank=23674
+617	cross-examine	anki_count=1	rank=23645
+618	imbibe	anki_count=1	rank=23600
+619	maniacal	anki_count=1	rank=23547
+620	clincher	anki_count=1	rank=23500
+621	inhibited	anki_count=1	rank=23493
+622	camo	anki_count=1	rank=23310
+623	squeamish	anki_count=1	rank=23191
+624	elope	anki_count=1	rank=23067
+625	identically	anki_count=1	rank=23020
+626	titillate	anki_count=1	rank=22955
+627	alms	anki_count=1	rank=22918
+628	tampon	anki_count=1	rank=22856
+629	walrus	anki_count=1	rank=22847
+630	turd	anki_count=1	rank=22818
+631	bloke	anki_count=1	rank=22788
+632	cobbled	anki_count=1	rank=22759
+633	demographically	anki_count=1	rank=22710
+634	embalm	anki_count=1	rank=22672
+635	boathouse	anki_count=1	rank=22663
+636	guava	anki_count=1	rank=22611
+637	rhinoceros	anki_count=1	rank=22598
+638	rectum	anki_count=1	rank=22513
+639	shifty	anki_count=1	rank=22456
+640	porpoise	anki_count=1	rank=22452
+641	vehemence	anki_count=1	rank=22404
+642	effusive	anki_count=1	rank=22366
+643	guardrail	anki_count=1	rank=22359
+644	vertebral	anki_count=1	rank=22280
+645	uptick	anki_count=1	rank=22257
+646	birthmark	anki_count=1	rank=22195
+647	chivalry	anki_count=1	rank=22135
+648	ulterior	anki_count=1	rank=22131
+649	malfeasance	anki_count=1	rank=22128
+650	annul	anki_count=1	rank=22107
+651	fun-loving	anki_count=1	rank=22104
+652	sociopath	anki_count=2	rank=22100
+653	deceitful	anki_count=1	rank=22088
+654	argumentative	anki_count=1	rank=22042
+655	intergalactic	anki_count=1	rank=22032
+656	cloying	anki_count=1	rank=22031
+657	orifice	anki_count=1	rank=22020
+658	bodega	anki_count=1	rank=22003
+659	etymology	anki_count=1	rank=21931
+660	squishy	anki_count=1	rank=21893
+661	malformation	anki_count=1	rank=21874
+662	lemming	anki_count=1	rank=21645
+663	merchandising	anki_count=1	rank=21579
+664	iffy	anki_count=1	rank=21578
+665	actualize	anki_count=1	rank=21536
+666	venerate	anki_count=1	rank=21452
+667	suited	anki_count=1	rank=21431
+668	lunacy	anki_count=1	rank=21353
+669	passable	anki_count=1	rank=21341
+670	irrefutable	anki_count=1	rank=21209
+671	knockoff	anki_count=1	rank=21177
+672	glob	anki_count=1	rank=21155
+673	withered	anki_count=1	rank=21112
+674	fatalism	anki_count=1	rank=21103
+675	tipsy	anki_count=1	rank=21030
+676	takeaway	anki_count=1	rank=20968
+677	savant	anki_count=1	rank=20939
+678	lackey	anki_count=1	rank=20920
+679	frankfurter	anki_count=1	rank=20902
+680	snitch	anki_count=1	rank=20899
+681	luge	anki_count=1	rank=20872
+682	foolhardy	anki_count=1	rank=20825
+683	cuddly	anki_count=1	rank=20764
+684	discoloration	anki_count=1	rank=20750
+685	excrement	anki_count=1	rank=20687
+686	nonchalant	anki_count=1	rank=20654
+687	detonator	anki_count=1	rank=20626
+688	mild-mannered	anki_count=1	rank=20581
+689	lethargic	anki_count=1	rank=20559
+690	bullhorn	anki_count=1	rank=20459
+691	ibuprofen	anki_count=1	rank=20453
+692	patchy	anki_count=1	rank=20361
+693	popsicle	anki_count=1	rank=20346
+694	teaser	anki_count=1	rank=20253
+695	slurry	anki_count=1	rank=20244
+696	scalloped	anki_count=1	rank=20214
+697	facilitation	anki_count=1	rank=20189
+698	banality	anki_count=1	rank=20181
+699	tawdry	anki_count=1	rank=19983
+700	indestructible	anki_count=1	rank=19972
+701	absorber	anki_count=1	rank=19947
+702	enabler	anki_count=1	rank=19941
+703	platitude	anki_count=1	rank=19938
+704	stoned	anki_count=1	rank=19929
+705	orangutan	anki_count=1	rank=19904
+706	nebulous	anki_count=1	rank=19899
+707	decapitate	anki_count=1	rank=19859
+708	ironclad	anki_count=1	rank=19830
+709	heist	anki_count=1	rank=19789
+710	diabolical	anki_count=1	rank=19752
+711	penniless	anki_count=1	rank=19705
+712	unambiguously	anki_count=1	rank=19639
+713	small-time	anki_count=1	rank=19624
+714	flout	anki_count=1	rank=19539
+715	grinch	anki_count=1	rank=19465
+716	condescension	anki_count=1	rank=19460
+717	incinerate	anki_count=1	rank=19431
+718	incapacitate	anki_count=1	rank=19428
+719	realign	anki_count=1	rank=19426
+720	oblong	anki_count=1	rank=19412
+721	glorified	anki_count=1	rank=19399
+722	unjustified	anki_count=1	rank=19370
+723	functionary	anki_count=1	rank=19329
+724	grooming	anki_count=1	rank=19322
+725	molar	anki_count=1	rank=19312
+726	mugger	anki_count=1	rank=19283
+727	cornea	anki_count=1	rank=19273
+728	millennial	anki_count=1	rank=19261
+729	recant	anki_count=1	rank=19245
+730	aloe	anki_count=1	rank=19236
+731	bugger	anki_count=1	rank=19196
+732	nachos	anki_count=1	rank=19179
+733	lusty	anki_count=1	rank=19162
+734	lollipop	anki_count=1	rank=19154
+735	ashen	anki_count=1	rank=19126
+736	hippo	anki_count=1	rank=19115
+737	trampoline	anki_count=1	rank=19051
+738	impale	anki_count=1	rank=19011
+739	catharsis	anki_count=1	rank=18997
+740	docile	anki_count=1	rank=18928
+741	conspiratorial	anki_count=1	rank=18890
+742	preen	anki_count=1	rank=18857
+743	post-mortem	anki_count=1	rank=18731
+744	culpability	anki_count=1	rank=18727
+745	craven	anki_count=1	rank=18725
+746	cortisol	anki_count=1	rank=18709
+747	confetti	anki_count=1	rank=18683
+748	menial	anki_count=1	rank=18666
+749	cremate	anki_count=1	rank=18636
+750	gory	anki_count=1	rank=18595
+751	maul	anki_count=1	rank=18571
+752	disgraceful	anki_count=1	rank=18537
+753	infirmary	anki_count=1	rank=18528
+754	prophesy	anki_count=1	rank=18511
+755	poncho	anki_count=1	rank=18498
+756	imitator	anki_count=1	rank=18494
+757	vindictive	anki_count=1	rank=18489
+758	mnemonic	anki_count=1	rank=18482
+759	kingpin	anki_count=1	rank=18463
+760	persimmon	anki_count=1	rank=18442
+761	macabre	anki_count=1	rank=18438
+762	bailiff	anki_count=1	rank=18433
+763	convoluted	anki_count=1	rank=18423
+764	salvo	anki_count=1	rank=18370
+765	impersonate	anki_count=1	rank=18310
+766	heathen	anki_count=1	rank=18302
+767	antibacterial	anki_count=1	rank=18227
+768	degenerative	anki_count=1	rank=18226
+769	spleen	anki_count=1	rank=18165
+770	minor-league	anki_count=1	rank=18073
+771	rad	anki_count=1	rank=18062
+772	run-in	anki_count=1	rank=17982
+773	billiards	anki_count=1	rank=17976
+774	dilate	anki_count=1	rank=17956
+775	opiates	anki_count=1	rank=17920
+776	travesty	anki_count=1	rank=17877
+777	irreplaceable	anki_count=1	rank=17852
+778	jetty	anki_count=1	rank=17851
+779	entropy	anki_count=1	rank=17849
+780	defamation	anki_count=1	rank=17823
+781	departed	anki_count=1	rank=17813
+782	squelch	anki_count=1	rank=17767
+783	mind-boggling	anki_count=1	rank=17686
+784	antagonize	anki_count=1	rank=17570
+785	girth	anki_count=1	rank=17523
+786	stethoscope	anki_count=1	rank=17483
+787	unscrew	anki_count=1	rank=17465
+788	sought-after	anki_count=1	rank=17444
+789	pimple	anki_count=1	rank=17350
+790	anvil	anki_count=1	rank=17322
+791	abscess	anki_count=1	rank=17297
+792	tertiary	anki_count=1	rank=17260
+793	oppressor	anki_count=1	rank=17257
+794	esteemed	anki_count=1	rank=17251
+795	mucus	anki_count=1	rank=17242
+796	slop	anki_count=1	rank=17239
+797	infest	anki_count=1	rank=17233
+798	demean	anki_count=1	rank=17218
+799	anemic	anki_count=1	rank=17103
+800	melodramatic	anki_count=1	rank=17099
+801	shoplifting	anki_count=1	rank=17083
+802	epilepsy	anki_count=1	rank=17066
+803	vole	anki_count=1	rank=17046
+804	cusp	anki_count=1	rank=16985
+805	narcissism	anki_count=1	rank=16961
+806	pompous	anki_count=1	rank=16946
+807	convulsion	anki_count=1	rank=16930
+808	dismayed	anki_count=1	rank=16887
+809	absolve	anki_count=1	rank=16886
+810	cauldron	anki_count=1	rank=16884
+811	subdivide	anki_count=1	rank=16864
+812	stork	anki_count=1	rank=16846
+813	promiscuous	anki_count=1	rank=16806
+814	slush	anki_count=1	rank=16794
+815	inhalation	anki_count=1	rank=16788
+816	disaffected	anki_count=1	rank=16782
+817	catchy	anki_count=1	rank=16756
+818	amputate	anki_count=1	rank=16747
+819	celibate	anki_count=1	rank=16745
+820	sedative	anki_count=1	rank=16691
+821	busted	anki_count=1	rank=16672
+822	coy	anki_count=1	rank=16669
+823	oncology	anki_count=1	rank=16657
+824	rumpled	anki_count=1	rank=16649
+825	satirical	anki_count=1	rank=16629
+826	respiration	anki_count=1	rank=16571
+827	hillbilly	anki_count=1	rank=16553
+828	cobbler	anki_count=1	rank=16550
+829	eulogy	anki_count=1	rank=16540
+830	molester	anki_count=1	rank=16530
+831	self-imposed	anki_count=1	rank=16524
+832	outlast	anki_count=1	rank=16496
+833	cuss	anki_count=1	rank=16488
+834	duplex	anki_count=1	rank=16470
+835	rev	anki_count=1	rank=16467
+836	pickled	anki_count=1	rank=16452
+837	ruse	anki_count=1	rank=16449
+838	platelet	anki_count=1	rank=16437
+839	indentation	anki_count=1	rank=16375
+840	nick	anki_count=2	rank=16373
+841	affiliated	anki_count=1	rank=16331
+842	jinx	anki_count=1	rank=16297
+843	seclusion	anki_count=1	rank=16234
+844	swindle	anki_count=1	rank=16208
+845	iteration	anki_count=1	rank=16207
+846	uncharted	anki_count=1	rank=16200
+847	skit	anki_count=1	rank=16180
+848	bouncers	anki_count=1	rank=16162
+849	mutate	anki_count=1	rank=16127
+850	scrawny	anki_count=1	rank=16119
+851	unattended	anki_count=1	rank=16109
+852	patronize	anki_count=1	rank=16085
+853	vindication	anki_count=1	rank=16081
+854	capillaries	anki_count=1	rank=16079
+855	congenial	anki_count=1	rank=16055
+856	militiaman	anki_count=1	rank=16042
+857	goad	anki_count=1	rank=16000
+858	re-enact	anki_count=1	rank=15996
+859	quill	anki_count=1	rank=15981
+860	haggle	anki_count=1	rank=15977
+861	incongruous	anki_count=1	rank=15961
+862	llamas	anki_count=1	rank=15920
+863	jaded	anki_count=1	rank=15846
+864	sordid	anki_count=1	rank=15840
+865	sully	anki_count=1	rank=15822
+866	belittle	anki_count=2	rank=15808
+867	audacity	anki_count=1	rank=15799
+868	archery	anki_count=1	rank=15786
+869	no-brainer	anki_count=1	rank=15756
+870	nuanced	anki_count=1	rank=15722
+871	subtext	anki_count=1	rank=15717
+872	tinted	anki_count=1	rank=15694
+873	consternation	anki_count=1	rank=15684
+874	abundantly	anki_count=1	rank=15674
+875	doomed	anki_count=1	rank=15663
+876	snorkel	anki_count=1	rank=15660
+877	earshot	anki_count=1	rank=15639
+878	grating	anki_count=1	rank=15631
+879	hermit	anki_count=1	rank=15608
+880	hiccups	anki_count=1	rank=15598
+881	unsolicited	anki_count=1	rank=15594
+882	diagonally	anki_count=1	rank=15565
+883	constrict	anki_count=1	rank=15530
+884	epitome	anki_count=1	rank=15511
+885	goblet	anki_count=1	rank=15508
+886	annihilation	anki_count=1	rank=15499
+887	whistle-blower	anki_count=1	rank=15462
+888	harmonica	anki_count=1	rank=15458
+889	bondage	anki_count=1	rank=15456
+890	rapture	anki_count=1	rank=15447
+891	endearing	anki_count=1	rank=15445
+892	kink	anki_count=1	rank=15400
+893	quagmire	anki_count=1	rank=15388
+894	morbid	anki_count=1	rank=15339
+895	alight	anki_count=1	rank=15334
+896	resounding	anki_count=1	rank=15331
+897	berate	anki_count=1	rank=15316
+898	bile	anki_count=1	rank=15314
+899	infringement	anki_count=1	rank=15285
+900	dandelion	anki_count=1	rank=15270
+901	quandary	anki_count=1	rank=15264
+902	penitentiary	anki_count=1	rank=15249
+903	sabbatical	anki_count=1	rank=15241
+904	lopsided	anki_count=1	rank=15234
+905	papaya	anki_count=1	rank=15220
+906	depose	anki_count=1	rank=15205
+907	amenable	anki_count=1	rank=15089
+908	cracking	anki_count=1	rank=15075
+909	placard	anki_count=1	rank=15074
+910	condescending	anki_count=1	rank=15052
+911	tantamount	anki_count=1	rank=15042
+912	annihilate	anki_count=1	rank=15007
+913	buoyant	anki_count=1	rank=15000
+914	goof	anki_count=1	rank=14970
+915	graciously	anki_count=1	rank=14960
+916	pander	anki_count=1	rank=14932
+917	fussy	anki_count=1	rank=14897
+918	lukewarm	anki_count=1	rank=14865
+919	shattering	anki_count=1	rank=14856
+920	amp	anki_count=1	rank=14825
+921	chafe	anki_count=1	rank=14810
+922	queasy	anki_count=1	rank=14808
+923	invincible	anki_count=1	rank=14790
+924	rekindle	anki_count=1	rank=14770
+925	restitution	anki_count=1	rank=14761
+926	refurbish	anki_count=1	rank=14760
+927	scab	anki_count=1	rank=14750
+928	affront	anki_count=1	rank=14709
+929	linguistics	anki_count=1	rank=14685
+930	lucid	anki_count=1	rank=14684
+931	gripping	anki_count=1	rank=14670
+932	depreciation	anki_count=1	rank=14618
+933	stipend	anki_count=1	rank=14617
+934	warped	anki_count=1	rank=14602
+935	nab	anki_count=1	rank=14596
+936	jumpsuit	anki_count=1	rank=14580
+937	remission	anki_count=1	rank=14559
+938	intricacy	anki_count=1	rank=14555
+939	fictitious	anki_count=1	rank=14548
+940	stuffy	anki_count=1	rank=14486
+941	catheter	anki_count=1	rank=14463
+942	dismissive	anki_count=1	rank=14456
+943	ferret	anki_count=1	rank=14428
+944	custodian	anki_count=1	rank=14405
+945	congested	anki_count=1	rank=14399
+946	spoonful	anki_count=1	rank=14300
+947	complacent	anki_count=1	rank=14298
+948	corollary	anki_count=1	rank=14293
+949	neurotic	anki_count=1	rank=14239
+950	autistic	anki_count=1	rank=14198
+951	wobbly	anki_count=1	rank=14164
+952	cleats	anki_count=1	rank=14142
+953	maniac	anki_count=1	rank=14128
+954	emblazon	anki_count=1	rank=14110
+955	severance	anki_count=1	rank=14021
+956	tarmac	anki_count=1	rank=14020
+957	saline	anki_count=1	rank=14003
+958	featured	anki_count=1	rank=13994
+959	impunity	anki_count=1	rank=13984
+960	interject	anki_count=1	rank=13973
+961	scalpel	anki_count=1	rank=13966
+962	deride	anki_count=1	rank=13965
+963	scourge	anki_count=1	rank=13955
+964	blowout	anki_count=1	rank=13876
+965	disobedience	anki_count=1	rank=13832
+966	charred	anki_count=1	rank=13805
+967	pap	anki_count=1	rank=13800
+968	biting	anki_count=1	rank=13777
+969	chug	anki_count=1	rank=13773
+970	extrapolate	anki_count=1	rank=13763
+971	inconclusive	anki_count=1	rank=13724
+972	scattering	anki_count=1	rank=13701
+973	planetarium	anki_count=1	rank=13696
+974	willful	anki_count=1	rank=13676
+975	decimate	anki_count=1	rank=13660
+976	trope	anki_count=1	rank=13659
+977	overtone	anki_count=1	rank=13614
+978	mainline	anki_count=1	rank=13586
+979	mishap	anki_count=1	rank=13580
+980	vortex	anki_count=1	rank=13515
+981	perspiration	anki_count=1	rank=13511
+982	nuke	anki_count=1	rank=13494
+983	retract	anki_count=1	rank=13479
+984	hereditary	anki_count=1	rank=13475
+985	doorknob	anki_count=1	rank=13457
+986	loin	anki_count=1	rank=13449
+987	heresy	anki_count=2	rank=13442
+988	stymie	anki_count=1	rank=13411
+989	dimple	anki_count=1	rank=13396
+990	cockroach	anki_count=1	rank=13374
+991	panhandle	anki_count=1	rank=13344
+992	namesake	anki_count=1	rank=13326
+993	tarnish	anki_count=1	rank=13303
+994	upholstery	anki_count=1	rank=13301
+995	vertigo	anki_count=1	rank=13272
+996	wallow	anki_count=1	rank=13260
+997	crony	anki_count=1	rank=13254
+998	tacit	anki_count=1	rank=13226
+999	caseload	anki_count=1	rank=13208
+1000	extrinsic	anki_count=1	rank=13188
+1001	predates	anki_count=1	rank=13160
+1002	vested	anki_count=1	rank=13098
+1003	chauffeur	anki_count=1	rank=13083
+1004	preposterous	anki_count=1	rank=13039
+1005	madly	anki_count=1	rank=13038
+1006	spank	anki_count=1	rank=13019
+1007	scorch	anki_count=1	rank=13014
+1008	cholera	anki_count=1	rank=13007
+1009	pout	anki_count=1	rank=13002
+1010	sedentary	anki_count=1	rank=12995
+1011	trivia	anki_count=1	rank=12987
+1012	condolence	anki_count=1	rank=12986
+1013	brat	anki_count=1	rank=12947
+1014	septic	anki_count=1	rank=12945
+1015	thorny	anki_count=1	rank=12942
+1016	vindicate	anki_count=1	rank=12937
+1017	groundbreaking	anki_count=1	rank=12934
+1018	dreaded	anki_count=1	rank=12929
+1019	airbag	anki_count=1	rank=12876
+1020	hemorrhage	anki_count=1	rank=12874
+1021	abate	anki_count=1	rank=12872
+1022	curt	anki_count=1	rank=12866
+1023	chasm	anki_count=1	rank=12856
+1024	pragmatism	anki_count=1	rank=12853
+1025	excruciating	anki_count=1	rank=12829
+1026	drool	anki_count=1	rank=12819
+1027	complimentary	anki_count=1	rank=12807
+1028	candor	anki_count=1	rank=12778
+1029	impulsive	anki_count=1	rank=12749
+1030	percentile	anki_count=1	rank=12741
+1031	rampage	anki_count=1	rank=12706
+1032	swab	anki_count=1	rank=12695
+1033	outsource	anki_count=1	rank=12694
+1034	geriatric	anki_count=1	rank=12690
+1035	uproar	anki_count=1	rank=12685
+1036	smuggling	anki_count=1	rank=12666
+1037	expatriate	anki_count=1	rank=12628
+1038	hornet	anki_count=1	rank=12618
+1039	shipyard	anki_count=1	rank=12593
+1040	precedence	anki_count=1	rank=12531
+1041	brawl	anki_count=1	rank=12505
+1042	payout	anki_count=1	rank=12467
+1043	mascara	anki_count=1	rank=12451
+1044	predispose	anki_count=1	rank=12447
+1045	fondly	anki_count=1	rank=12428
+1046	miscarriage	anki_count=1	rank=12393
+1047	entirety	anki_count=1	rank=12377
+1048	bigotry	anki_count=1	rank=12369
+1049	sobering	anki_count=1	rank=12357
+1050	marinate	anki_count=1	rank=12354
+1051	momentous	anki_count=1	rank=12353
+1052	defuse	anki_count=1	rank=12349
+1053	full-blown	anki_count=1	rank=12344
+1054	weasel	anki_count=2	rank=12323
+1055	squabble	anki_count=1	rank=12313
+1056	acorn	anki_count=1	rank=12273
+1057	conclusive	anki_count=1	rank=12264
+1058	impromptu	anki_count=1	rank=12259
+1059	impasse	anki_count=1	rank=12258
+1060	covet	anki_count=1	rank=12245
+1061	alibi	anki_count=1	rank=12217
+1062	gimmick	anki_count=2	rank=12213
+1063	composure	anki_count=1	rank=12211
+1064	drop-off	anki_count=1	rank=12206
+1065	reek	anki_count=1	rank=12200
+1066	aberration	anki_count=1	rank=12194
+1067	cobra	anki_count=1	rank=12192
+1068	suffocate	anki_count=1	rank=12189
+1069	puberty	anki_count=1	rank=12184
+1070	vultures	anki_count=1	rank=12183
+1071	immaculate	anki_count=1	rank=12165
+1072	reindeer	anki_count=1	rank=12161
+1073	suitor	anki_count=1	rank=12153
+1074	whopping	anki_count=1	rank=12146
+1075	classy	anki_count=1	rank=12138
+1076	glitch	anki_count=1	rank=12110
+1077	tenderloin	anki_count=1	rank=12103
+1078	evict	anki_count=1	rank=12102
+1079	mull	anki_count=1	rank=12089
+1080	trawl	anki_count=1	rank=12048
+1081	Dumpster	anki_count=1	rank=12030
+1082	hurtle	anki_count=1	rank=12000
+1083	heartfelt	anki_count=1	rank=11980
+1084	hallucination	anki_count=1	rank=11961
+1085	disgruntled	anki_count=1	rank=11940
+1086	cello	anki_count=1	rank=11928
+1087	clippers	anki_count=1	rank=11926
+1088	quintessential	anki_count=1	rank=11923
+1089	cunning	anki_count=1	rank=11917
+1090	gnaw	anki_count=1	rank=11915
+1091	oblivion	anki_count=1	rank=11903
+1092	tantrum	anki_count=2	rank=11880
+1093	stagnant	anki_count=1	rank=11878
+1094	bombardment	anki_count=1	rank=11868
+1095	manslaughter	anki_count=1	rank=11866
+1096	trilogy	anki_count=1	rank=11862
+1097	relapse	anki_count=1	rank=11841
+1098	naughty	anki_count=1	rank=11835
+1099	detergent	anki_count=1	rank=11827
+1100	bender	anki_count=1	rank=11826
+1101	detached	anki_count=1	rank=11820
+1102	affectionate	anki_count=1	rank=11819
+1103	fudge	anki_count=1	rank=11814
+1104	intermittent	anki_count=1	rank=11775
+1105	bosom	anki_count=1	rank=11772
+1106	heyday	anki_count=1	rank=11754
+1107	rant	anki_count=1	rank=11738
+1108	cede	anki_count=1	rank=11726
+1109	prerogative	anki_count=1	rank=11715
+1110	chimpanzee	anki_count=1	rank=11708
+1111	arson	anki_count=1	rank=11707
+1112	aptitude	anki_count=1	rank=11704
+1113	metaphorical	anki_count=1	rank=11703
+1114	caper	anki_count=1	rank=11678
+1115	retaliate	anki_count=2	rank=11657
+1116	uterus	anki_count=1	rank=11651
+1117	dissect	anki_count=1	rank=11643
+1118	almighty	anki_count=1	rank=11629
+1119	centrist	anki_count=1	rank=11612
+1120	morgue	anki_count=2	rank=11590
+1121	lunatic	anki_count=1	rank=11588
+1122	perpetrate	anki_count=1	rank=11571
+1123	crotch	anki_count=2	rank=11549
+1124	tamper	anki_count=2	rank=11539
+1125	paraphrase	anki_count=1	rank=11478
+1126	munch	anki_count=1	rank=11468
+1127	exude	anki_count=1	rank=11451
+1128	realtor	anki_count=1	rank=11443
+1129	wither	anki_count=1	rank=11436
+1130	peddle	anki_count=2	rank=11432
+1131	flail	anki_count=2	rank=11429
+1132	upside	anki_count=1	rank=11403
+1133	prosthetic	anki_count=1	rank=11388
+1134	reconnaissance	anki_count=1	rank=11381
+1135	fraught	anki_count=1	rank=11380
+1136	insensitive	anki_count=1	rank=11374
+1137	pertain	anki_count=1	rank=11371
+1138	malignant	anki_count=1	rank=11355
+1139	illiterate	anki_count=1	rank=11348
+1140	aforementioned	anki_count=1	rank=11329
+1141	scoot	anki_count=1	rank=11317
+1142	squander	anki_count=1	rank=11312
+1143	nip	anki_count=1	rank=11304
+1144	Arsenic	anki_count=1	rank=11301
+1145	staunch	anki_count=1	rank=11295
+1146	bask	anki_count=1	rank=11265
+1147	biceps	anki_count=1	rank=11254
+1148	utmost	anki_count=1	rank=11242
+1149	deteriorating	anki_count=1	rank=11234
+1150	ashtray	anki_count=1	rank=11233
+1151	forensics	anki_count=1	rank=11220
+1152	warship	anki_count=1	rank=11203
+1153	stub	anki_count=1	rank=11192
+1154	arcade	anki_count=1	rank=11152
+1155	posterior	anki_count=1	rank=11145
+1156	prodigy	anki_count=1	rank=11144
+1157	contagious	anki_count=1	rank=11142
+1158	roadblock	anki_count=1	rank=11122
+1159	vulgar	anki_count=1	rank=11092
+1160	debilitating	anki_count=1	rank=11062
+1161	supremacy	anki_count=1	rank=11039
+1162	postulate	anki_count=1	rank=11030
+1163	smudge	anki_count=1	rank=11024
+1164	subvert	anki_count=1	rank=11015
+1165	gruesome	anki_count=1	rank=11008
+1166	dynamite	anki_count=1	rank=11006
+1167	timid	anki_count=1	rank=10965
+1168	retort	anki_count=1	rank=10962
+1169	gall	anki_count=1	rank=10961
+1170	dredge	anki_count=1	rank=10954
+1171	etiquette	anki_count=1	rank=10948
+1172	pulmonary	anki_count=1	rank=10940
+1173	jacked	anki_count=1	rank=10926
+1174	saliva	anki_count=1	rank=10920
+1175	raging	anki_count=1	rank=10908
+1176	janitor	anki_count=1	rank=10887
+1177	onslaught	anki_count=1	rank=10885
+1178	rundown	anki_count=1	rank=10877
+1179	glittering	anki_count=1	rank=10872
+1180	morph	anki_count=1	rank=10865
+1181	detour	anki_count=1	rank=10855
+1182	bidder	anki_count=1	rank=10850
+1183	grinding	anki_count=1	rank=10824
+1184	itinerary	anki_count=1	rank=10805
+1185	conformity	anki_count=1	rank=10799
+1186	whiff	anki_count=1	rank=10789
+1187	repressive	anki_count=1	rank=10777
+1188	destabilize	anki_count=1	rank=10769
+1189	defective	anki_count=1	rank=10767
+1190	unpack	anki_count=1	rank=10764
+1191	truce	anki_count=1	rank=10759
+1192	separatist	anki_count=1	rank=10747
+1193	torpedo	anki_count=1	rank=10740
+1194	preface	anki_count=1	rank=10716
+1195	burglar	anki_count=1	rank=10705
+1196	hopper	anki_count=1	rank=10702
+1197	labyrinth	anki_count=1	rank=10687
+1198	discreet	anki_count=1	rank=10682
+1199	privatize	anki_count=1	rank=10674
+1200	frigid	anki_count=2	rank=10650
+1201	solace	anki_count=1	rank=10642
+1202	collage	anki_count=1	rank=10638
+1203	solvent	anki_count=1	rank=10627
+1204	spearhead	anki_count=1	rank=10624
+1205	stipulate	anki_count=2	rank=10611
+1206	ethos	anki_count=1	rank=10605
+1207	distorted	anki_count=1	rank=10571
+1208	elective	anki_count=1	rank=10541
+1209	pimp	anki_count=1	rank=10531
+1210	dwindle	anki_count=1	rank=10513
+1211	baggy	anki_count=1	rank=10505
+1212	junkie	anki_count=1	rank=10496
+1213	titanium	anki_count=1	rank=10494
+1214	hideous	anki_count=1	rank=10443
+1215	reinstate	anki_count=1	rank=10432
+1216	revere	anki_count=1	rank=10412
+1217	soprano	anki_count=1	rank=10402
+1218	concussion	anki_count=1	rank=10400
+1219	tedious	anki_count=1	rank=10354
+1220	homogeneous	anki_count=1	rank=10341
+1221	spook	anki_count=1	rank=10340
+1222	erratic	anki_count=1	rank=10328
+1223	obliterate	anki_count=2	rank=10310
+1224	renounce	anki_count=1	rank=10307
+1225	arid	anki_count=1	rank=10303
+1226	doorstep	anki_count=1	rank=10293
+1227	ecstatic	anki_count=1	rank=10291
+1228	infidelity	anki_count=1	rank=10290
+1229	memorabilia	anki_count=1	rank=10265
+1230	vial	anki_count=1	rank=10256
+1231	dignified	anki_count=1	rank=10252
+1232	nostalgic	anki_count=1	rank=10240
+1233	skyscrapers	anki_count=1	rank=10226
+1234	rendition	anki_count=1	rank=10225
+1235	disintegrate	anki_count=1	rank=10219
+1236	graft	anki_count=1	rank=10217
+1237	informative	anki_count=1	rank=10209
+1238	smother	anki_count=1	rank=10207
+1239	detrimental	anki_count=1	rank=10201
+1240	admirable	anki_count=1	rank=10198
+1241	neutralize	anki_count=1	rank=10190
+1242	gutter	anki_count=1	rank=10186
+1243	fleeting	anki_count=1	rank=10171
+1244	satire	anki_count=1	rank=10168
+1245	fragmentation	anki_count=1	rank=10165
+1246	leukemia	anki_count=1	rank=10146
+1247	mediocre	anki_count=1	rank=10112
+1248	pedestal	anki_count=1	rank=10109
+1249	sealed	anki_count=1	rank=10102
+1250	wring	anki_count=1	rank=10097
+1251	bipolar	anki_count=1	rank=10047
+1252	booze	anki_count=1	rank=10036
+1253	rift	anki_count=1	rank=10034
+1254	lifespan	anki_count=1	rank=10025
+1255	upbringing	anki_count=1	rank=10021
+1256	wellness	anki_count=1	rank=10011
+1257	rink	anki_count=1	rank=10007
+1258	cubicle	anki_count=1	rank=9986
+1259	predatory	anki_count=1	rank=9977
+1260	perverse	anki_count=1	rank=9960
+1261	sputter	anki_count=1	rank=9959
+1262	diarrhea	anki_count=1	rank=9953
+1263	collateral	anki_count=1	rank=9946
+1264	notoriously	anki_count=1	rank=9925
+1265	reciprocal	anki_count=1	rank=9885
+1266	caterpillar	anki_count=1	rank=9876
+1267	consolation	anki_count=1	rank=9868
+1268	infiltrate	anki_count=1	rank=9850
+1269	delineate	anki_count=1	rank=9844
+1270	awkwardly	anki_count=1	rank=9833
+1271	coroner	anki_count=1	rank=9813
+1272	profanity	anki_count=1	rank=9811
+1273	mitt	anki_count=1	rank=9809
+1274	mitts	anki_count=1	rank=9809
+1275	delusion	anki_count=1	rank=9785
+1276	clot	anki_count=1	rank=9760
+1277	prick	anki_count=1	rank=9753
+1278	hygiene	anki_count=1	rank=9727
+1279	disproportionate	anki_count=1	rank=9716
+1280	ramification	anki_count=1	rank=9705
+1281	bland	anki_count=1	rank=9699
+1282	biopsy	anki_count=1	rank=9691
+1283	recurrence	anki_count=1	rank=9680
+1284	pharmacist	anki_count=1	rank=9666
+1285	cosmopolitan	anki_count=1	rank=9633
+1286	edible	anki_count=1	rank=9632
+1287	viral	anki_count=1	rank=9626
+1288	glimmer	anki_count=1	rank=9622
+1289	abstinence	anki_count=1	rank=9621
+1290	transient	anki_count=1	rank=9575
+1291	downplay	anki_count=1	rank=9572
+1292	swipe	anki_count=1	rank=9558
+1293	ballistic	anki_count=1	rank=9554
+1294	adrenaline	anki_count=1	rank=9551
+1295	conspire	anki_count=1	rank=9527
+1296	devoid	anki_count=1	rank=9518
+1297	delinquent	anki_count=1	rank=9514
+1298	testosterone	anki_count=1	rank=9512
+1299	syringe	anki_count=1	rank=9510
+1300	cornerstone	anki_count=1	rank=9507
+1301	dunk	anki_count=1	rank=9496
+1302	translucent	anki_count=1	rank=9489
+1303	bidding	anki_count=1	rank=9460
+1304	coronary	anki_count=1	rank=9457
+1305	showdown	anki_count=1	rank=9452
+1306	insanity	anki_count=1	rank=9449
+1307	molest	anki_count=1	rank=9429
+1308	deflect	anki_count=1	rank=9416
+1309	defiant	anki_count=1	rank=9408
+1310	stale	anki_count=1	rank=9404
+1311	errand	anki_count=1	rank=9388
+1312	rebate	anki_count=1	rank=9368
+1313	incompetent	anki_count=1	rank=9367
+1314	rupture	anki_count=1	rank=9360
+1315	marrow	anki_count=1	rank=9351
+1316	ulcer	anki_count=1	rank=9342
+1317	disseminate	anki_count=1	rank=9334
+1318	plentiful	anki_count=1	rank=9333
+1319	mow	anki_count=1	rank=9330
+1320	evade	anki_count=1	rank=9328
+1321	rodent	anki_count=2	rank=9324
+1322	blister	anki_count=1	rank=9297
+1323	indicative	anki_count=1	rank=9281
+1324	wreath	anki_count=1	rank=9274
+1325	staggering	anki_count=1	rank=9271
+1326	outburst	anki_count=1	rank=9267
+1327	eclectic	anki_count=1	rank=9242
+1328	platinum	anki_count=1	rank=9234
+1329	vibrate	anki_count=1	rank=9232
+1330	loophole	anki_count=1	rank=9221
+1331	amplify	anki_count=1	rank=9181
+1332	vocation	anki_count=1	rank=9180
+1333	casket	anki_count=1	rank=9177
+1334	pundit	anki_count=1	rank=9161
+1335	sterile	anki_count=1	rank=9155
+1336	swat	anki_count=1	rank=9151
+1337	squirm	anki_count=1	rank=9149
+1338	predicament	anki_count=1	rank=9147
+1339	oust	anki_count=1	rank=9145
+1340	jug	anki_count=1	rank=9133
+1341	conspicuous	anki_count=1	rank=9120
+1342	proactive	anki_count=1	rank=9106
+1343	finale	anki_count=1	rank=9098
+1344	crease	anki_count=1	rank=9092
+1345	elude	anki_count=1	rank=9082
+1346	candid	anki_count=1	rank=9072
+1347	intimidating	anki_count=1	rank=9066
+1348	serum	anki_count=1	rank=9049
+1349	ashore	anki_count=1	rank=9048
+1350	monarchy	anki_count=2	rank=9044
+1351	shady	anki_count=1	rank=9042
+1352	anthem	anki_count=1	rank=9032
+1353	prophecy	anki_count=1	rank=9030
+1354	sap	anki_count=1	rank=9009
+1355	tangled	anki_count=1	rank=8989
+1356	canary	anki_count=1	rank=8984
+1357	impaired	anki_count=1	rank=8966
+1358	strut	anki_count=2	rank=8956
+1359	upbeat	anki_count=1	rank=8952
+1360	suffice	anki_count=1	rank=8950
+1361	twig	anki_count=1	rank=8939
+1362	splinter	anki_count=1	rank=8924
+1363	inadvertently	anki_count=1	rank=8911
+1364	undercut	anki_count=1	rank=8909
+1365	unilateral	anki_count=1	rank=8902
+1366	shun	anki_count=1	rank=8881
+1367	pageant	anki_count=1	rank=8879
+1368	outnumber	anki_count=1	rank=8872
+1369	eradicate	anki_count=1	rank=8867
+1370	umpire	anki_count=2	rank=8832
+1371	bowel	anki_count=1	rank=8826
+1372	hastily	anki_count=1	rank=8822
+1373	trafficking	anki_count=1	rank=8817
+1374	brisk	anki_count=1	rank=8813
+1375	overt	anki_count=1	rank=8802
+1376	waiver	anki_count=1	rank=8800
+1377	feud	anki_count=1	rank=8798
+1378	cramped	anki_count=1	rank=8785
+1379	sabotage	anki_count=1	rank=8781
+1380	terrestrial	anki_count=1	rank=8774
+1381	sever	anki_count=1	rank=8751
+1382	gorilla	anki_count=1	rank=8744
+1383	climax	anki_count=1	rank=8740
+1384	misconception	anki_count=1	rank=8730
+1385	cliche	anki_count=1	rank=8727
+1386	refinery	anki_count=1	rank=8693
+1387	orchestrate	anki_count=1	rank=8677
+1388	energize	anki_count=1	rank=8671
+1389	bounty	anki_count=2	rank=8653
+1390	irritation	anki_count=1	rank=8650
+1391	clearance	anki_count=1	rank=8648
+1392	proxy	anki_count=1	rank=8645
+1393	Admittedly	anki_count=1	rank=8603
+1394	anecdote	anki_count=1	rank=8583
+1395	plumbing	anki_count=1	rank=8566
+1396	ecstasy	anki_count=1	rank=8565
+1397	unanimous	anki_count=1	rank=8564
+1398	assassinate	anki_count=1	rank=8554
+1399	quiver	anki_count=1	rank=8550
+1400	symposium	anki_count=1	rank=8535
+1401	mundane	anki_count=1	rank=8534
+1402	plume	anki_count=1	rank=8525
+1403	placebo	anki_count=1	rank=8505
+1404	fallout	anki_count=1	rank=8501
+1405	assortment	anki_count=1	rank=8498
+1406	flinch	anki_count=1	rank=8495
+1407	cross-country	anki_count=1	rank=8493
+1408	unravel	anki_count=1	rank=8469
+1409	perpetual	anki_count=1	rank=8462
+1410	horrific	anki_count=1	rank=8456
+1411	sesame	anki_count=1	rank=8451
+1412	rampant	anki_count=1	rank=8438
+1413	invasive	anki_count=1	rank=8430
+1414	Asbestos	anki_count=1	rank=8384
+1415	persecution	anki_count=1	rank=8368
+1416	paranoid	anki_count=1	rank=8361
+1417	ailment	anki_count=1	rank=8347
+1418	skeptic	anki_count=1	rank=8339
+1419	Caucasian	anki_count=1	rank=8335
+1420	brutality	anki_count=1	rank=8321
+1421	vengeance	anki_count=1	rank=8314
+1422	misconduct	anki_count=1	rank=8305
+1423	troll	anki_count=1	rank=8289
+1424	cartel	anki_count=1	rank=8288
+1425	mitigate	anki_count=1	rank=8287
+1426	influx	anki_count=1	rank=8284
+1427	gracious	anki_count=1	rank=8281
+1428	confidentiality	anki_count=1	rank=8254
+1429	bun	anki_count=1	rank=8242
+1430	puddle	anki_count=1	rank=8228
+1431	caption	anki_count=1	rank=8214
+1432	soothing	anki_count=1	rank=8212
+1433	amenities	anki_count=1	rank=8210
+1434	disarm	anki_count=1	rank=8205
+1435	duo	anki_count=1	rank=8200
+1436	nanny	anki_count=1	rank=8192
+1437	chime	anki_count=1	rank=8186
+1438	customary	anki_count=1	rank=8176
+1439	peck	anki_count=1	rank=8152
+1440	raspberry	anki_count=1	rank=8143
+1441	reckless	anki_count=1	rank=8140
+1442	bog	anki_count=1	rank=8134
+1443	ominous	anki_count=1	rank=8124
+1444	moth	anki_count=1	rank=8083
+1445	impending	anki_count=1	rank=8048
+1446	phony	anki_count=1	rank=8023
+1447	aquarium	anki_count=1	rank=8019
+1448	classified	anki_count=1	rank=8012
+1449	oblivious	anki_count=2	rank=7985
+1450	mingle	anki_count=1	rank=7981
+1451	flora	anki_count=1	rank=7980
+1452	jeopardy	anki_count=1	rank=7974
+1453	bourgeois	anki_count=1	rank=7967
+1454	convertible	anki_count=2	rank=7931
+1455	stifle	anki_count=1	rank=7921
+1456	woo	anki_count=1	rank=7915
+1457	slit	anki_count=1	rank=7907
+1458	hoist	anki_count=1	rank=7904
+1459	pilgrimage	anki_count=1	rank=7900
+1460	sculptor	anki_count=1	rank=7899
+1461	stash	anki_count=2	rank=7877
+1462	crooked	anki_count=1	rank=7866
+1463	pristine	anki_count=1	rank=7849
+1464	strait	anki_count=1	rank=7842
+1465	clench	anki_count=1	rank=7834
+1466	ridicule	anki_count=1	rank=7822
+1467	knuckle	anki_count=1	rank=7818
+1468	eccentric	anki_count=1	rank=7811
+1469	packed	anki_count=1	rank=7770
+1470	diver	anki_count=1	rank=7765
+1471	exquisite	anki_count=1	rank=7756
+1472	thug	anki_count=1	rank=7755
+1473	indifference	anki_count=1	rank=7731
+1474	turnaround	anki_count=1	rank=7710
+1475	stature	anki_count=1	rank=7696
+1476	podium	anki_count=1	rank=7684
+1477	equate	anki_count=1	rank=7673
+1478	adorn	anki_count=1	rank=7648
+1479	scam	anki_count=1	rank=7639
+1480	gag	anki_count=1	rank=7635
+1481	coping	anki_count=1	rank=7627
+1482	ape	anki_count=1	rank=7623
+1483	autograph	anki_count=1	rank=7602
+1484	stunt	anki_count=1	rank=7576
+1485	gleaming	anki_count=1	rank=7562
+1486	cadet	anki_count=1	rank=7561
+1487	lapse	anki_count=1	rank=7560
+1488	ordeal	anki_count=1	rank=7536
+1489	convene	anki_count=1	rank=7532
+1490	snag	anki_count=1	rank=7523
+1491	hustle	anki_count=3	rank=7513
+1492	rogue	anki_count=1	rank=7508
+1493	turnout	anki_count=1	rank=7500
+1494	deceased	anki_count=1	rank=7439
+1495	patriotic	anki_count=1	rank=7431
+1496	resemblance	anki_count=1	rank=7407
+1497	deteriorate	anki_count=1	rank=7383
+1498	cardiac	anki_count=1	rank=7381
+1499	refined	anki_count=1	rank=7372
+1500	fumes	anki_count=1	rank=7362
+1501	sic	anki_count=1	rank=7358
+1502	celery	anki_count=1	rank=7339
+1503	ceramic	anki_count=1	rank=7330
+1504	lesion	anki_count=1	rank=7321
+1505	startling	anki_count=1	rank=7313
+1506	agony	anki_count=1	rank=7278
+1507	topple	anki_count=1	rank=7274
+1508	inherently	anki_count=1	rank=7268
+1509	pharmacy	anki_count=1	rank=7262
+1510	tortilla	anki_count=1	rank=7220
+1511	pinpoint	anki_count=1	rank=7215
+1512	hoop	anki_count=1	rank=7208
+1513	discretion	anki_count=1	rank=7176
+1514	broccoli	anki_count=1	rank=7173
+1515	feasible	anki_count=1	rank=7168
+1516	stoop	anki_count=1	rank=7159
+1517	ignite	anki_count=1	rank=7155
+1518	fidelity	anki_count=1	rank=7146
+1519	bartender	anki_count=1	rank=7142
+1520	crate	anki_count=1	rank=7139
+1521	estrogen	anki_count=1	rank=7131
+1522	cracker	anki_count=1	rank=7126
+1523	comrade	anki_count=1	rank=7117
+1524	seminary	anki_count=1	rank=7114
+1525	savvy	anki_count=1	rank=7107
+1526	binoculars	anki_count=1	rank=7104
+1527	cavity	anki_count=1	rank=7084
+1528	bleak	anki_count=1	rank=7079
+1529	salvage	anki_count=1	rank=7065
+1530	unleash	anki_count=1	rank=7054
+1531	sewer	anki_count=1	rank=7050
+1532	readiness	anki_count=1	rank=7041
+1533	allegiance	anki_count=1	rank=7032
+1534	pragmatic	anki_count=1	rank=7015
+1535	friction	anki_count=2	rank=6994
+1536	lingering	anki_count=1	rank=6949
+1537	urine	anki_count=1	rank=6941
+1538	validate	anki_count=1	rank=6935
+1539	judiciary	anki_count=1	rank=6931
+1540	tangible	anki_count=1	rank=6919
+1541	autonomous	anki_count=1	rank=6908
+1542	overhaul	anki_count=1	rank=6900
+1543	lurk	anki_count=1	rank=6884
+1544	carnival	anki_count=1	rank=6874
+1545	genocide	anki_count=1	rank=6873
+1546	feat	anki_count=1	rank=6872
+1547	torso	anki_count=1	rank=6867
+1548	underway	anki_count=2	rank=6866
+1549	cram	anki_count=1	rank=6862
+1550	throne	anki_count=1	rank=6858
+1551	periodically	anki_count=1	rank=6849
+1552	dire	anki_count=1	rank=6831
+1553	apt	anki_count=1	rank=6825
+1554	bum	anki_count=1	rank=6819
+1555	rhetorical	anki_count=1	rank=6813
+1556	relentless	anki_count=1	rank=6807
+1557	refrain	anki_count=1	rank=6803
+1558	confidential	anki_count=1	rank=6800
+1559	renovation	anki_count=1	rank=6798
+1560	empathy	anki_count=1	rank=6779
+1561	shack	anki_count=1	rank=6778
+1562	intercept	anki_count=1	rank=6768
+1563	benign	anki_count=1	rank=6754
+1564	withstand	anki_count=1	rank=6744
+1565	premature	anki_count=1	rank=6716
+1566	susceptible	anki_count=1	rank=6694
+1567	apparatus	anki_count=1	rank=6679
+1568	compatible	anki_count=1	rank=6666
+1569	surpass	anki_count=1	rank=6664
+1570	substantive	anki_count=1	rank=6663
+1571	erode	anki_count=1	rank=6659
+1572	contradicting	anki_count=1	rank=6634
+1573	cylinder	anki_count=1	rank=6628
+1574	coherent	anki_count=1	rank=6627
+1575	mourn	anki_count=1	rank=6626
+1576	staircase	anki_count=1	rank=6625
+1577	arsenal	anki_count=2	rank=6624
+1578	exemption	anki_count=1	rank=6623
+1579	wrestling	anki_count=1	rank=6622
+1580	leftover	anki_count=1	rank=6612
+1581	informant	anki_count=1	rank=6597
+1582	crumb	anki_count=1	rank=6586
+1583	cozy	anki_count=1	rank=6582
+1584	ammunition	anki_count=1	rank=6581
+1585	mumble	anki_count=1	rank=6573
+1586	whirl	anki_count=1	rank=6568
+1587	hunch	anki_count=1	rank=6567
+1588	pottery	anki_count=1	rank=6562
+1589	fungus	anki_count=1	rank=6541
+1590	indulge	anki_count=2	rank=6535
+1591	battered	anki_count=1	rank=6531
+1592	windshield	anki_count=1	rank=6517
+1593	commute	anki_count=1	rank=6512
+1594	operative	anki_count=1	rank=6510
+1595	intrinsic	anki_count=1	rank=6503
+1596	exploitation	anki_count=1	rank=6499
+1597	attic	anki_count=1	rank=6489
+1598	pierce	anki_count=1	rank=6476
+1599	distort	anki_count=1	rank=6468
+1600	crest	anki_count=1	rank=6464
+1601	reformer	anki_count=1	rank=6462
+1602	pervasive	anki_count=1	rank=6461
+1603	snort	anki_count=1	rank=6459
+1604	captive	anki_count=1	rank=6436
+1605	lightweight	anki_count=1	rank=6430
+1606	propel	anki_count=1	rank=6424
+1607	trump	anki_count=1	rank=6422
+1608	prestige	anki_count=2	rank=6421
+1609	inhale	anki_count=1	rank=6411
+1610	withhold	anki_count=1	rank=6410
+1611	trajectory	anki_count=1	rank=6402
+1612	definitive	anki_count=1	rank=6378
+1613	evacuate	anki_count=1	rank=6376
+1614	grease	anki_count=1	rank=6364
+1615	authoritarian	anki_count=1	rank=6355
+1616	discrepancy	anki_count=1	rank=6352
+1617	coincide	anki_count=1	rank=6329
+1618	volatile	anki_count=1	rank=6326
+1619	resent	anki_count=1	rank=6316
+1620	smear	anki_count=1	rank=6311
+1621	pluck	anki_count=2	rank=6303
+1622	catastrophe	anki_count=1	rank=6292
+1623	blunt	anki_count=2	rank=6288
+1624	steroids	anki_count=1	rank=6283
+1625	rigorous	anki_count=1	rank=6282
+1626	referendum	anki_count=1	rank=6275
+1627	elicit	anki_count=1	rank=6274
+1628	turmoil	anki_count=1	rank=6262
+1629	weary	anki_count=1	rank=6261
+1630	tabloid	anki_count=1	rank=6259
+1631	parole	anki_count=1	rank=6244
+1632	embryo	anki_count=1	rank=6241
+1633	pillar	anki_count=1	rank=6232
+1634	vet	anki_count=1	rank=6229
+1635	reconcile	anki_count=1	rank=6225
+1636	outright	anki_count=1	rank=6208
+1637	bunker	anki_count=1	rank=6204
+1638	detention	anki_count=1	rank=6150
+1639	petty	anki_count=1	rank=6148
+1640	lag	anki_count=1	rank=6132
+1641	vicious	anki_count=1	rank=6130
+1642	paw	anki_count=1	rank=6118
+1643	hemisphere	anki_count=1	rank=6114
+1644	recite	anki_count=1	rank=6112
+1645	keen	anki_count=1	rank=6107
+1646	petroleum	anki_count=1	rank=6095
+1647	pilgrim	anki_count=2	rank=6071
+1648	rebellion	anki_count=1	rank=6059
+1649	stark	anki_count=2	rank=6052
+1650	tornado	anki_count=1	rank=6048
+1651	underestimate	anki_count=1	rank=6046
+1652	constituency	anki_count=1	rank=6027
+1653	skeleton	anki_count=1	rank=6009
+1654	premiere	anki_count=1	rank=6008
+1655	verge	anki_count=1	rank=5994
+1656	tow	anki_count=1	rank=5990
+1657	lethal	anki_count=1	rank=5982
+1658	shred	anki_count=1	rank=5981
+1659	questionable	anki_count=1	rank=5979
+1660	prone	anki_count=1	rank=5968
+1661	anticipation	anki_count=1	rank=5952
+1662	overturn	anki_count=1	rank=5951
+1663	exterior	anki_count=1	rank=5933
+1664	intrigue	anki_count=1	rank=5930
+1665	aviation	anki_count=1	rank=5908
+1666	usher	anki_count=1	rank=5900
+1667	shovel	anki_count=1	rank=5899
+1668	glorious	anki_count=1	rank=5898
+1669	volcano	anki_count=1	rank=5846
+1670	prophet	anki_count=1	rank=5843
+1671	pier	anki_count=1	rank=5840
+1672	leverage	anki_count=2	rank=5836
+1673	reef	anki_count=1	rank=5815
+1674	sideline	anki_count=2	rank=5803
+1675	vest	anki_count=1	rank=5791
+1676	walnut	anki_count=1	rank=5778
+1677	grunt	anki_count=1	rank=5769
+1678	retention	anki_count=1	rank=5768
+1679	denounce	anki_count=1	rank=5766
+1680	console	anki_count=1	rank=5762
+1681	disturbance	anki_count=1	rank=5756
+1682	appliance	anki_count=1	rank=5754
+1683	solidarity	anki_count=1	rank=5745
+1684	chore	anki_count=2	rank=5726
+1685	jewels	anki_count=1	rank=5707
+1686	intensify	anki_count=1	rank=5705
+1687	entail	anki_count=1	rank=5696
+1688	groom	anki_count=1	rank=5695
+1689	asteroid	anki_count=1	rank=5690
+1690	cushion	anki_count=1	rank=5658
+1691	spectacle	anki_count=2	rank=5636
+1692	smack	anki_count=2	rank=5629
+1693	squint	anki_count=1	rank=5627
+1694	transparent	anki_count=1	rank=5621
+1695	ignorance	anki_count=1	rank=5616
+1696	mattress	anki_count=1	rank=5615
+1697	niche	anki_count=1	rank=5586
+1698	sprint	anki_count=1	rank=5578
+1699	relay	anki_count=1	rank=5574
+1700	presume	anki_count=1	rank=5573
+1701	analogy	anki_count=1	rank=5569
+1702	thesis	anki_count=1	rank=5560
+1703	dividend	anki_count=1	rank=5538
+1704	sweeping	anki_count=1	rank=5536
+1705	immense	anki_count=1	rank=5511
+1706	dub	anki_count=1	rank=5501
+1707	ramp	anki_count=1	rank=5490
+1708	distinguished	anki_count=1	rank=5485
+1709	delegation	anki_count=1	rank=5476
+1710	dairy	anki_count=1	rank=5472
+1711	levy	anki_count=1	rank=5469
+1712	defy	anki_count=1	rank=5463
+1713	ditch	anki_count=1	rank=5442
+1714	faction	anki_count=1	rank=5423
+1715	accountable	anki_count=1	rank=5406
+1716	calf	anki_count=1	rank=5403
+1717	preacher	anki_count=1	rank=5400
+1718	socioeconomic	anki_count=1	rank=5388
+1719	magnificent	anki_count=1	rank=5379
+1720	puff	anki_count=1	rank=5367
+1721	intimacy	anki_count=1	rank=5358
+1722	savage	anki_count=1	rank=5354
+1723	bail	anki_count=1	rank=5347
+1724	sore	anki_count=1	rank=5333
+1725	moss	anki_count=1	rank=5308
+1726	legitimacy	anki_count=1	rank=5280
+1727	claw	anki_count=1	rank=5267
+1728	groan	anki_count=1	rank=5266
+1729	shatter	anki_count=1	rank=5260
+1730	penetrate	anki_count=1	rank=5259
+1731	slate	anki_count=1	rank=5245
+1732	settler	anki_count=1	rank=5240
+1733	sophomore	anki_count=1	rank=5233
+1734	restraint	anki_count=1	rank=5224
+1735	dart	anki_count=1	rank=5203
+1736	crunch	anki_count=1	rank=5200
+1737	corpse	anki_count=1	rank=5187
+1738	aspiration	anki_count=1	rank=5182
+1739	rig	anki_count=2	rank=5166
+1740	prescribe	anki_count=1	rank=5146
+1741	rehearsal	anki_count=1	rank=5127
+1742	lump	anki_count=1	rank=5123
+1743	grim	anki_count=1	rank=5122
+1744	chant	anki_count=2	rank=5115
+1745	sniff	anki_count=1	rank=5098
+1746	yank	anki_count=1	rank=5093
+1747	tick	anki_count=1	rank=5083
+1748	mob	anki_count=1	rank=5080
+1749	nurture	anki_count=1	rank=5063
+1750	flap	anki_count=1	rank=5061
+1751	choir	anki_count=1	rank=5059
+1752	remains	anki_count=1	rank=5055
+1753	venue	anki_count=1	rank=5031
+1754	remarkably	anki_count=1	rank=5026
+1755	offend	anki_count=1	rank=5025
+1756	hostility	anki_count=1	rank=5014
+1757	designate	anki_count=2	rank=5007
+1758	gauge	anki_count=1	rank=5000
+1759	vintage	anki_count=1	rank=4989
+1760	pharmaceutical	anki_count=1	rank=4977
+1761	hail	anki_count=1	rank=4969
+1762	lobbyist	anki_count=1	rank=4957
+1763	temper	anki_count=1	rank=4948
+1764	tease	anki_count=1	rank=4937
+1765	litigation	anki_count=1	rank=4936
+1766	clause	anki_count=1	rank=4927
+1767	inclusion	anki_count=1	rank=4926
+1768	homicide	anki_count=2	rank=4916
+1769	adjacent	anki_count=1	rank=4907
+1770	intervene	anki_count=1	rank=4906
+1771	mat	anki_count=1	rank=4900
+1772	petition	anki_count=1	rank=4889
+1773	pinch	anki_count=1	rank=4872
+1774	shiver	anki_count=1	rank=4870
+1775	entertain	anki_count=1	rank=4860
+1776	compassion	anki_count=1	rank=4850
+1777	frog	anki_count=1	rank=4849
+1778	strive	anki_count=1	rank=4839
+1779	rug	anki_count=1	rank=4836
+1780	viable	anki_count=1	rank=4833
+1781	disclosure	anki_count=1	rank=4830
+1782	antibiotics	anki_count=1	rank=4822
+1783	concession	anki_count=1	rank=4816
+1784	medieval	anki_count=2	rank=4805
+1785	inadequate	anki_count=1	rank=4788
+1786	chuckle	anki_count=1	rank=4774
+1787	vague	anki_count=1	rank=4769
+1788	mound	anki_count=1	rank=4759
+1789	authentic	anki_count=1	rank=4741
+1790	monk	anki_count=1	rank=4727
+1791	provoke	anki_count=1	rank=4710
+1792	depart	anki_count=1	rank=4703
+1793	drip	anki_count=1	rank=4689
+1794	bronze	anki_count=1	rank=4678
+1795	disturbing	anki_count=1	rank=4669
+1796	grind	anki_count=1	rank=4665
+1797	slim	anki_count=1	rank=4658
+1798	loom	anki_count=1	rank=4632
+1799	sergeant	anki_count=1	rank=4629
+1800	pupil	anki_count=1	rank=4628
+1801	crude	anki_count=1	rank=4627
+1802	marble	anki_count=1	rank=4589
+1803	exile	anki_count=1	rank=4576
+1804	projection	anki_count=1	rank=4575
+1805	soar	anki_count=1	rank=4574
+1806	plaintiff	anki_count=1	rank=4573
+1807	tenure	anki_count=2	rank=4569
+1808	neat	anki_count=1	rank=4548
+1809	militant	anki_count=1	rank=4544
+1810	stern	anki_count=1	rank=4543
+1811	surveillance	anki_count=1	rank=4542
+1812	fraction	anki_count=1	rank=4541
+1813	explicit	anki_count=1	rank=4535
+1814	conscience	anki_count=1	rank=4527
+1815	landmark	anki_count=1	rank=4523
+1816	murmur	anki_count=1	rank=4515
+1817	transit	anki_count=1	rank=4514
+1818	intact	anki_count=1	rank=4483
+1819	dictate	anki_count=1	rank=4478
+1820	debris	anki_count=2	rank=4473
+1821	curb	anki_count=2	rank=4471
+1822	missionary	anki_count=1	rank=4467
+1823	spiral	anki_count=1	rank=4466
+1824	scrap	anki_count=1	rank=4465
+1825	bananas	anki_count=1	rank=4453
+1826	juvenile	anki_count=1	rank=4452
+1827	widow	anki_count=1	rank=4449
+1828	fatigues	anki_count=1	rank=4418
+1829	allegedly	anki_count=2	rank=4415
+1830	bust	anki_count=1	rank=4413
+1831	sustainable	anki_count=1	rank=4403
+1832	soak	anki_count=1	rank=4384
+1833	plague	anki_count=1	rank=4378
+1834	jurisdiction	anki_count=1	rank=4374
+1835	speculation	anki_count=1	rank=4354
+1836	fry	anki_count=1	rank=4347
+1837	deem	anki_count=1	rank=4337
+1838	cemetery	anki_count=1	rank=4328
+1839	confrontation	anki_count=1	rank=4324
+1840	distress	anki_count=1	rank=4302
+1841	stance	anki_count=1	rank=4299
+1842	exclusively	anki_count=1	rank=4288
+1843	collar	anki_count=2	rank=4285
+1844	upward	anki_count=1	rank=4284
+1845	unprecedented	anki_count=1	rank=4278
+1846	conception	anki_count=1	rank=4277
+1847	sleeve	anki_count=1	rank=4266
+1848	stall	anki_count=2	rank=4248
+1849	custody	anki_count=1	rank=4243
+1850	sensation	anki_count=1	rank=4238
+1851	Protestant	anki_count=1	rank=4218
+1852	balloon	anki_count=1	rank=4203
+1853	mortality	anki_count=1	rank=4196
+1854	dash	anki_count=1	rank=4186
+1855	poke	anki_count=1	rank=4181
+1856	coup	anki_count=1	rank=4173
+1857	dissolve	anki_count=1	rank=4162
+1858	sneak	anki_count=1	rank=4142
+1859	influential	anki_count=1	rank=4128
+1860	concede	anki_count=2	rank=4126
+1861	scramble	anki_count=2	rank=4124
+1862	courtesy	anki_count=1	rank=4118
+1863	hop	anki_count=1	rank=4116
+1864	conspiracy	anki_count=1	rank=4112
+1865	proposition	anki_count=1	rank=4103
+1866	noble	anki_count=1	rank=4084
+1867	alley	anki_count=1	rank=4083
+1868	toll	anki_count=1	rank=4077
+1869	interact	anki_count=1	rank=4068
+1870	vow	anki_count=1	rank=4057
+1871	glare	anki_count=1	rank=4053
+1872	verdict	anki_count=1	rank=4052
+1873	condemn	anki_count=1	rank=4041
+1874	casualty	anki_count=1	rank=4029
+1875	revelation	anki_count=1	rank=4027
+1876	neutral	anki_count=1	rank=4024
+1877	poison	anki_count=1	rank=3988
+1878	strap	anki_count=1	rank=3983
+1879	discharge	anki_count=1	rank=3976
+1880	grief	anki_count=1	rank=3944
+1881	raid	anki_count=1	rank=3941
+1882	hatch	anki_count=1	rank=3933
+1883	sentiment	anki_count=1	rank=3932
+1884	liability	anki_count=2	rank=3909
+1885	scent	anki_count=2	rank=3891
+1886	shove	anki_count=3	rank=3862
+1887	coastal	anki_count=1	rank=3851
+1888	bark	anki_count=1	rank=3848
+1889	inmate	anki_count=1	rank=3830
+1890	tumor	anki_count=1	rank=3827
+1891	pursuit	anki_count=1	rank=3824
+1892	gravity	anki_count=1	rank=3823
+1893	exploit	anki_count=1	rank=3820
+1894	undertake	anki_count=1	rank=3818
+1895	promising	anki_count=2	rank=3813
+1896	boulder	anki_count=1	rank=3803
+1897	verbal	anki_count=1	rank=3800
+1898	magnitude	anki_count=1	rank=3796
+1899	clutch	anki_count=2	rank=3785
+1900	merits	anki_count=1	rank=3762
+1901	gut	anki_count=1	rank=3761
+1902	inventory	anki_count=1	rank=3759
+1903	endorse	anki_count=1	rank=3751
+1904	diplomatic	anki_count=1	rank=3747
+1905	stiff	anki_count=1	rank=3720
+1906	warrant	anki_count=2	rank=3713
+1907	thread	anki_count=1	rank=3705
+1908	bolt	anki_count=1	rank=3688
+1909	sole	anki_count=1	rank=3677
+1910	intimate	anki_count=1	rank=3658
+1911	pioneer	anki_count=1	rank=3646
+1912	residence	anki_count=1	rank=3620
+1913	execute	anki_count=1	rank=3610
+1914	antique	anki_count=1	rank=3600
+1915	contractor	anki_count=1	rank=3597
+1916	lodge	anki_count=1	rank=3592
+1917	stamp	anki_count=1	rank=3582
+1918	probe	anki_count=1	rank=3569
+1919	undermine	anki_count=1	rank=3536
+1920	nest	anki_count=1	rank=3534
+1921	pond	anki_count=1	rank=3530
+1922	steam	anki_count=1	rank=3512
+1923	belly	anki_count=1	rank=3499
+1924	chin	anki_count=1	rank=3477
+1925	obstacle	anki_count=1	rank=3466
+1926	tuck	anki_count=1	rank=3465
+1927	chuck	anki_count=1	rank=3464
+1928	entitled	anki_count=1	rank=3435
+1929	crawl	anki_count=1	rank=3432
+1930	shuttle	anki_count=1	rank=3429
+1931	surge	anki_count=1	rank=3426
+1932	hostage	anki_count=1	rank=3406
+1933	faint	anki_count=2	rank=3404
+1934	subtle	anki_count=1	rank=3371
+1935	theology	anki_count=1	rank=3363
+1936	gross	anki_count=2	rank=3351
+1937	patrol	anki_count=1	rank=3307
+1938	trim	anki_count=1	rank=3306
+1939	acceptance	anki_count=1	rank=3294
+1940	playoffs	anki_count=1	rank=3269
+1941	scratch	anki_count=1	rank=3245
+1942	defendant	anki_count=1	rank=3243
+1943	defendants	anki_count=1	rank=3243
+1944	convicts	anki_count=1	rank=3236
+1945	seize	anki_count=1	rank=3235
+1946	tactic	anki_count=1	rank=3230
+1947	inquiry	anki_count=2	rank=3229
+1948	ballot	anki_count=1	rank=3225
+1949	anchor	anki_count=1	rank=3211
+1950	adequate	anki_count=1	rank=3187
+1951	swear	anki_count=1	rank=3173
+1952	ranch	anki_count=1	rank=3152
+1953	consensus	anki_count=1	rank=3149
+1954	peel	anki_count=1	rank=3145
+1955	cave	anki_count=1	rank=3143
+1956	appoint	anki_count=1	rank=3138
+1957	depict	anki_count=1	rank=3134
+1958	circuit	anki_count=1	rank=3120
+1959	couch	anki_count=1	rank=3106
+1960	scout	anki_count=1	rank=3098
+1961	wander	anki_count=1	rank=3084
+1962	swallow	anki_count=1	rank=3076
+1963	ghost	anki_count=1	rank=3065
+1964	blast	anki_count=3	rank=3063
+1965	navy	anki_count=1	rank=3034
+1966	retreat	anki_count=1	rank=3011
+1967	rally	anki_count=2	rank=3002
+1968	harvest	anki_count=1	rank=2989
+1969	customs	anki_count=1	rank=2950
+1970	outline	anki_count=1	rank=2939
+1971	sustain	anki_count=1	rank=2932
+1972	admission	anki_count=1	rank=2931
+1973	battery	anki_count=1	rank=2919
+1974	lane	anki_count=1	rank=2908
+1975	drill	anki_count=1	rank=2901
+1976	porch	anki_count=1	rank=2870
+1977	rifle	anki_count=1	rank=2868
+1978	bid	anki_count=2	rank=2863
+1979	pine	anki_count=1	rank=2857
+1980	vitals	anki_count=1	rank=2856
+1981	prominent	anki_count=1	rank=2846
+1982	spray	anki_count=1	rank=2845
+1983	mortgage	anki_count=1	rank=2841
+1984	controversy	anki_count=1	rank=2815
+1985	tail	anki_count=1	rank=2801
+1986	bull	anki_count=1	rank=2776
+1987	mutual	anki_count=1	rank=2774
+1988	click	anki_count=1	rank=2763
+1989	leather	anki_count=1	rank=2753
+1990	establishment	anki_count=1	rank=2750
+1991	pole	anki_count=1	rank=2747
+1992	affiliation	anki_count=1	rank=2734
+1993	testify	anki_count=1	rank=2723
+1994	pipe	anki_count=1	rank=2709
+1995	characterize	anki_count=1	rank=2706
+1996	stadium	anki_count=1	rank=2703
+1997	insight	anki_count=1	rank=2680
+1998	retain	anki_count=2	rank=2672
+1999	counsel	anki_count=1	rank=2654
+2000	contest	anki_count=1	rank=2651
+2001	drain	anki_count=1	rank=2644
+2002	ritual	anki_count=2	rank=2632
+2003	incentive	anki_count=1	rank=2628
+2004	interpret	anki_count=1	rank=2620
+2005	chamber	anki_count=1	rank=2619
+2006	portrait	anki_count=1	rank=2618
+2007	bishop	anki_count=1	rank=2608
+2008	grip	anki_count=1	rank=2560
+2009	sensitive	anki_count=1	rank=2506
+2010	strain	anki_count=1	rank=2501
+2011	weigh	anki_count=1	rank=2469
+2012	grin	anki_count=1	rank=2463
+2013	provision	anki_count=1	rank=2458
+2014	historic	anki_count=1	rank=2432
+2015	flat	anki_count=1	rank=2402
+2016	deputy	anki_count=1	rank=2394
+2017	arrangement	anki_count=1	rank=2356
+2018	gulf	anki_count=1	rank=2322
+2019	intense	anki_count=2	rank=2319
+2020	Marine	anki_count=1	rank=2314
+2021	throat	anki_count=1	rank=2298
+2022	tune	anki_count=1	rank=2289
+2023	tension	anki_count=1	rank=2191
+2024	dean	anki_count=1	rank=2184
+2025	toss	anki_count=1	rank=2151
+2026	brand	anki_count=1	rank=2146
+2027	wage	anki_count=1	rank=2137
+2028	settlement	anki_count=1	rank=2132
+2029	potato	anki_count=1	rank=2131
+2030	split	anki_count=1	rank=2126
+2031	trace	anki_count=1	rank=2110
+2032	remaining	anki_count=1	rank=2108
+2033	exhibit	anki_count=1	rank=2076
+2034	correspondent	anki_count=1	rank=2059
+2035	wire	anki_count=2	rank=2050
+2036	perceive	anki_count=1	rank=2042
+2037	prosecutor	anki_count=1	rank=2016
+2038	regarding	anki_count=1	rank=2009
+2039	dust	anki_count=1	rank=1977
+2040	sharp	anki_count=1	rank=1968
+2041	resolution	anki_count=1	rank=1931
+2042	sink	anki_count=1	rank=1926
+2043	legislation	anki_count=1	rank=1920
+2044	draft	anki_count=1	rank=1903
+2045	convention	anki_count=1	rank=1902
+2046	curriculum	anki_count=1	rank=1895
+2047	tanking	anki_count=1	rank=1864
+2048	crack	anki_count=1	rank=1843
+2049	cream	anki_count=1	rank=1842
+2050	faculty	anki_count=2	rank=1817
+2051	coat	anki_count=1	rank=1814
+2052	knock	anki_count=1	rank=1805
+2053	smart	anki_count=1	rank=1804
+2054	net	anki_count=1	rank=1800
+2055	brief	anki_count=1	rank=1798
+2056	label	anki_count=1	rank=1794
+2057	tight	anki_count=1	rank=1778
+2058	funny	anki_count=1	rank=1773
+2059	motion	anki_count=1	rank=1747
+2060	perception	anki_count=1	rank=1739
+2061	divide	anki_count=1	rank=1731
+2062	rank	anki_count=1	rank=1711
+2063	intervention	anki_count=1	rank=1684
+2064	revenue	anki_count=1	rank=1669
+2065	fix	anki_count=1	rank=1622
+2066	swing	anki_count=1	rank=1620
+2067	bridge	anki_count=2	rank=1568
+2068	domestic	anki_count=1	rank=1552
+2069	storm	anki_count=1	rank=1524
+2070	frame	anki_count=1	rank=1438
+2071	empty	anki_count=1	rank=1435
+2072	tip	anki_count=1	rank=1424
+2073	smoke	anki_count=1	rank=1421
+2074	pack	anki_count=1	rank=1373
+2075	waste	anki_count=1	rank=1365
+2076	fuel	anki_count=1	rank=1360
+2077	emerge	anki_count=1	rank=1358
+2078	ear	anki_count=1	rank=1345
+2079	promote	anki_count=1	rank=1332
+2080	basis	anki_count=1	rank=1324
+2081	Lean	anki_count=1	rank=1293
+2082	introduce	anki_count=1	rank=1287
+2083	fair	anki_count=1	rank=1274
+2084	quick	anki_count=1	rank=1268
+2085	solution	anki_count=1	rank=1258
+2086	vision	anki_count=1	rank=1252
+2087	spirit	anki_count=1	rank=1226
+2088	due	anki_count=1	rank=1189
+2089	lift	anki_count=2	rank=1182
+2090	trust	anki_count=1	rank=1173
+2091	pound	anki_count=1	rank=1158
+2092	Contract	anki_count=1	rank=1156
+2093	suit	anki_count=1	rank=1135
+2094	warm	anki_count=1	rank=1115
+2095	senate	anki_count=1	rank=1059
+2096	attorney	anki_count=1	rank=1046
+2097	hill	anki_count=1	rank=1010
+2098	contain	anki_count=1	rank=992
+2099	credit	anki_count=1	rank=977
+2100	spot	anki_count=1	rank=944
+2101	trip	anki_count=1	rank=893
+2102	track	anki_count=1	rank=889
+2103	structure	anki_count=1	rank=883
+2104	march	anki_count=1	rank=874
+2105	district	anki_count=1	rank=871
+2106	strike	anki_count=3	rank=869
+2107	impact	anki_count=1	rank=864
+2108	shake	anki_count=1	rank=858
+2109	section	anki_count=1	rank=836
+2110	beat	anki_count=1	rank=791
+2111	alone	anki_count=1	rank=707
+2112	sport	anki_count=1	rank=667
+2113	floor	anki_count=1	rank=661
+2114	board	anki_count=1	rank=658
+2115	doctor	anki_count=1	rank=593
+2116	claim	anki_count=1	rank=571
+2117	share	anki_count=1	rank=498
+2118	sell	anki_count=1	rank=477
+2119	sound	anki_count=1	rank=396
+2120	air	anki_count=1	rank=380
+2121	figure	anki_count=1	rank=374
+2122	table	anki_count=1	rank=327
+2123	lead	anki_count=1	rank=271
+2124	force	anki_count=1	rank=262
+2125	side	anki_count=1	rank=258
+2126	open	anki_count=1	rank=215
+2127	move	anki_count=1	rank=189
+2128	point	anki_count=1	rank=162
+2129	points	anki_count=1	rank=162

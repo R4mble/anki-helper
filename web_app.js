@@ -15,6 +15,7 @@ const DEFAULT_SETTINGS_FILE = path.join(APP_DIR, 'app_default_setting.json');
 const SETTINGS_FILE = path.join(APP_DIR, 'app_settings.json');
 const BACKUP_DIR = path.join(APP_DIR, 'backup');
 const RUNTIME_DIR = path.join(APP_DIR, '.runtime');
+const WORD_FREQ_FILE = path.join(__dirname, 'public', '20000.txt');
 const DEFAULT_SETTINGS_TEMPLATE = {
     ankiConnectUrl: 'http://127.0.0.1:8765',
     mediaDir:
@@ -32,6 +33,7 @@ const DEFAULT_SETTINGS_TEMPLATE = {
     latestCardImageField: '例句图片',
     latestCardAudioField: '例句发音',
     clipboardMonitorEnabled: false,
+    subtitleSearchDir: '',
 };
 
 const app = express();
@@ -51,10 +53,282 @@ let clipboardMonitorRunning = false;
 let clipboardMonitorTimer = null;
 let clipboardLastImageHash = '';
 let clipboardMonitorBusy = false;
+let wordFreqCache = null;
 
 function parseNumber(value, fallback) {
     const n = Number(value);
     return Number.isFinite(n) ? n : fallback;
+}
+
+function escapeRegExp(value) {
+    return String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function parseSubtitleTimeToSeconds(raw) {
+    const text = String(raw || '').trim().replace(',', '.');
+    const matched = /^(\d{1,2}):(\d{2}):(\d{2}(?:\.\d+)?)$/.exec(text);
+    if (!matched) return null;
+    const hours = Number(matched[1]);
+    const minutes = Number(matched[2]);
+    const seconds = Number(matched[3]);
+    if ([hours, minutes, seconds].some((v) => Number.isNaN(v))) return null;
+    return hours * 3600 + minutes * 60 + seconds;
+}
+
+function cleanSubtitleText(input) {
+    return String(input || '')
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/\{[^}]*\}/g, ' ')
+        .replace(/\\N/g, ' ')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+async function loadWordFrequencyList() {
+    if (wordFreqCache) return wordFreqCache;
+    const raw = await fs.readFile(WORD_FREQ_FILE, 'utf8');
+    const rows = raw
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((line) => {
+            const matched = /^(\d+)\s+(.+)$/.exec(line);
+            if (!matched) return null;
+            return { rank: Number(matched[1]), word: matched[2].trim() };
+        })
+        .filter((row) => row && Number.isFinite(row.rank) && row.word);
+    wordFreqCache = rows;
+    return rows;
+}
+
+async function listFilesRecursive(rootDir, extsLowerSet) {
+    const result = [];
+    const queue = [rootDir];
+    while (queue.length > 0) {
+        const current = queue.shift();
+        const items = await fs.readdir(current, { withFileTypes: true });
+        for (const item of items) {
+            const fullPath = path.join(current, item.name);
+            if (item.isDirectory()) {
+                queue.push(fullPath);
+                continue;
+            }
+            if (!item.isFile()) continue;
+            const ext = path.extname(item.name).toLowerCase();
+            if (extsLowerSet.has(ext)) {
+                result.push(fullPath);
+            }
+        }
+    }
+    return result;
+}
+
+async function parseSrtFile(filePath) {
+    const raw = await fs.readFile(filePath, 'utf8');
+    const blocks = raw.split(/\r?\n\r?\n/);
+    const rows = [];
+    for (const block of blocks) {
+        const lines = block
+            .split(/\r?\n/)
+            .map((line) => line.trim())
+            .filter(Boolean);
+        if (lines.length < 2) continue;
+        const timeLine = lines.find((line) => line.includes('-->'));
+        if (!timeLine) continue;
+        const pieces = timeLine.split('-->');
+        if (pieces.length !== 2) continue;
+        const start = parseSubtitleTimeToSeconds(pieces[0]);
+        const end = parseSubtitleTimeToSeconds(pieces[1]);
+        if (start === null || end === null || end <= start) continue;
+        const textLines = lines.filter((line) => !line.includes('-->') && !/^\d+$/.test(line));
+        const text = cleanSubtitleText(textLines.join(' '));
+        if (!text) continue;
+        rows.push({ start, end, text });
+    }
+    return rows;
+}
+
+async function parseVttFile(filePath) {
+    const raw = await fs.readFile(filePath, 'utf8');
+    const blocks = raw.split(/\r?\n\r?\n/);
+    const rows = [];
+    for (const block of blocks) {
+        const lines = block
+            .split(/\r?\n/)
+            .map((line) => line.trim())
+            .filter(Boolean);
+        if (lines.length < 2) continue;
+        const timeLine = lines.find((line) => line.includes('-->'));
+        if (!timeLine) continue;
+        const pieces = timeLine.split('-->');
+        if (pieces.length !== 2) continue;
+        const start = parseSubtitleTimeToSeconds(pieces[0].split(/\s+/)[0]);
+        const end = parseSubtitleTimeToSeconds(pieces[1].split(/\s+/)[0]);
+        if (start === null || end === null || end <= start) continue;
+        const textLines = lines.filter((line) => !line.includes('-->') && !/^NOTE\b/i.test(line));
+        const text = cleanSubtitleText(textLines.join(' '));
+        if (!text) continue;
+        rows.push({ start, end, text });
+    }
+    return rows;
+}
+
+async function parseAssFile(filePath) {
+    const raw = await fs.readFile(filePath, 'utf8');
+    const lines = raw.split(/\r?\n/);
+    const rows = [];
+    for (const line of lines) {
+        if (!line.startsWith('Dialogue:')) continue;
+        const payload = line.slice('Dialogue:'.length).trim();
+        const parts = payload.split(',');
+        if (parts.length < 10) continue;
+        const start = parseSubtitleTimeToSeconds(parts[1]);
+        const end = parseSubtitleTimeToSeconds(parts[2]);
+        if (start === null || end === null || end <= start) continue;
+        const text = cleanSubtitleText(parts.slice(9).join(','));
+        if (!text) continue;
+        rows.push({ start, end, text });
+    }
+    return rows;
+}
+
+async function parseSubtitleFile(filePath) {
+    const ext = path.extname(filePath).toLowerCase();
+    if (ext === '.srt') return parseSrtFile(filePath);
+    if (ext === '.vtt') return parseVttFile(filePath);
+    if (ext === '.ass' || ext === '.ssa') return parseAssFile(filePath);
+    return [];
+}
+
+function subtitleContainsWord(text, word) {
+    const normalizedText = String(text || '').toLowerCase();
+    const normalizedWord = String(word || '').toLowerCase().trim();
+    if (!normalizedWord) return false;
+    if (/^[a-z0-9]+$/i.test(normalizedWord)) {
+        const matcher = new RegExp(`\\b${escapeRegExp(normalizedWord)}\\b`, 'i');
+        return matcher.test(normalizedText);
+    }
+    return normalizedText.includes(normalizedWord);
+}
+
+async function findMediaFileForSubtitle(subtitlePath) {
+    const mediaExts = ['.mp4', '.mkv', '.mov', '.avi', '.webm', '.m4v'];
+    const base = path.basename(subtitlePath, path.extname(subtitlePath));
+    const dir = path.dirname(subtitlePath);
+    for (const ext of mediaExts) {
+        const candidate = path.join(dir, `${base}${ext}`);
+        if (await fs.pathExists(candidate)) return candidate;
+    }
+    const siblings = await fs.readdir(dir);
+    const fallback = siblings.find((name) => mediaExts.includes(path.extname(name).toLowerCase()));
+    return fallback ? path.join(dir, fallback) : null;
+}
+
+async function extractScreenshotFromVideo(videoPath, seconds, outPath) {
+    await new Promise((resolve, reject) => {
+        ffmpeg(videoPath)
+            .seekInput(Math.max(0, seconds))
+            .outputOptions(['-frames:v 1'])
+            .output(outPath)
+            .on('end', resolve)
+            .on('error', reject)
+            .run();
+    });
+}
+
+async function extractAudioFromVideo(videoPath, startSeconds, durationSeconds, outPath) {
+    await new Promise((resolve, reject) => {
+        ffmpeg(videoPath)
+            .seekInput(Math.max(0, startSeconds))
+            .duration(Math.max(0.3, durationSeconds))
+            .audioCodec('aac')
+            .noVideo()
+            .output(outPath)
+            .on('end', resolve)
+            .on('error', reject)
+            .run();
+    });
+}
+
+async function updateLatestNoteMediaFields({ imageFilename, audioFilename }) {
+    const latestNoteId = await getLatestAddedNoteId();
+    const fields = {};
+    if (imageFilename) {
+        fields[settings.latestCardImageField] = `<img src="${imageFilename}">`;
+    }
+    if (audioFilename) {
+        fields[settings.latestCardAudioField] = `[sound:${audioFilename}]`;
+    }
+    await invoke('updateNoteFields', {
+        note: {
+            id: latestNoteId,
+            fields,
+        },
+    });
+    return latestNoteId;
+}
+
+async function updateLatestNoteMediaByWord({ word, subtitleDir }) {
+    const targetWord = String(word || '').trim();
+    if (!targetWord) throw new Error('word 不能为空。');
+    const targetDir = String(subtitleDir || settings.subtitleSearchDir || '').trim();
+    if (!targetDir) throw new Error('subtitleDir 不能为空。');
+    if (!(await fs.pathExists(targetDir))) throw new Error(`目录不存在: ${targetDir}`);
+
+    const subtitleExts = new Set(['.srt', '.vtt', '.ass', '.ssa']);
+    const subtitleFiles = await listFilesRecursive(targetDir, subtitleExts);
+    if (subtitleFiles.length === 0) {
+        throw new Error(`未找到字幕文件（支持 srt/vtt/ass/ssa）: ${targetDir}`);
+    }
+
+    let hit = null;
+    for (const subtitlePath of subtitleFiles.sort((a, b) => a.localeCompare(b))) {
+        const rows = await parseSubtitleFile(subtitlePath);
+        const matchedRow = rows.find((row) => subtitleContainsWord(row.text, targetWord));
+        if (!matchedRow) continue;
+        hit = { subtitlePath, row: matchedRow };
+        break;
+    }
+    if (!hit) throw new Error(`在字幕目录中未匹配到词汇: ${targetWord}`);
+
+    const mediaPath = await findMediaFileForSubtitle(hit.subtitlePath);
+    if (!mediaPath) {
+        throw new Error(`找到字幕但未找到同目录视频文件: ${path.basename(hit.subtitlePath)}`);
+    }
+
+    await fs.ensureDir(RUNTIME_DIR);
+    const stamp = Date.now();
+    const safeWord = targetWord.toLowerCase().replace(/[^a-z0-9_-]+/gi, '_');
+    const screenshotPath = path.join(RUNTIME_DIR, `wf_${safeWord}_${stamp}.png`);
+    const audioPath = path.join(RUNTIME_DIR, `wf_${safeWord}_${stamp}.m4a`);
+    const middleSecond = hit.row.start + Math.max(0.1, (hit.row.end - hit.row.start) / 2);
+    const audioStart = Math.max(0, hit.row.start - 0.15);
+    const audioDuration = Math.min(6, Math.max(1.1, hit.row.end - hit.row.start + 0.3));
+
+    await extractScreenshotFromVideo(mediaPath, middleSecond, screenshotPath);
+    await extractAudioFromVideo(mediaPath, audioStart, audioDuration, audioPath);
+
+    const imageFilename = await storeMediaWithAnki(
+        screenshotPath,
+        `wf_${safeWord}_${stamp}.png`
+    );
+    const audioFilename = await storeMediaWithAnki(
+        audioPath,
+        `wf_${safeWord}_${stamp}.m4a`
+    );
+    const noteId = await updateLatestNoteMediaFields({ imageFilename, audioFilename });
+
+    return {
+        noteId,
+        imageFilename,
+        audioFilename,
+        subtitlePath: hit.subtitlePath,
+        mediaPath,
+        subtitleText: hit.row.text,
+        subtitleStart: hit.row.start,
+        subtitleEnd: hit.row.end,
+    };
 }
 
 function sanitizeSettings(input) {
@@ -73,6 +347,7 @@ function sanitizeSettings(input) {
         latestCardImageField: String(merged.latestCardImageField || '例句图片').trim(),
         latestCardAudioField: String(merged.latestCardAudioField || '例句发音').trim(),
         clipboardMonitorEnabled: Boolean(merged.clipboardMonitorEnabled),
+        subtitleSearchDir: String(merged.subtitleSearchDir || '').trim(),
     };
 }
 
@@ -717,6 +992,43 @@ app.post('/api/settings', async (req, res) => {
                 cron: syncJobCron,
                 nextRunAt: syncJob ? syncJob.nextInvocation()?.toISOString() : null,
             },
+        });
+    } catch (error) {
+        res.status(400).json({ ok: false, error: error.message });
+    }
+});
+
+app.get('/api/word-freq/list', async (req, res) => {
+    try {
+        const start = Math.max(1, Number(req.query.start || 5000));
+        const end = Math.max(start, Number(req.query.end || start + 99));
+        const limit = Math.min(500, Math.max(1, end - start + 1));
+        const rows = await loadWordFrequencyList();
+        const filtered = rows.filter((item) => item.rank >= start && item.rank <= end).slice(0, limit);
+        res.json({
+            ok: true,
+            start,
+            end,
+            total: filtered.length,
+            rows: filtered,
+        });
+    } catch (error) {
+        res.status(400).json({ ok: false, error: error.message });
+    }
+});
+
+app.post('/api/anki/update-latest-media-by-word', async (req, res) => {
+    try {
+        const word = String(req.body?.word || '').trim();
+        const subtitleDir = String(req.body?.subtitleDir || '').trim();
+        if (!word) throw new Error('word 不能为空。');
+        if (!subtitleDir) throw new Error('subtitleDir 不能为空。');
+        settings = await saveSettings({ ...settings, subtitleSearchDir: subtitleDir });
+        const result = await updateLatestNoteMediaByWord({ word, subtitleDir });
+        res.json({
+            ok: true,
+            message: `已更新最近新增卡片媒体（${word}）。`,
+            ...result,
         });
     } catch (error) {
         res.status(400).json({ ok: false, error: error.message });

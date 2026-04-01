@@ -2,6 +2,8 @@
   "bin": "web_app.js",
   "scripts": {
     "start:web": "node web_app.js",
+    "analyze:anki-freq": "node anki_word_freq_report.js",
+    "fill:anki-freq": "node anki_fill_word_freq.js",
     "build:mac": "pkg . --targets node18-macos-x64 --output dist/anki-helper-macos",
     "build:win": "pkg . --targets node18-win-x64 --output dist/anki-helper-win.exe",
     "build:all": "npm run build:mac && npm run build:win"

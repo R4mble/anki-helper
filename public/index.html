@@ -132,10 +132,30 @@
             padding-top: 14px;
             border-top: 1px dashed var(--line);
         }
+        .freq-list {
+            display: grid;
+            gap: 8px;
+            max-height: 520px;
+            overflow: auto;
+        }
+        .freq-row {
+            display: grid;
+            grid-template-columns: 90px 1fr 110px;
+            gap: 8px;
+            align-items: center;
+            padding: 8px 10px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: #0f172a;
+        }
+        .freq-rank { color: var(--muted); font-size: 12px; }
+        .freq-word { font-weight: 600; }
         @media (max-width: 840px) {
             h1 { font-size: 24px; }
             .grid.mode-anki { grid-template-columns: 1fr; }
             .span-2 { grid-column: span 1; }
+            .freq-row { grid-template-columns: 80px 1fr; }
+            .freq-row .btn { grid-column: span 2; }
         }
     </style>
 </head>
@@ -146,6 +166,7 @@
         <div class="tabs">
             <button class="btn btn-blue" onclick="switchView('dashboard')">桌面控制台</button>
             <button class="btn btn-primary" onclick="switchView('remote')">手机遥控器</button>
+            <button class="btn btn-orange" onclick="switchView('wordfreq')">词频制卡</button>
             <button class="btn" onclick="switchView('settings')">设置</button>
         </div>
     </div>
@@ -240,6 +261,34 @@
         </div>
     </div>
 
+    <div id="wordFreqView" class="hidden">
+        <div class="panel">
+            <h3>词频制卡</h3>
+            <div class="row">
+                <div style="flex:1;min-width:320px;">
+                    <label for="subtitleDirInput">字幕目录（递归搜索）</label>
+                    <input id="subtitleDirInput" placeholder="/path/to/subtitles" />
+                </div>
+            </div>
+            <div class="row">
+                <div style="flex:1;min-width:140px;">
+                    <label for="freqStartInput">开始词频（默认 5000）</label>
+                    <input id="freqStartInput" value="5000" />
+                </div>
+                <div style="flex:1;min-width:140px;">
+                    <label for="freqEndInput">结束词频</label>
+                    <input id="freqEndInput" value="5100" />
+                </div>
+                <button class="btn btn-blue" onclick="loadWordFreqList()">加载词汇列表</button>
+            </div>
+            <div id="freqStats" class="status" style="min-height: 48px;">等待加载词汇...</div>
+        </div>
+        <div class="panel">
+            <h3>词频词汇列表</h3>
+            <div id="wordFreqList" class="freq-list"></div>
+        </div>
+    </div>
+
     <div id="settingsView" class="hidden">
         <div class="panel">
             <h3>个性化配置</h3>
@@ -320,12 +369,15 @@
         const views = {
             dashboard: document.getElementById('dashboardView'),
             remote: document.getElementById('remoteView'),
+            wordfreq: document.getElementById('wordFreqView'),
             settings: document.getElementById('settingsView'),
         };
         Object.values(views).forEach(v => v.classList.add('hidden'));
         views[view].classList.remove('hidden');
         if (view === 'remote') {
             history.replaceState(null, '', '/?mode=remote');
+        } else if (view === 'wordfreq') {
+            history.replaceState(null, '', '/?mode=wordfreq');
         } else if (view === 'settings') {
             history.replaceState(null, '', '/?mode=settings');
         } else {
@@ -507,6 +559,66 @@ fields: ${fields}`;
         }
     }
 
+    async function captureLatestNow() {
+        try {
+            const data = await api('/api/anki/capture-latest', 'POST');
+            log(`已写入最近卡片媒体：note=${data.noteId}`);
+        } catch (error) {
+            log(`录制失败: ${error.message}`);
+        }
+    }
+
+    async function loadWordFreqList() {
+        try {
+            const start = Number(document.getElementById('freqStartInput').value.trim() || 5000);
+            const end = Number(document.getElementById('freqEndInput').value.trim() || (start + 100));
+            const data = await api(`/api/word-freq/list?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`);
+            const container = document.getElementById('wordFreqList');
+            container.innerHTML = '';
+            for (const row of data.rows) {
+                const item = document.createElement('div');
+                item.className = 'freq-row';
+                item.innerHTML = `
+                    <div class="freq-rank">#${row.rank}</div>
+                    <div class="freq-word">${row.word}</div>
+                    <button class="btn btn-primary btn-small">更新媒体</button>
+                `;
+                const btn = item.querySelector('button');
+                btn.addEventListener('click', async () => {
+                    await updateLatestMediaByWord(row.word, row.rank, btn);
+                });
+                container.appendChild(item);
+            }
+            document.getElementById('freqStats').textContent = `当前范围: ${data.start} - ${data.end}\n共 ${data.total} 个词`;
+            log(`已加载词频列表：${data.start}-${data.end}（${data.total} 个）`);
+        } catch (error) {
+            log(`加载词频列表失败: ${error.message}`);
+        }
+    }
+
+    async function updateLatestMediaByWord(word, rank, btnEl) {
+        const subtitleDir = document.getElementById('subtitleDirInput').value.trim();
+        if (!subtitleDir) {
+            log('请先填写字幕目录。');
+            return;
+        }
+        const originText = btnEl.textContent;
+        btnEl.disabled = true;
+        btnEl.textContent = '更新中...';
+        try {
+            const data = await api('/api/anki/update-latest-media-by-word', 'POST', {
+                word,
+                subtitleDir,
+            });
+            log(`词频#${rank} ${word} 已更新媒体 -> note=${data.noteId}`);
+        } catch (error) {
+            log(`词频#${rank} ${word} 更新失败: ${error.message}`);
+        } finally {
+            btnEl.disabled = false;
+            btnEl.textContent = originText;
+        }
+    }
+
     async function loadSettings() {
         try {
             const data = await api('/api/settings');
@@ -520,6 +632,9 @@ fields: ${fields}`;
             document.getElementById('settingSyncTime').value = cronToTimeText(s.defaultSyncCron || '30 19 * * *');
             document.getElementById('settingSyncEnabled').checked = Boolean(s.syncEnabled);
             document.getElementById('settingSyncEnabledText').textContent = s.syncEnabled ? '已开启' : '已关闭';
+            if (document.getElementById('subtitleDirInput')) {
+                document.getElementById('subtitleDirInput').value = s.subtitleSearchDir || '';
+            }
             if (document.getElementById('cleanFieldInput') && !document.getElementById('cleanFieldInput').value) {
                 document.getElementById('cleanFieldInput').value = s.targetField || '';
             }
@@ -615,6 +730,7 @@ nextRunAt: ${data.syncScheduler.nextRunAt || 'null'}`;
     (async function init() {
         const mode = new URLSearchParams(location.search).get('mode');
         if (mode === 'remote') switchView('remote');
+        else if (mode === 'wordfreq') switchView('wordfreq');
         else if (mode === 'settings') switchView('settings');
         else switchView('dashboard');
         refreshCaptureToggleStatus();
@@ -630,6 +746,7 @@ nextRunAt: ${data.syncScheduler.nextRunAt || 'null'}`;
         await refreshSilentAudioLoopStatus();
         await refreshClipboardMonitorStatus();
         await fetchCurrentCard();
+        await loadWordFreqList();
     })();
 </script>
 </body>
