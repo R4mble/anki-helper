@@ -6,6 +6,7 @@ const { execFile, spawn } = require('child_process');
 const crypto = require('crypto');
 const ffmpeg = require('fluent-ffmpeg');
 const schedule = require('node-schedule');
+const Database = require('better-sqlite3');
 
 const APP_DIR = process.pkg ? path.dirname(process.execPath) : __dirname;
 const BUNDLED_DEFAULT_SETTINGS_FILE = path.join(__dirname, 'app_default_setting.json');
@@ -34,6 +35,16 @@ const DEFAULT_SETTINGS_TEMPLATE = {
     latestCardAudioField: '例句发音',
     clipboardMonitorEnabled: false,
     subtitleSearchDir: '',
+    ankiReportEnabled: true,
+    ankiReportCron: '29 19 * * *',
+    ankiCollectionDb:
+        os.platform() === 'win32'
+            ? ''
+            : os.homedir() + '/Library/Application Support/Anki2/99/collection.anki2',
+    ankiEnglishDeck: '#Listening::English::Audio',
+    ankiReportBaseUrl: 'https://sanshi.lol',
+    ankiReportPath: '/api/anki/report',
+    ankiReportToken: '',
 };
 
 const app = express();
@@ -43,6 +54,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 let syncJob = null;
 let syncJobCron = DEFAULT_SETTINGS_TEMPLATE.defaultSyncCron;
 let syncEnabled = false;
+let reportJob = null;
+let reportJobCron = DEFAULT_SETTINGS_TEMPLATE.ankiReportCron;
+let reportEnabled = false;
 let settings = null;
 let defaultSettings = null;
 let silenceLoopRunning = false;
@@ -348,6 +362,13 @@ function sanitizeSettings(input) {
         latestCardAudioField: String(merged.latestCardAudioField || '例句发音').trim(),
         clipboardMonitorEnabled: Boolean(merged.clipboardMonitorEnabled),
         subtitleSearchDir: String(merged.subtitleSearchDir || '').trim(),
+        ankiReportEnabled: Boolean(merged.ankiReportEnabled),
+        ankiReportCron: String(merged.ankiReportCron || '29 19 * * *').trim(),
+        ankiCollectionDb: String(merged.ankiCollectionDb || '').trim(),
+        ankiEnglishDeck: String(merged.ankiEnglishDeck || '#Listening::English::Audio').trim(),
+        ankiReportBaseUrl: String(merged.ankiReportBaseUrl || 'https://sanshi.lol').trim(),
+        ankiReportPath: String(merged.ankiReportPath || '/api/anki/report').trim(),
+        ankiReportToken: String(merged.ankiReportToken || '').trim(),
     };
 }
 
@@ -895,6 +916,146 @@ async function restoreAudio(filename) {
     await fs.copy(backupPath, targetPath, { overwrite: true });
 }
 
+function getDayBounds(targetDate) {
+    let dayStart;
+    if (targetDate) {
+        const parts = targetDate.split('-').map(Number);
+        dayStart = new Date(parts[0], parts[1] - 1, parts[2], 0, 0, 0, 0);
+    } else {
+        const now = new Date();
+        dayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+    }
+    const startMs = dayStart.getTime();
+    const endMs = startMs + 86400000;
+    const dateStr = `${dayStart.getFullYear()}-${String(dayStart.getMonth() + 1).padStart(2, '0')}-${String(dayStart.getDate()).padStart(2, '0')}`;
+    return { dateStr, startMs, endMs };
+}
+
+function collectAnkiStats(collectionDb, englishDeck, targetDate) {
+    const { dateStr, startMs, endMs } = getDayBounds(targetDate);
+    const dbPath = (collectionDb || '').trim();
+    if (!dbPath || !fs.pathExistsSync(dbPath)) {
+        throw new Error(`未找到 Anki collection 数据库: ${dbPath}`);
+    }
+
+    const db = new Database(dbPath, { readonly: true, fileMustExist: true });
+    try {
+        const deckIds = [];
+        const deckKeySep = '\x1f';
+        const deckKey = englishDeck.replace(/::/g, deckKeySep);
+
+        let hasDecksTable = false;
+        try {
+            const rows = db.prepare('SELECT id, name FROM decks').all();
+            hasDecksTable = true;
+            for (const row of rows) {
+                const name = String(row.name || '');
+                if (name === deckKey || name.startsWith(deckKey + deckKeySep)) {
+                    deckIds.push(Number(row.id));
+                } else if (name === englishDeck || name.startsWith(englishDeck + '::')) {
+                    deckIds.push(Number(row.id));
+                }
+            }
+        } catch (_) {
+            // decks 表不存在，走旧版逻辑
+        }
+
+        if (!hasDecksTable) {
+            const colRow = db.prepare('SELECT decks FROM col LIMIT 1').get();
+            const decksJson = colRow && colRow.decks ? colRow.decks : '{}';
+            let decksData;
+            try {
+                decksData = JSON.parse(decksJson);
+            } catch (e) {
+                throw new Error(`解析 col.decks 失败: ${e.message}`);
+            }
+            for (const [did, info] of Object.entries(decksData || {})) {
+                const name = String((info || {}).name || '');
+                if (name === englishDeck || name.startsWith(englishDeck + '::')) {
+                    const numId = Number(did);
+                    if (Number.isFinite(numId)) deckIds.push(numId);
+                }
+            }
+        }
+
+        const reviewedRow = db.prepare(
+            'SELECT COUNT(DISTINCT cid) AS c FROM revlog WHERE id >= ? AND id < ?'
+        ).get(startMs, endMs);
+
+        const studyRow = db.prepare(
+            'SELECT COALESCE(SUM(time), 0) AS s FROM revlog WHERE id >= ? AND id < ?'
+        ).get(startMs, endMs);
+
+        let deckTotal = 0;
+        let newCards = 0;
+        if (deckIds.length > 0) {
+            const marks = deckIds.map(() => '?').join(',');
+            const totalRow = db.prepare(
+                `SELECT COUNT(*) AS c FROM cards WHERE did IN (${marks})`
+            ).get(...deckIds);
+            const newRow = db.prepare(
+                `SELECT COUNT(*) AS c FROM cards WHERE did IN (${marks}) AND id >= ? AND id < ?`
+            ).get(...deckIds, startMs, endMs);
+            deckTotal = Number(totalRow?.c || 0);
+            newCards = Number(newRow?.c || 0);
+        }
+
+        return {
+            date: dateStr,
+            study_ms: Number(studyRow?.s || 0),
+            cards_reviewed: Number(reviewedRow?.c || 0),
+            new_cards: newCards,
+            deck_total: deckTotal,
+        };
+    } finally {
+        db.close();
+    }
+}
+
+async function reportAnkiStats(baseUrl, reportPath, payload, token) {
+    const url = baseUrl.replace(/\/+$/, '') + reportPath;
+    const body = JSON.stringify(payload);
+    const headers = {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Accept': 'application/json, text/plain, */*',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+        'Origin': baseUrl.replace(/\/+$/, ''),
+        'Referer': baseUrl.replace(/\/+$/, '') + '/',
+    };
+    if (token) headers['X-Anki-Report-Token'] = token;
+
+    const resp = await fetch(url, {
+        method: 'POST',
+        headers,
+        body,
+        signal: AbortSignal.timeout(15000),
+    });
+    return await resp.text();
+}
+
+async function runAnkiReport(targetDate) {
+    const stats = collectAnkiStats(
+        settings.ankiCollectionDb,
+        settings.ankiEnglishDeck,
+        targetDate || null
+    );
+    const payload = {
+        date: stats.date,
+        study_ms: stats.study_ms,
+        cards_reviewed: stats.cards_reviewed,
+        new_cards: stats.new_cards,
+        deck_total: stats.deck_total,
+        source: 'anki-helper/web_app',
+    };
+    const raw = await reportAnkiStats(
+        settings.ankiReportBaseUrl,
+        settings.ankiReportPath,
+        payload,
+        settings.ankiReportToken || null
+    );
+    return { stats, response: raw };
+}
+
 async function syncNow() {
     await invoke('sync');
 }
@@ -905,6 +1066,40 @@ function stopSyncJob() {
         syncJob = null;
     }
     syncEnabled = false;
+}
+
+function stopReportJob() {
+    if (reportJob) {
+        reportJob.cancel();
+        reportJob = null;
+    }
+    reportEnabled = false;
+}
+
+function startReportJob(cron) {
+    if (!cron || typeof cron !== 'string') {
+        throw new Error('上报 Cron 表达式不能为空。');
+    }
+    stopReportJob();
+    let createdJob = null;
+    try {
+        createdJob = schedule.scheduleJob(cron, async () => {
+            try {
+                const result = await runAnkiReport();
+                console.log(`[${new Date().toLocaleString()}] Anki 上报成功: ${JSON.stringify(result.stats)}`);
+            } catch (error) {
+                console.error(`[${new Date().toLocaleString()}] Anki 上报失败: ${error.message}`);
+            }
+        });
+    } catch (error) {
+        throw new Error(`无效的上报 Cron 表达式: ${cron}`);
+    }
+    if (!createdJob) {
+        throw new Error(`无效的上报 Cron 表达式: ${cron}`);
+    }
+    reportJob = createdJob;
+    reportEnabled = true;
+    reportJobCron = cron;
 }
 
 function startSyncJob(cron) {
@@ -942,6 +1137,11 @@ app.get('/api/health', (req, res) => {
             cron: syncJobCron,
             nextRunAt: syncJob ? syncJob.nextInvocation()?.toISOString() : null,
         },
+        reportScheduler: {
+            enabled: reportEnabled,
+            cron: reportJobCron,
+            nextRunAt: reportJob ? reportJob.nextInvocation()?.toISOString() : null,
+        },
     });
 });
 
@@ -977,6 +1177,11 @@ app.post('/api/settings', async (req, res) => {
         } else {
             stopSyncJob();
         }
+        if (settings.ankiReportEnabled) {
+            startReportJob(settings.ankiReportCron);
+        } else {
+            stopReportJob();
+        }
         if (settings.clipboardMonitorEnabled) {
             startClipboardMonitor();
         } else {
@@ -991,6 +1196,11 @@ app.post('/api/settings', async (req, res) => {
                 enabled: syncEnabled,
                 cron: syncJobCron,
                 nextRunAt: syncJob ? syncJob.nextInvocation()?.toISOString() : null,
+            },
+            reportScheduler: {
+                enabled: reportEnabled,
+                cron: reportJobCron,
+                nextRunAt: reportJob ? reportJob.nextInvocation()?.toISOString() : null,
             },
         });
     } catch (error) {
@@ -1097,6 +1307,44 @@ app.post('/api/sync-scheduler', (req, res) => {
         return res.json({ ok: true, enabled: false, cron: syncJobCron, nextRunAt: null });
     } catch (error) {
         return res.status(400).json({ ok: false, error: error.message });
+    }
+});
+
+app.get('/api/anki-report-scheduler', (req, res) => {
+    res.json({
+        ok: true,
+        enabled: reportEnabled,
+        cron: reportJobCron,
+        nextRunAt: reportJob ? reportJob.nextInvocation()?.toISOString() : null,
+    });
+});
+
+app.post('/api/anki-report-scheduler', (req, res) => {
+    try {
+        const { enabled, cron } = req.body || {};
+        if (enabled) {
+            startReportJob(cron || reportJobCron || settings.ankiReportCron);
+            return res.json({
+                ok: true,
+                enabled: reportEnabled,
+                cron: reportJobCron,
+                nextRunAt: reportJob ? reportJob.nextInvocation()?.toISOString() : null,
+            });
+        }
+        stopReportJob();
+        return res.json({ ok: true, enabled: false, cron: reportJobCron, nextRunAt: null });
+    } catch (error) {
+        return res.status(400).json({ ok: false, error: error.message });
+    }
+});
+
+app.post('/api/anki-report/run', async (req, res) => {
+    try {
+        const targetDate = String(req.body?.date || '').trim() || null;
+        const result = await runAnkiReport(targetDate);
+        res.json({ ok: true, ...result });
+    } catch (error) {
+        res.status(400).json({ ok: false, error: error.message });
     }
 });
 
@@ -1403,10 +1651,16 @@ app.post('/api/remote/deck-review', async (req, res) => {
 async function boot() {
     settings = await loadSettings();
     syncJobCron = settings.defaultSyncCron;
+    reportJobCron = settings.ankiReportCron;
     if (settings.syncEnabled) {
         startSyncJob(settings.defaultSyncCron);
     } else {
         stopSyncJob();
+    }
+    if (settings.ankiReportEnabled) {
+        startReportJob(settings.ankiReportCron);
+    } else {
+        stopReportJob();
     }
     if (settings.clipboardMonitorEnabled) {
         startClipboardMonitor();
