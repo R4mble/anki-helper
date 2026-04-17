@@ -36,7 +36,8 @@ const DEFAULT_SETTINGS_TEMPLATE = {
     clipboardMonitorEnabled: false,
     subtitleSearchDir: '',
     ankiReportEnabled: true,
-    ankiReportCron: '29 19 * * *',
+    ankiReportCron: '0 * * * *',
+    ankiReportDays: 10,
     ankiCollectionDb:
         os.platform() === 'win32'
             ? ''
@@ -363,7 +364,8 @@ function sanitizeSettings(input) {
         clipboardMonitorEnabled: Boolean(merged.clipboardMonitorEnabled),
         subtitleSearchDir: String(merged.subtitleSearchDir || '').trim(),
         ankiReportEnabled: Boolean(merged.ankiReportEnabled),
-        ankiReportCron: String(merged.ankiReportCron || '29 19 * * *').trim(),
+        ankiReportCron: String(merged.ankiReportCron || '0 * * * *').trim(),
+        ankiReportDays: Math.max(1, Math.floor(parseNumber(merged.ankiReportDays, 10))),
         ankiCollectionDb: String(merged.ankiCollectionDb || '').trim(),
         ankiEnglishDeck: String(merged.ankiEnglishDeck || '#Listening::English::Audio').trim(),
         ankiReportBaseUrl: String(merged.ankiReportBaseUrl || 'https://sanshi.lol').trim(),
@@ -396,6 +398,12 @@ async function loadSettings() {
     }
     try {
         const appSettings = await fs.readJson(SETTINGS_FILE);
+        if (String(appSettings?.ankiReportCron || '').trim() === '29 19 * * *') {
+            appSettings.ankiReportCron = '0 * * * *';
+        }
+        if (!Number.isFinite(Number(appSettings?.ankiReportDays))) {
+            appSettings.ankiReportDays = 10;
+        }
         // app_settings.json 存在时作为唯一生效配置；缺失字段仅做兼容兜底并回写为完整配置。
         const fullSettings = sanitizeSettings(appSettings || {});
         await fs.writeJson(SETTINGS_FILE, fullSettings, { spaces: 2 });
@@ -1033,27 +1041,57 @@ async function reportAnkiStats(baseUrl, reportPath, payload, token) {
     return await resp.text();
 }
 
-async function runAnkiReport(targetDate) {
-    const stats = collectAnkiStats(
-        settings.ankiCollectionDb,
-        settings.ankiEnglishDeck,
-        targetDate || null
-    );
-    const payload = {
-        date: stats.date,
-        study_ms: stats.study_ms,
-        cards_reviewed: stats.cards_reviewed,
-        new_cards: stats.new_cards,
-        deck_total: stats.deck_total,
-        source: 'anki-helper/web_app',
+function buildReportDates(days, targetDate) {
+    const maxDays = Math.max(1, Math.floor(Number(days) || 1));
+    const { dateStr } = getDayBounds(targetDate || null);
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const anchor = new Date(year, month - 1, day, 0, 0, 0, 0);
+    const dates = [];
+    for (let i = maxDays - 1; i >= 0; i -= 1) {
+        const current = new Date(anchor);
+        current.setDate(anchor.getDate() - i);
+        const yyyy = current.getFullYear();
+        const mm = String(current.getMonth() + 1).padStart(2, '0');
+        const dd = String(current.getDate()).padStart(2, '0');
+        dates.push(`${yyyy}-${mm}-${dd}`);
+    }
+    return dates;
+}
+
+async function runAnkiReport(targetDate, days) {
+    const reportDays = Math.max(1, Math.floor(Number(days) || settings.ankiReportDays || 10));
+    const reportDates = buildReportDates(reportDays, targetDate || null);
+    const rows = [];
+
+    for (const reportDate of reportDates) {
+        const stats = collectAnkiStats(
+            settings.ankiCollectionDb,
+            settings.ankiEnglishDeck,
+            reportDate
+        );
+        const payload = {
+            date: stats.date,
+            study_ms: stats.study_ms,
+            cards_reviewed: stats.cards_reviewed,
+            new_cards: stats.new_cards,
+            deck_total: stats.deck_total,
+            source: 'anki-helper/web_app',
+        };
+        const raw = await reportAnkiStats(
+            settings.ankiReportBaseUrl,
+            settings.ankiReportPath,
+            payload,
+            settings.ankiReportToken || null
+        );
+        rows.push({ date: reportDate, stats, response: raw });
+    }
+
+    return {
+        days: reportDays,
+        startDate: reportDates[0],
+        endDate: reportDates[reportDates.length - 1],
+        rows,
     };
-    const raw = await reportAnkiStats(
-        settings.ankiReportBaseUrl,
-        settings.ankiReportPath,
-        payload,
-        settings.ankiReportToken || null
-    );
-    return { stats, response: raw };
 }
 
 async function syncNow() {
@@ -1086,7 +1124,9 @@ function startReportJob(cron) {
         createdJob = schedule.scheduleJob(cron, async () => {
             try {
                 const result = await runAnkiReport();
-                console.log(`[${new Date().toLocaleString()}] Anki 上报成功: ${JSON.stringify(result.stats)}`);
+                console.log(
+                    `[${new Date().toLocaleString()}] Anki 上报成功: ${result.startDate} ~ ${result.endDate}, 共 ${result.rows.length} 天`
+                );
             } catch (error) {
                 console.error(`[${new Date().toLocaleString()}] Anki 上报失败: ${error.message}`);
             }
@@ -1341,7 +1381,8 @@ app.post('/api/anki-report-scheduler', (req, res) => {
 app.post('/api/anki-report/run', async (req, res) => {
     try {
         const targetDate = String(req.body?.date || '').trim() || null;
-        const result = await runAnkiReport(targetDate);
+        const days = Number(req.body?.days || settings.ankiReportDays || 10);
+        const result = await runAnkiReport(targetDate, days);
         res.json({ ok: true, ...result });
     } catch (error) {
         res.status(400).json({ ok: false, error: error.message });
