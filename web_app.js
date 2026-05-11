@@ -52,9 +52,14 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+const HOURLY_SYNC_CRON = '0 * * * *';
+
 let syncJob = null;
+let syncHourlyJob = null;
 let syncJobCron = DEFAULT_SETTINGS_TEMPLATE.defaultSyncCron;
 let syncEnabled = false;
+let syncLastSuccessAt = null;
+let syncRunning = false;
 let reportJob = null;
 let reportJobCron = DEFAULT_SETTINGS_TEMPLATE.ankiReportCron;
 let reportEnabled = false;
@@ -1096,12 +1101,17 @@ async function runAnkiReport(targetDate, days) {
 
 async function syncNow() {
     await invoke('sync');
+    syncLastSuccessAt = new Date().toISOString();
 }
 
 function stopSyncJob() {
     if (syncJob) {
         syncJob.cancel();
         syncJob = null;
+    }
+    if (syncHourlyJob) {
+        syncHourlyJob.cancel();
+        syncHourlyJob = null;
     }
     syncEnabled = false;
 }
@@ -1147,36 +1157,71 @@ function startSyncJob(cron) {
         throw new Error('Cron 表达式不能为空。');
     }
     stopSyncJob();
-    let createdJob = null;
+    let createdMainJob = null;
+    let createdHourlyJob = null;
+    const runScheduledSync = async (triggerName) => {
+        if (syncRunning) {
+            console.log(
+                `[${new Date().toLocaleString()}] 自动同步跳过（上次任务仍在执行中，触发源: ${triggerName}）`
+            );
+            return;
+        }
+        syncRunning = true;
+        try {
+            await syncNow();
+            console.log(`[${new Date().toLocaleString()}] 自动同步成功（触发源: ${triggerName}）`);
+        } catch (error) {
+            console.error(
+                `[${new Date().toLocaleString()}] 自动同步失败（触发源: ${triggerName}）: ${error.message}`
+            );
+        } finally {
+            syncRunning = false;
+        }
+    };
     try {
-        createdJob = schedule.scheduleJob(cron, async () => {
-            try {
-                await syncNow();
-                console.log(`[${new Date().toLocaleString()}] 自动同步成功`);
-            } catch (error) {
-                console.error(`[${new Date().toLocaleString()}] 自动同步失败: ${error.message}`);
-            }
-        });
+        createdMainJob = schedule.scheduleJob(cron, () => runScheduledSync('custom-cron'));
+        createdHourlyJob = schedule.scheduleJob(HOURLY_SYNC_CRON, () =>
+            runScheduledSync('hourly-on-the-hour')
+        );
     } catch (error) {
         throw new Error(`无效的 Cron 表达式: ${cron}`);
     }
-    if (!createdJob) {
+    if (!createdMainJob || !createdHourlyJob) {
         throw new Error(`无效的 Cron 表达式: ${cron}`);
     }
-    syncJob = createdJob;
+    syncJob = createdMainJob;
+    syncHourlyJob = createdHourlyJob;
     syncEnabled = true;
     syncJobCron = cron;
+}
+
+function getNextSyncRunAt() {
+    const timestamps = [syncJob, syncHourlyJob]
+        .map((job) => job?.nextInvocation())
+        .filter(Boolean)
+        .map((invocation) => invocation.toISOString());
+    if (timestamps.length === 0) return null;
+    timestamps.sort();
+    return timestamps[0];
+}
+
+function getSyncSchedulerState() {
+    return {
+        enabled: syncEnabled,
+        cron: syncJobCron,
+        hourlyCron: HOURLY_SYNC_CRON,
+        nextRunAt: getNextSyncRunAt(),
+        customNextRunAt: syncJob ? syncJob.nextInvocation()?.toISOString() : null,
+        hourlyNextRunAt: syncHourlyJob ? syncHourlyJob.nextInvocation()?.toISOString() : null,
+        lastSuccessAt: syncLastSuccessAt,
+    };
 }
 
 app.get('/api/health', (req, res) => {
     res.json({
         ok: true,
         config: settings,
-        syncScheduler: {
-            enabled: syncEnabled,
-            cron: syncJobCron,
-            nextRunAt: syncJob ? syncJob.nextInvocation()?.toISOString() : null,
-        },
+        syncScheduler: getSyncSchedulerState(),
         reportScheduler: {
             enabled: reportEnabled,
             cron: reportJobCron,
@@ -1198,6 +1243,7 @@ app.get('/api/settings', async (req, res) => {
                 host: HOST,
             },
             backupDir: BACKUP_DIR,
+            syncScheduler: getSyncSchedulerState(),
         });
     } catch (error) {
         res.status(500).json({ ok: false, error: error.message });
@@ -1232,11 +1278,7 @@ app.post('/api/settings', async (req, res) => {
             ok: true,
             message: '配置已保存。',
             settings,
-            syncScheduler: {
-                enabled: syncEnabled,
-                cron: syncJobCron,
-                nextRunAt: syncJob ? syncJob.nextInvocation()?.toISOString() : null,
-            },
+            syncScheduler: getSyncSchedulerState(),
             reportScheduler: {
                 enabled: reportEnabled,
                 cron: reportJobCron,
@@ -1316,19 +1358,14 @@ app.get('/api/current-card', async (req, res) => {
 app.post('/api/sync', async (req, res) => {
     try {
         await syncNow();
-        res.json({ ok: true, message: '同步命令已发送。' });
+        res.json({ ok: true, message: '同步命令已发送。', lastSuccessAt: syncLastSuccessAt });
     } catch (error) {
         res.status(400).json({ ok: false, error: error.message });
     }
 });
 
 app.get('/api/sync-scheduler', (req, res) => {
-    res.json({
-        ok: true,
-        enabled: syncEnabled,
-        cron: syncJobCron,
-        nextRunAt: syncJob ? syncJob.nextInvocation()?.toISOString() : null,
-    });
+    res.json({ ok: true, ...getSyncSchedulerState() });
 });
 
 app.post('/api/sync-scheduler', (req, res) => {
@@ -1336,15 +1373,10 @@ app.post('/api/sync-scheduler', (req, res) => {
         const { enabled, cron } = req.body || {};
         if (enabled) {
             startSyncJob(cron || syncJobCron || settings.defaultSyncCron);
-            return res.json({
-                ok: true,
-                enabled: syncEnabled,
-                cron: syncJobCron,
-                nextRunAt: syncJob ? syncJob.nextInvocation()?.toISOString() : null,
-            });
+            return res.json({ ok: true, ...getSyncSchedulerState() });
         }
         stopSyncJob();
-        return res.json({ ok: true, enabled: false, cron: syncJobCron, nextRunAt: null });
+        return res.json({ ok: true, ...getSyncSchedulerState() });
     } catch (error) {
         return res.status(400).json({ ok: false, error: error.message });
     }

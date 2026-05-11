@@ -150,12 +150,36 @@
         }
         .freq-rank { color: var(--muted); font-size: 12px; }
         .freq-word { font-weight: 600; }
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .chart-wrap {
+            background: #020617;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 10px;
+        }
+        #fatLossChart {
+            width: 100%;
+            height: 260px;
+            display: block;
+            background: #020617;
+            border-radius: 8px;
+        }
+        .hint {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 6px;
+        }
         @media (max-width: 840px) {
             h1 { font-size: 24px; }
             .grid.mode-anki { grid-template-columns: 1fr; }
             .span-2 { grid-column: span 1; }
             .freq-row { grid-template-columns: 80px 1fr; }
             .freq-row .btn { grid-column: span 2; }
+            .calc-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -235,6 +259,54 @@
         <div class="panel">
             <h3>操作日志</h3>
             <div id="statusLog" class="status">准备就绪。</div>
+        </div>
+
+        <div class="panel">
+            <h3>BMI 计算器</h3>
+            <div class="calc-grid">
+                <div>
+                    <label for="bmiHeightInput">身高（cm）</label>
+                    <input id="bmiHeightInput" type="number" min="50" step="0.1" value="170" />
+                </div>
+                <div>
+                    <label for="bmiWeightInput">体重（kg）</label>
+                    <input id="bmiWeightInput" type="number" min="20" step="0.1" value="70" />
+                </div>
+            </div>
+            <div class="row" style="margin-top: 10px;">
+                <button class="btn btn-blue" onclick="calcBmi()">计算 BMI</button>
+            </div>
+            <div id="bmiResult" class="status" style="min-height:48px;">请输入身高体重后计算。</div>
+        </div>
+
+        <div class="panel">
+            <h3>减脂日期计算器（折线图）</h3>
+            <div class="calc-grid">
+                <div>
+                    <label for="fatStartWeightInput">当前体重（kg）</label>
+                    <input id="fatStartWeightInput" type="number" min="20" step="0.1" value="70" />
+                </div>
+                <div>
+                    <label for="fatDailyDeficitInput">每天热量差（kcal，负数表示盈余）</label>
+                    <input id="fatDailyDeficitInput" type="number" step="1" value="500" />
+                </div>
+                <div>
+                    <label for="fatStartDateInput">开始日期</label>
+                    <input id="fatStartDateInput" type="date" />
+                </div>
+                <div>
+                    <label for="fatDaysInput">计算天数</label>
+                    <input id="fatDaysInput" type="number" min="1" step="1" value="30" />
+                </div>
+            </div>
+            <div class="row" style="margin-top: 10px;">
+                <button class="btn btn-primary" onclick="calcFatLossProjection()">生成折线图</button>
+            </div>
+            <div id="fatLossSummary" class="status" style="min-height:56px;">默认按每天 500 kcal、30 天估算。</div>
+            <div class="chart-wrap" style="margin-top:10px;">
+                <canvas id="fatLossChart" width="900" height="260"></canvas>
+                <div class="hint">按 7700 kcal ≈ 1 kg 估算，仅作趋势参考。</div>
+            </div>
         </div>
     </div>
 
@@ -324,7 +396,7 @@
             </div>
             <div class="row">
                 <div style="flex:1;min-width:320px;">
-                    <label for="settingSyncTime">自动同步时间（默认 19:30）</label>
+                    <label for="settingSyncTime">自动同步时间（默认 19:30，且每小时整点同步）</label>
                     <input id="settingSyncTime" type="time" value="19:30" />
                 </div>
                 <div style="flex:1;min-width:260px;">
@@ -390,6 +462,134 @@
         return v || '例句发音';
     }
 
+    function calcBmi() {
+        const heightCm = Number(document.getElementById('bmiHeightInput').value);
+        const weightKg = Number(document.getElementById('bmiWeightInput').value);
+        const el = document.getElementById('bmiResult');
+        if (!Number.isFinite(heightCm) || !Number.isFinite(weightKg) || heightCm <= 0 || weightKg <= 0) {
+            el.textContent = '请输入有效的身高和体重。';
+            return;
+        }
+        const heightM = heightCm / 100;
+        const bmi = weightKg / (heightM * heightM);
+        let level = '正常';
+        if (bmi < 18.5) level = '偏瘦';
+        else if (bmi >= 24 && bmi < 28) level = '超重';
+        else if (bmi >= 28) level = '肥胖';
+        el.textContent = `BMI: ${bmi.toFixed(2)}\n判定: ${level}`;
+    }
+
+    function formatDateYmd(dateObj) {
+        const y = dateObj.getFullYear();
+        const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const d = String(dateObj.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+
+    function drawWeightLineChart(canvas, points) {
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        ctx.clearRect(0, 0, width, height);
+
+        const padding = { left: 56, right: 20, top: 18, bottom: 38 };
+        const plotW = width - padding.left - padding.right;
+        const plotH = height - padding.top - padding.bottom;
+        if (plotW <= 0 || plotH <= 0 || points.length === 0) return;
+
+        let minW = Math.min(...points.map(p => p.weight));
+        let maxW = Math.max(...points.map(p => p.weight));
+        if (Math.abs(maxW - minW) < 0.2) {
+            maxW += 0.1;
+            minW -= 0.1;
+        }
+        const wPad = Math.max(0.2, (maxW - minW) * 0.1);
+        minW -= wPad;
+        maxW += wPad;
+
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(padding.left, padding.top);
+        ctx.lineTo(padding.left, height - padding.bottom);
+        ctx.lineTo(width - padding.right, height - padding.bottom);
+        ctx.stroke();
+
+        ctx.fillStyle = '#9ca3af';
+        ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+        const yTicks = 4;
+        for (let i = 0; i <= yTicks; i++) {
+            const ratio = i / yTicks;
+            const y = padding.top + (1 - ratio) * plotH;
+            const val = minW + ratio * (maxW - minW);
+            ctx.strokeStyle = '#1f2937';
+            ctx.beginPath();
+            ctx.moveTo(padding.left, y);
+            ctx.lineTo(width - padding.right, y);
+            ctx.stroke();
+            ctx.fillText(val.toFixed(1), 8, y + 4);
+        }
+
+        const first = points[0];
+        const last = points[points.length - 1];
+        ctx.fillStyle = '#9ca3af';
+        ctx.fillText(first.date, padding.left, height - 12);
+        const lastW = ctx.measureText(last.date).width;
+        ctx.fillText(last.date, width - padding.right - lastW, height - 12);
+
+        ctx.strokeStyle = '#22c55e';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        points.forEach((p, i) => {
+            const x = padding.left + (i / Math.max(1, points.length - 1)) * plotW;
+            const y = padding.top + ((maxW - p.weight) / (maxW - minW)) * plotH;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+    }
+
+    function calcFatLossProjection() {
+        const startWeight = Number(document.getElementById('fatStartWeightInput').value);
+        const dailyDeficit = Number(document.getElementById('fatDailyDeficitInput').value);
+        const days = Math.max(1, Math.floor(Number(document.getElementById('fatDaysInput').value)));
+        const startDateText = document.getElementById('fatStartDateInput').value;
+        const summaryEl = document.getElementById('fatLossSummary');
+        const canvas = document.getElementById('fatLossChart');
+
+        if (!Number.isFinite(startWeight) || startWeight <= 0) {
+            summaryEl.textContent = '请输入有效的当前体重。';
+            return;
+        }
+        if (!Number.isFinite(dailyDeficit)) {
+            summaryEl.textContent = '请输入有效的每天热量差。';
+            return;
+        }
+
+        const startDate = startDateText ? new Date(`${startDateText}T00:00:00`) : new Date();
+        const baseDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+        const kcalPerKg = 7700;
+        const points = [];
+
+        for (let i = 0; i <= days; i++) {
+            const d = new Date(baseDate);
+            d.setDate(baseDate.getDate() + i);
+            const deltaKg = (dailyDeficit * i) / kcalPerKg;
+            const weight = startWeight - deltaKg;
+            points.push({ day: i, date: formatDateYmd(d), weight });
+        }
+
+        const last = points[points.length - 1];
+        const totalChange = startWeight - last.weight;
+        summaryEl.textContent =
+            `开始体重: ${startWeight.toFixed(1)} kg\n` +
+            `每天热量差: ${dailyDeficit.toFixed(0)} kcal\n` +
+            `${days} 天后预计体重: ${last.weight.toFixed(2)} kg（变化 ${totalChange >= 0 ? '-' : '+'}${Math.abs(totalChange).toFixed(2)} kg）\n` +
+            `结束日期: ${last.date}`;
+
+        drawWeightLineChart(canvas, points);
+    }
+
     function cronToTimeText(cronExpr) {
         const raw = String(cronExpr || '').trim();
         const parts = raw.split(/\s+/);
@@ -408,6 +608,24 @@
         const hour = Number(matched[1]);
         const minute = Number(matched[2]);
         return `${minute} ${hour} * * *`;
+    }
+
+    function formatDateTimeText(value) {
+        if (!value) return 'null';
+        const dt = new Date(value);
+        if (Number.isNaN(dt.getTime())) return String(value);
+        return dt.toLocaleString();
+    }
+
+    function formatSyncSchedulerText(syncScheduler) {
+        if (!syncScheduler) return '自动同步状态: 未知';
+        return `syncEnabled: ${syncScheduler.enabled}
+customCron: ${syncScheduler.cron}
+hourlyCron: ${syncScheduler.hourlyCron || '0 * * * *'}
+customNextRunAt: ${formatDateTimeText(syncScheduler.customNextRunAt)}
+hourlyNextRunAt: ${formatDateTimeText(syncScheduler.hourlyNextRunAt)}
+nextRunAt: ${formatDateTimeText(syncScheduler.nextRunAt)}
+lastSuccessAt: ${formatDateTimeText(syncScheduler.lastSuccessAt)}`;
     }
 
     async function fetchCurrentCard() {
@@ -640,6 +858,7 @@ fields: ${fields}`;
             }
             document.getElementById('settingsInfo').textContent = `server: ${data.server.host}:${data.server.port}
 backup目录(固定): ${data.backupDir}
+${formatSyncSchedulerText(data.syncScheduler)}
 配置文件已加载。`;
             document.getElementById('fieldNameInput').value = s.targetField || '例句发音';
             document.getElementById('amplifyFactorInput').value = s.defaultAmplifyFactor ?? 4;
@@ -669,9 +888,7 @@ backup目录(固定): ${data.backupDir}
             document.getElementById('settingSyncEnabledText').textContent = data.syncScheduler.enabled ? '已开启' : '已关闭';
             document.getElementById('settingsInfo').textContent = `自动保存成功。
 time: ${syncTimeText}
-syncEnabled: ${data.syncScheduler.enabled}
-cron: ${data.syncScheduler.cron}
-nextRunAt: ${data.syncScheduler.nextRunAt || 'null'}`;
+${formatSyncSchedulerText(data.syncScheduler)}`;
         } catch (error) {
             document.getElementById('settingsInfo').textContent = `自动保存失败: ${error.message}`;
         } finally {
@@ -747,6 +964,9 @@ nextRunAt: ${data.syncScheduler.nextRunAt || 'null'}`;
         await refreshClipboardMonitorStatus();
         await fetchCurrentCard();
         await loadWordFreqList();
+        document.getElementById('fatStartDateInput').value = formatDateYmd(new Date());
+        calcBmi();
+        calcFatLossProjection();
     })();
 </script>
 </body>
