@@ -52,10 +52,10 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const HOURLY_SYNC_CRON = '0 * * * *';
+const FIXED_SYNC_CRONS = ['15 10 * * *', '20 10 * * *', '0 12 * * *', '0 14 * * *', '30 19 * * *', '50 19 * * *'];
 
 let syncJob = null;
-let syncHourlyJob = null;
+let syncFixedJobs = [];
 let syncJobCron = DEFAULT_SETTINGS_TEMPLATE.defaultSyncCron;
 let syncEnabled = false;
 let syncLastSuccessAt = null;
@@ -1109,9 +1109,9 @@ function stopSyncJob() {
         syncJob.cancel();
         syncJob = null;
     }
-    if (syncHourlyJob) {
-        syncHourlyJob.cancel();
-        syncHourlyJob = null;
+    if (syncFixedJobs.length > 0) {
+        syncFixedJobs.forEach((job) => job.cancel());
+        syncFixedJobs = [];
     }
     syncEnabled = false;
 }
@@ -1158,7 +1158,7 @@ function startSyncJob(cron) {
     }
     stopSyncJob();
     let createdMainJob = null;
-    let createdHourlyJob = null;
+    const createdFixedJobs = [];
     const runScheduledSync = async (triggerName) => {
         if (syncRunning) {
             console.log(
@@ -1180,23 +1180,29 @@ function startSyncJob(cron) {
     };
     try {
         createdMainJob = schedule.scheduleJob(cron, () => runScheduledSync('custom-cron'));
-        createdHourlyJob = schedule.scheduleJob(HOURLY_SYNC_CRON, () =>
-            runScheduledSync('hourly-on-the-hour')
-        );
+        FIXED_SYNC_CRONS.forEach((fixedCron) => {
+            const fixedJob = schedule.scheduleJob(fixedCron, () =>
+                runScheduledSync(`fixed-cron-${fixedCron}`)
+            );
+            if (!fixedJob) {
+                throw new Error(`无效的固定 Cron 表达式: ${fixedCron}`);
+            }
+            createdFixedJobs.push(fixedJob);
+        });
     } catch (error) {
         throw new Error(`无效的 Cron 表达式: ${cron}`);
     }
-    if (!createdMainJob || !createdHourlyJob) {
+    if (!createdMainJob || createdFixedJobs.length !== FIXED_SYNC_CRONS.length) {
         throw new Error(`无效的 Cron 表达式: ${cron}`);
     }
     syncJob = createdMainJob;
-    syncHourlyJob = createdHourlyJob;
+    syncFixedJobs = createdFixedJobs;
     syncEnabled = true;
     syncJobCron = cron;
 }
 
 function getNextSyncRunAt() {
-    const timestamps = [syncJob, syncHourlyJob]
+    const timestamps = [syncJob, ...syncFixedJobs]
         .map((job) => job?.nextInvocation())
         .filter(Boolean)
         .map((invocation) => invocation.toISOString());
@@ -1209,10 +1215,13 @@ function getSyncSchedulerState() {
     return {
         enabled: syncEnabled,
         cron: syncJobCron,
-        hourlyCron: HOURLY_SYNC_CRON,
+        fixedCrons: FIXED_SYNC_CRONS,
         nextRunAt: getNextSyncRunAt(),
         customNextRunAt: syncJob ? syncJob.nextInvocation()?.toISOString() : null,
-        hourlyNextRunAt: syncHourlyJob ? syncHourlyJob.nextInvocation()?.toISOString() : null,
+        fixedNextRunAt: syncFixedJobs.map((job, index) => ({
+            cron: FIXED_SYNC_CRONS[index],
+            nextRunAt: job?.nextInvocation()?.toISOString() || null,
+        })),
         lastSuccessAt: syncLastSuccessAt,
     };
 }
