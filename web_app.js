@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const ffmpeg = require('fluent-ffmpeg');
 const schedule = require('node-schedule');
 const Database = require('better-sqlite3');
+const sharp = require('sharp');
 
 const APP_DIR = process.pkg ? path.dirname(process.execPath) : __dirname;
 const BUNDLED_DEFAULT_SETTINGS_FILE = path.join(__dirname, 'app_default_setting.json');
@@ -17,6 +18,16 @@ const SETTINGS_FILE = path.join(APP_DIR, 'app_settings.json');
 const BACKUP_DIR = path.join(APP_DIR, 'backup');
 const RUNTIME_DIR = path.join(APP_DIR, '.runtime');
 const WORD_FREQ_FILE = path.join(__dirname, 'public', '20000.txt');
+const BBC_NEWS_PIC_IMAGE_FIELD = '例句图片';
+const BBC_NEWS_PIC_TARGET_FIELD = '例句图片';
+const BBC_NEWS_PIC_TARGET_WIDTH = 2248;
+const BBC_NEWS_PIC_TARGET_HEIGHT = 1366;
+const BBC_NEWS_PIC_CROP_TOP = 720;
+const BBC_NEWS_PIC_CROP_HEIGHT = 500;
+const BBC_NEWS_PIC_CROP_LEFT = 120;
+const BBC_NEWS_PIC_CROP_RIGHT = 120;
+const BBC_NEWS_PIC_CROP_WIDTH =
+    BBC_NEWS_PIC_TARGET_WIDTH - BBC_NEWS_PIC_CROP_LEFT - BBC_NEWS_PIC_CROP_RIGHT;
 const DEFAULT_SETTINGS_TEMPLATE = {
     ankiConnectUrl: 'http://127.0.0.1:8765',
     mediaDir:
@@ -348,6 +359,101 @@ async function updateLatestNoteMediaByWord({ word, subtitleDir }) {
         subtitleText: hit.row.text,
         subtitleStart: hit.row.start,
         subtitleEnd: hit.row.end,
+    };
+}
+
+function extractImageFilenameFromHtml(imgHtml) {
+    const matched = String(imgHtml || '').match(/src=["']([^"']+)["']/i);
+    return matched ? matched[1].split('?')[0] : '';
+}
+
+async function getCurrentCardImageInfo() {
+    const card = await getCurrentCard();
+    const cardsInfo = await invoke('cardsInfo', { cards: [card.cardId] });
+    const noteId = cardsInfo[0].note;
+    const mediaDirPath = await invoke('getMediaDirPath');
+    const imgHtml = card.fields[BBC_NEWS_PIC_IMAGE_FIELD].value;
+    const imgFilename = extractImageFilenameFromHtml(imgHtml);
+    const fullImgPath = path.join(mediaDirPath, imgFilename);
+    return { noteId, imgFilename, fullImgPath };
+}
+
+async function cutCurrentCardBbcPic() {
+    const backupDirPath = path.join(BACKUP_DIR, 'pic');
+    await fs.ensureDir(backupDirPath);
+    const { noteId, imgFilename, fullImgPath } = await getCurrentCardImageInfo();
+    const metadata = await sharp(fullImgPath).metadata();
+    if (metadata.width === BBC_NEWS_PIC_CROP_WIDTH && metadata.height === BBC_NEWS_PIC_CROP_HEIGHT) {
+        return {
+            noteId,
+            filename: imgFilename,
+            updated: false,
+            reason: `图片已经是裁剪后的尺寸（${BBC_NEWS_PIC_CROP_WIDTH}x${BBC_NEWS_PIC_CROP_HEIGHT}）。`,
+        };
+    }
+    if (
+        metadata.width !== BBC_NEWS_PIC_TARGET_WIDTH ||
+        metadata.height !== BBC_NEWS_PIC_TARGET_HEIGHT
+    ) {
+        return {
+            noteId,
+            filename: imgFilename,
+            updated: false,
+            reason: `图片尺寸为 ${metadata.width}x${metadata.height}，不匹配 ${BBC_NEWS_PIC_TARGET_WIDTH}x${BBC_NEWS_PIC_TARGET_HEIGHT}`,
+        };
+    }
+
+    const ext = path.extname(imgFilename);
+    const backupFilename = `${path.basename(imgFilename, ext)}_backup${ext}`;
+    const backupPath = path.join(backupDirPath, backupFilename);
+    await fs.copyFile(fullImgPath, backupPath);
+
+    const croppedBuffer = await sharp(fullImgPath)
+        .extract({
+            left: BBC_NEWS_PIC_CROP_LEFT,
+            top: BBC_NEWS_PIC_CROP_TOP,
+            width: BBC_NEWS_PIC_CROP_WIDTH,
+            height: BBC_NEWS_PIC_CROP_HEIGHT,
+        })
+        .toBuffer();
+    await fs.writeFile(fullImgPath, croppedBuffer);
+
+    await invoke('updateNoteFields', {
+        note: {
+            id: noteId,
+            fields: {
+                [BBC_NEWS_PIC_TARGET_FIELD]: `<img src="${imgFilename}?v=${Date.now()}">`,
+            },
+        },
+    });
+
+    return {
+        noteId,
+        filename: imgFilename,
+        backupPath,
+        updated: true,
+    };
+}
+
+async function restoreCurrentCardBbcPic() {
+    const { noteId, imgFilename, fullImgPath } = await getCurrentCardImageInfo();
+    const ext = path.extname(imgFilename);
+    const backupFilename = `${path.basename(imgFilename, ext)}_backup${ext}`;
+    const backupPath = path.join(BACKUP_DIR, 'pic', backupFilename);
+    await fs.copyFile(backupPath, fullImgPath);
+    await invoke('updateNoteFields', {
+        note: {
+            id: noteId,
+            fields: {
+                [BBC_NEWS_PIC_TARGET_FIELD]: `<img src="${imgFilename}?v=${Date.now()}">`,
+            },
+        },
+    });
+    return {
+        noteId,
+        filename: imgFilename,
+        backupPath,
+        restored: true,
     };
 }
 
@@ -1596,6 +1702,35 @@ app.post('/api/anki/capture-latest', async (req, res) => {
         res.json({
             ok: true,
             message: '截图和录音已写入最近添加卡片。',
+            ...result,
+        });
+    } catch (error) {
+        res.status(400).json({ ok: false, error: error.message });
+    }
+});
+
+app.post('/api/anki/cut-bbcnews-pic', async (req, res) => {
+    try {
+        const result = await cutCurrentCardBbcPic();
+        const message = result.updated
+            ? `已裁剪当前图片: ${result.filename}`
+            : `当前图片未裁剪: ${result.reason}`;
+        res.json({
+            ok: true,
+            message,
+            ...result,
+        });
+    } catch (error) {
+        res.status(400).json({ ok: false, error: error.message });
+    }
+});
+
+app.post('/api/anki/restore-current-bbc-pic', async (req, res) => {
+    try {
+        const result = await restoreCurrentCardBbcPic();
+        res.json({
+            ok: true,
+            message: `已恢复当前图片: ${result.filename}`,
             ...result,
         });
     } catch (error) {

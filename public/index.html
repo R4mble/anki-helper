@@ -212,6 +212,8 @@
                 <button class="btn btn-primary" onclick="amplifyCurrentAudio()">执行音量放大</button>
                 <button class="btn btn-red" onclick="restoreCurrentAudio()">恢复原音频</button>
                 <button id="silenceToggleBtn" class="btn btn-blue" onclick="toggleSilentAudioLoop()">开启静音音频循环</button>
+                <button id="cutBbcPicBtn" class="btn btn-orange" onclick="cutBbcNewsPic()">裁剪当前图片</button>
+                <button id="restoreBbcPicBtn" class="btn" onclick="restoreCurrentBbcPic()">恢复当前图片</button>
             </div>
             <label>去掉开头（点击直接裁剪）</label>
             <div class="quick-buttons" style="margin-bottom: 12px;">
@@ -686,6 +688,40 @@ fields: ${fields}`;
             await refreshSilentAudioLoopStatus();
         } catch (error) {
             log(`切换静音循环失败: ${error.message}`);
+        }
+    }
+
+    async function cutBbcNewsPic() {
+        const btn = document.getElementById('cutBbcPicBtn');
+        if (!btn) return;
+        const oldText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = '处理中...';
+        try {
+            const data = await api('/api/anki/cut-bbcnews-pic', 'POST');
+            log(data.message);
+        } catch (error) {
+            log(`裁剪当前图片失败: ${error.message}`);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = oldText;
+        }
+    }
+
+    async function restoreCurrentBbcPic() {
+        const btn = document.getElementById('restoreBbcPicBtn');
+        if (!btn) return;
+        const oldText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = '恢复中...';
+        try {
+            const data = await api('/api/anki/restore-current-bbc-pic', 'POST');
+            log(data.message);
+        } catch (error) {
+            log(`恢复当前图片失败: ${error.message}`);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = oldText;
         }
     }
 
