@@ -324,6 +324,18 @@
             </div>
             <div class="row">
                 <div style="flex:1;min-width:320px;">
+                    <label>裁剪后自动重播音频</label>
+                    <div class="switch-row">
+                        <input id="settingReplayAfterTrim" type="checkbox" />
+                        <span id="settingReplayAfterTrimText">关闭（不发快捷键）</span>
+                    </div>
+                    <div class="status" style="margin-top:6px;font-size:12px;opacity:0.85;">
+                        开启后：去头/去尾成功会向当前前台窗口发送 Shift+R（与遥控「回放」相同），不刷新复习页；请保持 Anki 在前台。
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div style="flex:1;min-width:320px;">
                     <label for="settingSyncTime">自动同步时间（默认 19:30）</label>
                     <input id="settingSyncTime" type="time" value="19:30" />
                 </div>
@@ -507,10 +519,18 @@ fields: ${fields}`;
         return data;
     }
 
+    function formatReplayHint(replay) {
+        if (!replay || replay.skipped) return '';
+        if (replay.ok && replay.method === 'hotkey') return ' 已发送重播快捷键（Shift+R）。';
+        if (replay.ok) return ' 已重播。';
+        if (replay.error) return ` 重播失败: ${replay.error}`;
+        return '';
+    }
+
     async function quickTrimStart(seconds) {
         try {
             const data = await trimCurrentAudio(seconds, 0);
-            log(`${data.message}（去头 ${seconds}s）`);
+            log(`${data.message}（去头 ${seconds}s）${formatReplayHint(data.replay)}`);
         } catch (error) {
             log(`去头裁剪失败: ${error.message}`);
         }
@@ -519,7 +539,7 @@ fields: ${fields}`;
     async function quickTrimEnd(seconds) {
         try {
             const data = await trimCurrentAudio(0, seconds);
-            log(`${data.message}（去尾 ${seconds}s）`);
+            log(`${data.message}（去尾 ${seconds}s）${formatReplayHint(data.replay)}`);
         } catch (error) {
             log(`去尾裁剪失败: ${error.message}`);
         }
@@ -550,12 +570,32 @@ fields: ${fields}`;
     }
 
     async function cmd(command) {
+        const rid = `c-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+        log(`遥控[${rid}] 请求 command=${JSON.stringify(command)}`);
         try {
-            const data = await api('/api/remote/cmd', 'POST', { command });
-            log(`遥控: ${data.message}`);
+            const res = await fetch('/api/remote/cmd', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ command }),
+            });
+            const raw = await res.text();
+            log(`遥控[${rid}] HTTP ${res.status} 响应长度=${raw.length}`);
+            let data;
+            try {
+                data = JSON.parse(raw);
+            } catch (parseErr) {
+                log(`遥控[${rid}] 响应非 JSON，前 240 字: ${raw.slice(0, 240)}`);
+                throw new Error(`服务器返回非 JSON（HTTP ${res.status}）`);
+            }
+            if (!data.ok) {
+                log(`遥控[${rid}] 业务失败: ${data.error || '?'} debug=${JSON.stringify(data.debug || {})}`);
+                throw new Error(data.error || '请求失败');
+            }
+            const dbg = data.debug ? ` debug=${JSON.stringify(data.debug)}` : '';
+            log(`遥控[${rid}] 成功: ${data.message}${dbg}`);
             await fetchCurrentCard();
         } catch (error) {
-            log(`遥控失败: ${error.message}`);
+            log(`遥控[${rid}] 异常: ${error.message}`);
         }
     }
 
@@ -632,6 +672,13 @@ fields: ${fields}`;
             document.getElementById('settingSyncTime').value = cronToTimeText(s.defaultSyncCron || '30 19 * * *');
             document.getElementById('settingSyncEnabled').checked = Boolean(s.syncEnabled);
             document.getElementById('settingSyncEnabledText').textContent = s.syncEnabled ? '已开启' : '已关闭';
+            const replayTrim = document.getElementById('settingReplayAfterTrim');
+            if (replayTrim) {
+                replayTrim.checked = Boolean(s.replayAudioAfterTrim);
+                document.getElementById('settingReplayAfterTrimText').textContent = replayTrim.checked
+                    ? '已开启（Shift+R）'
+                    : '关闭（不发快捷键）';
+            }
             if (document.getElementById('subtitleDirInput')) {
                 document.getElementById('subtitleDirInput').value = s.subtitleSearchDir || '';
             }
@@ -664,6 +711,7 @@ backup目录(固定): ${data.backupDir}
                 defaultAmplifyFactor: Number(document.getElementById('settingAmplify').value.trim()),
                 defaultSyncCron: timeTextToCron(syncTimeText),
                 syncEnabled: document.getElementById('settingSyncEnabled').checked,
+                replayAudioAfterTrim: document.getElementById('settingReplayAfterTrim').checked,
             };
             const data = await api('/api/settings', 'POST', payload);
             document.getElementById('settingSyncEnabledText').textContent = data.syncScheduler.enabled ? '已开启' : '已关闭';
@@ -696,6 +744,7 @@ nextRunAt: ${data.syncScheduler.nextRunAt || 'null'}`;
             'settingAmplify',
             'settingSyncTime',
             'settingSyncEnabled',
+            'settingReplayAfterTrim',
         ];
         ids.forEach((id) => {
             const el = document.getElementById(id);
@@ -707,6 +756,14 @@ nextRunAt: ${data.syncScheduler.nextRunAt || 'null'}`;
         if (syncToggle) {
             syncToggle.addEventListener('change', () => {
                 document.getElementById('settingSyncEnabledText').textContent = syncToggle.checked ? '已开启' : '已关闭';
+            });
+        }
+        const replayTrimToggle = document.getElementById('settingReplayAfterTrim');
+        if (replayTrimToggle) {
+            replayTrimToggle.addEventListener('change', () => {
+                document.getElementById('settingReplayAfterTrimText').textContent = replayTrimToggle.checked
+                    ? '已开启（Shift+R）'
+                    : '关闭（不发快捷键）';
             });
         }
     }

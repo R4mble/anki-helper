@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const os = require('os');
 const fs = require('fs-extra');
-const { execFile, spawn } = require('child_process');
+const { execFile, execFileSync, spawn } = require('child_process');
 const crypto = require('crypto');
 const ffmpeg = require('fluent-ffmpeg');
 const schedule = require('node-schedule');
@@ -21,13 +21,15 @@ const DEFAULT_SETTINGS_TEMPLATE = {
     ankiConnectUrl: 'http://127.0.0.1:8765',
     mediaDir:
         os.platform() === 'win32'
-            ? 'C:\\Users\\user\\AppData\\Roaming\\Anki2\\账户 1\\collection.media'
+            ? 'C:\\Users\\sansh\\AppData\\Roaming\\Anki2\\账户 1\\collection.media'
             : '/Users/user/Library/Application Support/Anki2/账户 1/collection.media',
     mediaDirMac: '/Users/user/Library/Application Support/Anki2/账户 1/collection.media',
-    mediaDirWindows: 'C:\\Users\\user\\AppData\\Roaming\\Anki2\\账户 1\\collection.media',
+    mediaDirWindows: 'C:\\Users\\sansh\\AppData\\Roaming\\Anki2\\账户 1\\collection.media',
     targetField: process.env.ANKI_TARGET_FIELD || '例句发音',
     defaultTrimStartSeconds: 0.5,
     defaultTrimEndSeconds: 0,
+    /** 去头/去尾裁剪成功后是否向前台发 Anki「重播音频」快捷键（Shift+R），不刷新复习页 */
+    replayAudioAfterTrim: false,
     defaultAmplifyFactor: 4.0,
     defaultSyncCron: '30 19 * * *',
     syncEnabled: true,
@@ -355,6 +357,7 @@ function sanitizeSettings(input) {
         targetField: String(merged.targetField || '例句发音').trim(),
         defaultTrimStartSeconds: Math.max(0, parseNumber(merged.defaultTrimStartSeconds, 0.5)),
         defaultTrimEndSeconds: Math.max(0, parseNumber(merged.defaultTrimEndSeconds, 0)),
+        replayAudioAfterTrim: Boolean(merged.replayAudioAfterTrim),
         defaultAmplifyFactor: Math.max(0.1, parseNumber(merged.defaultAmplifyFactor, 4)),
         defaultSyncCron: String(merged.defaultSyncCron || '30 19 * * *').trim(),
         syncEnabled: Boolean(merged.syncEnabled),
@@ -772,6 +775,113 @@ function getLocalNetworkIp() {
         }
     }
     return '127.0.0.1';
+}
+
+const REMOTE_LOG_ENABLED = process.env.ANKI_HELPER_REMOTE_LOG !== '0';
+
+function logRemote(event, detail) {
+    if (!REMOTE_LOG_ENABLED) return;
+    const payload = detail !== undefined ? ` ${typeof detail === 'object' ? JSON.stringify(detail) : detail}` : '';
+    console.log(`[anki-helper:remote] ${new Date().toISOString()} ${event}${payload}`);
+}
+
+function escapePowerShellSingleQuoted(value) {
+    return String(value).replace(/'/g, "''");
+}
+
+/**
+ * Windows：你当前机器上 robotjs 的 keyTap 全部返回 Invalid key code（预编译与系统不兼容），
+ * 改用 .NET SendKeys，行为仍是「向前台窗口注入按键」。
+ */
+function sendRemoteKeyboardWindows(command) {
+    const sendKeysByCmd = {
+        '1': '1',
+        '2': '2',
+        space: ' ',
+        anki_undo: '^z',
+        R: '+r',
+    };
+    const pattern = sendKeysByCmd[command];
+    if (!pattern) throw new Error(`不支持的远程命令: ${command}`);
+    const safe = escapePowerShellSingleQuoted(pattern);
+    const psScript = `Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.SendKeys]::SendWait('${safe}')`;
+    try {
+        execFileSync('powershell', ['-NoProfile', '-Command', psScript], {
+            windowsHide: true,
+            maxBuffer: 1024 * 1024,
+        });
+    } catch (err) {
+        const stderr = err.stderr ? err.stderr.toString().trim() : '';
+        throw new Error(`SendKeys 失败: ${err.message}${stderr ? ` (${stderr})` : ''}`);
+    }
+    return `win32.SendKeys(${JSON.stringify(pattern)})`;
+}
+
+/** macOS / Linux：使用 robotjs（按需 require，避免 Windows 加载无效原生模块）。 */
+function sendRemoteKeyboardRobotJs(command) {
+    const robot = require('robotjs');
+    switch (command) {
+        case '1':
+            robot.typeString('1');
+            return "robot.typeString('1')";
+        case '2':
+            robot.typeString('2');
+            return "robot.typeString('2')";
+        case 'space':
+            robot.typeString(' ');
+            return "robot.typeString(' ')";
+        case 'anki_undo': {
+            const mod = os.platform() === 'darwin' ? 'command' : 'control';
+            robot.keyTap('z', mod);
+            return `robot.keyTap('z', '${mod}')`;
+        }
+        case 'R':
+            robot.keyTap('r', 'shift');
+            return "robot.keyTap('r', 'shift')";
+        default:
+            throw new Error(`不支持的远程命令: ${command}`);
+    }
+}
+
+/**
+ * 向当前前台窗口发键，不经过 AnkiConnect。Windows 用 SendKeys；其他平台用 robotjs。
+ * @returns {{ action: string, robotMs: number }}
+ */
+function sendRobotRemoteCmd(command) {
+    const t0 = Date.now();
+    const impl = os.platform() === 'win32' ? 'SendKeys(powershell)' : 'robotjs';
+    logRemote('robot:enter', { command, platform: os.platform(), pid: process.pid, impl });
+    let action = '';
+    try {
+        if (os.platform() === 'win32') {
+            action = sendRemoteKeyboardWindows(command);
+        } else {
+            action = sendRemoteKeyboardRobotJs(command);
+        }
+        const robotMs = Date.now() - t0;
+        logRemote('robot:ok', { command, action, robotMs, impl });
+        return { action, robotMs };
+    } catch (error) {
+        const robotMs = Date.now() - t0;
+        logRemote('robot:error', {
+            command,
+            robotMs,
+            impl,
+            message: error && error.message ? error.message : String(error),
+            stack: error && error.stack ? error.stack : undefined,
+        });
+        console.error('[anki-helper:remote] 遥控按键异常', error);
+        const detail = error && error.message ? error.message : String(error);
+        throw new Error(`遥控按键失败: ${detail}`);
+    }
+}
+
+/** 与手机遥控「回放」一致：Shift+R，需 Anki 复习窗口在前台；不调用 guiShowQuestion/Answer。 */
+function sendAnkiReplayAudioHotkey() {
+    if (os.platform() === 'win32') {
+        return { action: sendRemoteKeyboardWindows('R') };
+    }
+    return { action: sendRemoteKeyboardRobotJs('R') };
 }
 
 async function invoke(action, params = {}) {
@@ -1364,6 +1474,16 @@ app.post('/api/audio/trim-current', async (req, res) => {
             req.body?.fieldName || settings.targetField
         );
         await trimAudio(filename, startSeconds, endSeconds);
+        let replay = { ok: false, skipped: true };
+        if (settings.replayAudioAfterTrim) {
+            try {
+                await new Promise((r) => setTimeout(r, 60));
+                const { action } = sendAnkiReplayAudioHotkey();
+                replay = { ok: true, method: 'hotkey', action };
+            } catch (replayErr) {
+                replay = { ok: false, error: replayErr.message };
+            }
+        }
         res.json({
             ok: true,
             message: `已完成裁剪: ${filename}`,
@@ -1371,6 +1491,7 @@ app.post('/api/audio/trim-current', async (req, res) => {
             fieldName,
             startSeconds,
             endSeconds,
+            replay,
         });
     } catch (error) {
         res.status(400).json({ ok: false, error: error.message });
@@ -1561,37 +1682,78 @@ app.post('/api/anki/remove-substring', async (req, res) => {
 });
 
 app.post('/api/remote/cmd', async (req, res) => {
+    const reqId = `${Date.now().toString(36)}-${crypto.randomBytes(3).toString('hex')}`;
+    const clientIp =
+        (typeof req.headers['x-forwarded-for'] === 'string' &&
+            req.headers['x-forwarded-for'].split(',')[0].trim()) ||
+        req.socket.remoteAddress ||
+        '';
+    logRemote('http:POST /api/remote/cmd', {
+        reqId,
+        clientIp,
+        body: req.body,
+        contentType: req.headers['content-type'],
+    });
     try {
         const command = String(req.body?.command || '').trim();
         if (!command) throw new Error('command 不能为空。');
 
+        const okPayload = (message, robotMeta) => ({
+            ok: true,
+            message,
+            debug: {
+                reqId,
+                clientIp,
+                command,
+                ...robotMeta,
+            },
+        });
+
         if (command === '1') {
-            await invoke('guiAnswerCard', { ease: 1 });
-            return res.json({ ok: true, message: '已执行：重来' });
+            const meta = sendRobotRemoteCmd('1');
+            logRemote('http:ok', { reqId, command: '1', ...meta });
+            return res.json(
+                okPayload('已发送按键：1（重来，请保持 Anki 在前台）', meta),
+            );
         }
         if (command === '2') {
-            await invoke('guiAnswerCard', { ease: 2 });
-            return res.json({ ok: true, message: '已执行：困难' });
+            const meta = sendRobotRemoteCmd('2');
+            logRemote('http:ok', { reqId, command: '2', ...meta });
+            return res.json(
+                okPayload('已发送按键：2（困难，请保持 Anki 在前台）', meta),
+            );
         }
         if (command === 'space') {
-            await invoke('guiShowAnswer');
-            return res.json({ ok: true, message: '已执行：翻面' });
+            const meta = sendRobotRemoteCmd('space');
+            logRemote('http:ok', { reqId, command: 'space', ...meta });
+            return res.json(
+                okPayload('已发送按键：空格（翻面，请保持 Anki 在前台）', meta),
+            );
         }
         if (command === 'anki_undo') {
-            await invoke('undo');
-            return res.json({ ok: true, message: '已执行：撤销' });
+            const meta = sendRobotRemoteCmd('anki_undo');
+            logRemote('http:ok', { reqId, command: 'anki_undo', ...meta });
+            return res.json(okPayload('已发送撤销快捷键（请保持 Anki 在前台）', meta));
         }
         if (command === 'R') {
-            const result = await captureAndAttachToLatestNote();
-            return res.json({
-                ok: true,
-                message: '已执行：回放（截图+录音写入最近卡片）',
-                ...result,
-            });
+            const meta = sendRobotRemoteCmd('R');
+            logRemote('http:ok', { reqId, command: 'R', ...meta });
+            return res.json(
+                okPayload(
+                    '已发送按键：R（请保持 Anki 在前台；截图写入卡片请用「写入最近卡片」接口）',
+                    meta,
+                ),
+            );
         }
         throw new Error(`不支持的命令: ${command}`);
     } catch (error) {
-        res.status(400).json({ ok: false, error: error.message });
+        logRemote('http:error', {
+            reqId,
+            message: error && error.message ? error.message : String(error),
+            stack: error && error.stack ? error.stack : undefined,
+        });
+        console.error('[anki-helper:remote] /api/remote/cmd', error);
+        res.status(400).json({ ok: false, error: error.message, debug: { reqId, clientIp } });
     }
 });
 
@@ -1674,6 +1836,9 @@ async function boot() {
         console.log(`手机遥控地址: http://${localIp}:${PORT}/?mode=remote`);
         console.log(`AnkiConnect: ${settings.ankiConnectUrl}`);
         console.log(`媒体库目录: ${settings.mediaDir}`);
+        if (REMOTE_LOG_ENABLED) {
+            console.log('遥控按键调试日志: 已开启（终端搜索 [anki-helper:remote]；环境变量 ANKI_HELPER_REMOTE_LOG=0 可关闭）');
+        }
     });
 }
 
