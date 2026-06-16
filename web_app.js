@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const ffmpeg = require('fluent-ffmpeg');
 const schedule = require('node-schedule');
 const Database = require('better-sqlite3');
+const sharp = require('sharp');
 
 const APP_DIR = process.pkg ? path.dirname(process.execPath) : __dirname;
 const BUNDLED_DEFAULT_SETTINGS_FILE = path.join(__dirname, 'app_default_setting.json');
@@ -17,6 +18,16 @@ const SETTINGS_FILE = path.join(APP_DIR, 'app_settings.json');
 const BACKUP_DIR = path.join(APP_DIR, 'backup');
 const RUNTIME_DIR = path.join(APP_DIR, '.runtime');
 const WORD_FREQ_FILE = path.join(__dirname, 'public', '20000.txt');
+const BBC_NEWS_PIC_IMAGE_FIELD = '例句图片';
+const BBC_NEWS_PIC_TARGET_FIELD = '例句图片';
+const BBC_NEWS_PIC_TARGET_WIDTH = 2248;
+const BBC_NEWS_PIC_TARGET_HEIGHT = 1366;
+const BBC_NEWS_PIC_CROP_TOP = 720;
+const BBC_NEWS_PIC_CROP_HEIGHT = 500;
+const BBC_NEWS_PIC_CROP_LEFT = 120;
+const BBC_NEWS_PIC_CROP_RIGHT = 120;
+const BBC_NEWS_PIC_CROP_WIDTH =
+    BBC_NEWS_PIC_TARGET_WIDTH - BBC_NEWS_PIC_CROP_LEFT - BBC_NEWS_PIC_CROP_RIGHT;
 const DEFAULT_SETTINGS_TEMPLATE = {
     ankiConnectUrl: 'http://127.0.0.1:8765',
     mediaDir:
@@ -38,7 +49,8 @@ const DEFAULT_SETTINGS_TEMPLATE = {
     clipboardMonitorEnabled: false,
     subtitleSearchDir: '',
     ankiReportEnabled: true,
-    ankiReportCron: '29 19 * * *',
+    ankiReportCron: '0 * * * *',
+    ankiReportDays: 10,
     ankiCollectionDb:
         os.platform() === 'win32'
             ? ''
@@ -53,9 +65,14 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+const FIXED_SYNC_CRONS = ['15 10 * * *', '20 10 * * *', '0 12 * * *', '0 14 * * *', '30 19 * * *', '50 19 * * *'];
+
 let syncJob = null;
+let syncFixedJobs = [];
 let syncJobCron = DEFAULT_SETTINGS_TEMPLATE.defaultSyncCron;
 let syncEnabled = false;
+let syncLastSuccessAt = null;
+let syncRunning = false;
 let reportJob = null;
 let reportJobCron = DEFAULT_SETTINGS_TEMPLATE.ankiReportCron;
 let reportEnabled = false;
@@ -347,6 +364,101 @@ async function updateLatestNoteMediaByWord({ word, subtitleDir }) {
     };
 }
 
+function extractImageFilenameFromHtml(imgHtml) {
+    const matched = String(imgHtml || '').match(/src=["']([^"']+)["']/i);
+    return matched ? matched[1].split('?')[0] : '';
+}
+
+async function getCurrentCardImageInfo() {
+    const card = await getCurrentCard();
+    const cardsInfo = await invoke('cardsInfo', { cards: [card.cardId] });
+    const noteId = cardsInfo[0].note;
+    const mediaDirPath = await invoke('getMediaDirPath');
+    const imgHtml = card.fields[BBC_NEWS_PIC_IMAGE_FIELD].value;
+    const imgFilename = extractImageFilenameFromHtml(imgHtml);
+    const fullImgPath = path.join(mediaDirPath, imgFilename);
+    return { noteId, imgFilename, fullImgPath };
+}
+
+async function cutCurrentCardBbcPic() {
+    const backupDirPath = path.join(BACKUP_DIR, 'pic');
+    await fs.ensureDir(backupDirPath);
+    const { noteId, imgFilename, fullImgPath } = await getCurrentCardImageInfo();
+    const metadata = await sharp(fullImgPath).metadata();
+    if (metadata.width === BBC_NEWS_PIC_CROP_WIDTH && metadata.height === BBC_NEWS_PIC_CROP_HEIGHT) {
+        return {
+            noteId,
+            filename: imgFilename,
+            updated: false,
+            reason: `图片已经是裁剪后的尺寸（${BBC_NEWS_PIC_CROP_WIDTH}x${BBC_NEWS_PIC_CROP_HEIGHT}）。`,
+        };
+    }
+    if (
+        metadata.width !== BBC_NEWS_PIC_TARGET_WIDTH ||
+        metadata.height !== BBC_NEWS_PIC_TARGET_HEIGHT
+    ) {
+        return {
+            noteId,
+            filename: imgFilename,
+            updated: false,
+            reason: `图片尺寸为 ${metadata.width}x${metadata.height}，不匹配 ${BBC_NEWS_PIC_TARGET_WIDTH}x${BBC_NEWS_PIC_TARGET_HEIGHT}`,
+        };
+    }
+
+    const ext = path.extname(imgFilename);
+    const backupFilename = `${path.basename(imgFilename, ext)}_backup${ext}`;
+    const backupPath = path.join(backupDirPath, backupFilename);
+    await fs.copyFile(fullImgPath, backupPath);
+
+    const croppedBuffer = await sharp(fullImgPath)
+        .extract({
+            left: BBC_NEWS_PIC_CROP_LEFT,
+            top: BBC_NEWS_PIC_CROP_TOP,
+            width: BBC_NEWS_PIC_CROP_WIDTH,
+            height: BBC_NEWS_PIC_CROP_HEIGHT,
+        })
+        .toBuffer();
+    await fs.writeFile(fullImgPath, croppedBuffer);
+
+    await invoke('updateNoteFields', {
+        note: {
+            id: noteId,
+            fields: {
+                [BBC_NEWS_PIC_TARGET_FIELD]: `<img src="${imgFilename}?v=${Date.now()}">`,
+            },
+        },
+    });
+
+    return {
+        noteId,
+        filename: imgFilename,
+        backupPath,
+        updated: true,
+    };
+}
+
+async function restoreCurrentCardBbcPic() {
+    const { noteId, imgFilename, fullImgPath } = await getCurrentCardImageInfo();
+    const ext = path.extname(imgFilename);
+    const backupFilename = `${path.basename(imgFilename, ext)}_backup${ext}`;
+    const backupPath = path.join(BACKUP_DIR, 'pic', backupFilename);
+    await fs.copyFile(backupPath, fullImgPath);
+    await invoke('updateNoteFields', {
+        note: {
+            id: noteId,
+            fields: {
+                [BBC_NEWS_PIC_TARGET_FIELD]: `<img src="${imgFilename}?v=${Date.now()}">`,
+            },
+        },
+    });
+    return {
+        noteId,
+        filename: imgFilename,
+        backupPath,
+        restored: true,
+    };
+}
+
 function sanitizeSettings(input) {
     const merged = { ...(defaultSettings || DEFAULT_SETTINGS_TEMPLATE), ...(input || {}) };
     return {
@@ -366,7 +478,8 @@ function sanitizeSettings(input) {
         clipboardMonitorEnabled: Boolean(merged.clipboardMonitorEnabled),
         subtitleSearchDir: String(merged.subtitleSearchDir || '').trim(),
         ankiReportEnabled: Boolean(merged.ankiReportEnabled),
-        ankiReportCron: String(merged.ankiReportCron || '29 19 * * *').trim(),
+        ankiReportCron: String(merged.ankiReportCron || '0 * * * *').trim(),
+        ankiReportDays: Math.max(1, Math.floor(parseNumber(merged.ankiReportDays, 10))),
         ankiCollectionDb: String(merged.ankiCollectionDb || '').trim(),
         ankiEnglishDeck: String(merged.ankiEnglishDeck || '#Listening::English::Audio').trim(),
         ankiReportBaseUrl: String(merged.ankiReportBaseUrl || 'https://sanshi.lol').trim(),
@@ -399,6 +512,12 @@ async function loadSettings() {
     }
     try {
         const appSettings = await fs.readJson(SETTINGS_FILE);
+        if (String(appSettings?.ankiReportCron || '').trim() === '29 19 * * *') {
+            appSettings.ankiReportCron = '0 * * * *';
+        }
+        if (!Number.isFinite(Number(appSettings?.ankiReportDays))) {
+            appSettings.ankiReportDays = 10;
+        }
         // app_settings.json 存在时作为唯一生效配置；缺失字段仅做兼容兜底并回写为完整配置。
         const fullSettings = sanitizeSettings(appSettings || {});
         await fs.writeJson(SETTINGS_FILE, fullSettings, { spaces: 2 });
@@ -1143,37 +1262,72 @@ async function reportAnkiStats(baseUrl, reportPath, payload, token) {
     return await resp.text();
 }
 
-async function runAnkiReport(targetDate) {
-    const stats = collectAnkiStats(
-        settings.ankiCollectionDb,
-        settings.ankiEnglishDeck,
-        targetDate || null
-    );
-    const payload = {
-        date: stats.date,
-        study_ms: stats.study_ms,
-        cards_reviewed: stats.cards_reviewed,
-        new_cards: stats.new_cards,
-        deck_total: stats.deck_total,
-        source: 'anki-helper/web_app',
+function buildReportDates(days, targetDate) {
+    const maxDays = Math.max(1, Math.floor(Number(days) || 1));
+    const { dateStr } = getDayBounds(targetDate || null);
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const anchor = new Date(year, month - 1, day, 0, 0, 0, 0);
+    const dates = [];
+    for (let i = maxDays - 1; i >= 0; i -= 1) {
+        const current = new Date(anchor);
+        current.setDate(anchor.getDate() - i);
+        const yyyy = current.getFullYear();
+        const mm = String(current.getMonth() + 1).padStart(2, '0');
+        const dd = String(current.getDate()).padStart(2, '0');
+        dates.push(`${yyyy}-${mm}-${dd}`);
+    }
+    return dates;
+}
+
+async function runAnkiReport(targetDate, days) {
+    const reportDays = Math.max(1, Math.floor(Number(days) || settings.ankiReportDays || 10));
+    const reportDates = buildReportDates(reportDays, targetDate || null);
+    const rows = [];
+
+    for (const reportDate of reportDates) {
+        const stats = collectAnkiStats(
+            settings.ankiCollectionDb,
+            settings.ankiEnglishDeck,
+            reportDate
+        );
+        const payload = {
+            date: stats.date,
+            study_ms: stats.study_ms,
+            cards_reviewed: stats.cards_reviewed,
+            new_cards: stats.new_cards,
+            deck_total: stats.deck_total,
+            source: 'anki-helper/web_app',
+        };
+        const raw = await reportAnkiStats(
+            settings.ankiReportBaseUrl,
+            settings.ankiReportPath,
+            payload,
+            settings.ankiReportToken || null
+        );
+        rows.push({ date: reportDate, stats, response: raw });
+    }
+
+    return {
+        days: reportDays,
+        startDate: reportDates[0],
+        endDate: reportDates[reportDates.length - 1],
+        rows,
     };
-    const raw = await reportAnkiStats(
-        settings.ankiReportBaseUrl,
-        settings.ankiReportPath,
-        payload,
-        settings.ankiReportToken || null
-    );
-    return { stats, response: raw };
 }
 
 async function syncNow() {
     await invoke('sync');
+    syncLastSuccessAt = new Date().toISOString();
 }
 
 function stopSyncJob() {
     if (syncJob) {
         syncJob.cancel();
         syncJob = null;
+    }
+    if (syncFixedJobs.length > 0) {
+        syncFixedJobs.forEach((job) => job.cancel());
+        syncFixedJobs = [];
     }
     syncEnabled = false;
 }
@@ -1196,7 +1350,9 @@ function startReportJob(cron) {
         createdJob = schedule.scheduleJob(cron, async () => {
             try {
                 const result = await runAnkiReport();
-                console.log(`[${new Date().toLocaleString()}] Anki 上报成功: ${JSON.stringify(result.stats)}`);
+                console.log(
+                    `[${new Date().toLocaleString()}] Anki 上报成功: ${result.startDate} ~ ${result.endDate}, 共 ${result.rows.length} 天`
+                );
             } catch (error) {
                 console.error(`[${new Date().toLocaleString()}] Anki 上报失败: ${error.message}`);
             }
@@ -1217,36 +1373,80 @@ function startSyncJob(cron) {
         throw new Error('Cron 表达式不能为空。');
     }
     stopSyncJob();
-    let createdJob = null;
+    let createdMainJob = null;
+    const createdFixedJobs = [];
+    const runScheduledSync = async (triggerName) => {
+        if (syncRunning) {
+            console.log(
+                `[${new Date().toLocaleString()}] 自动同步跳过（上次任务仍在执行中，触发源: ${triggerName}）`
+            );
+            return;
+        }
+        syncRunning = true;
+        try {
+            await syncNow();
+            console.log(`[${new Date().toLocaleString()}] 自动同步成功（触发源: ${triggerName}）`);
+        } catch (error) {
+            console.error(
+                `[${new Date().toLocaleString()}] 自动同步失败（触发源: ${triggerName}）: ${error.message}`
+            );
+        } finally {
+            syncRunning = false;
+        }
+    };
     try {
-        createdJob = schedule.scheduleJob(cron, async () => {
-            try {
-                await syncNow();
-                console.log(`[${new Date().toLocaleString()}] 自动同步成功`);
-            } catch (error) {
-                console.error(`[${new Date().toLocaleString()}] 自动同步失败: ${error.message}`);
+        createdMainJob = schedule.scheduleJob(cron, () => runScheduledSync('custom-cron'));
+        FIXED_SYNC_CRONS.forEach((fixedCron) => {
+            const fixedJob = schedule.scheduleJob(fixedCron, () =>
+                runScheduledSync(`fixed-cron-${fixedCron}`)
+            );
+            if (!fixedJob) {
+                throw new Error(`无效的固定 Cron 表达式: ${fixedCron}`);
             }
+            createdFixedJobs.push(fixedJob);
         });
     } catch (error) {
         throw new Error(`无效的 Cron 表达式: ${cron}`);
     }
-    if (!createdJob) {
+    if (!createdMainJob || createdFixedJobs.length !== FIXED_SYNC_CRONS.length) {
         throw new Error(`无效的 Cron 表达式: ${cron}`);
     }
-    syncJob = createdJob;
+    syncJob = createdMainJob;
+    syncFixedJobs = createdFixedJobs;
     syncEnabled = true;
     syncJobCron = cron;
+}
+
+function getNextSyncRunAt() {
+    const timestamps = [syncJob, ...syncFixedJobs]
+        .map((job) => job?.nextInvocation())
+        .filter(Boolean)
+        .map((invocation) => invocation.toISOString());
+    if (timestamps.length === 0) return null;
+    timestamps.sort();
+    return timestamps[0];
+}
+
+function getSyncSchedulerState() {
+    return {
+        enabled: syncEnabled,
+        cron: syncJobCron,
+        fixedCrons: FIXED_SYNC_CRONS,
+        nextRunAt: getNextSyncRunAt(),
+        customNextRunAt: syncJob ? syncJob.nextInvocation()?.toISOString() : null,
+        fixedNextRunAt: syncFixedJobs.map((job, index) => ({
+            cron: FIXED_SYNC_CRONS[index],
+            nextRunAt: job?.nextInvocation()?.toISOString() || null,
+        })),
+        lastSuccessAt: syncLastSuccessAt,
+    };
 }
 
 app.get('/api/health', (req, res) => {
     res.json({
         ok: true,
         config: settings,
-        syncScheduler: {
-            enabled: syncEnabled,
-            cron: syncJobCron,
-            nextRunAt: syncJob ? syncJob.nextInvocation()?.toISOString() : null,
-        },
+        syncScheduler: getSyncSchedulerState(),
         reportScheduler: {
             enabled: reportEnabled,
             cron: reportJobCron,
@@ -1268,6 +1468,7 @@ app.get('/api/settings', async (req, res) => {
                 host: HOST,
             },
             backupDir: BACKUP_DIR,
+            syncScheduler: getSyncSchedulerState(),
         });
     } catch (error) {
         res.status(500).json({ ok: false, error: error.message });
@@ -1302,11 +1503,7 @@ app.post('/api/settings', async (req, res) => {
             ok: true,
             message: '配置已保存。',
             settings,
-            syncScheduler: {
-                enabled: syncEnabled,
-                cron: syncJobCron,
-                nextRunAt: syncJob ? syncJob.nextInvocation()?.toISOString() : null,
-            },
+            syncScheduler: getSyncSchedulerState(),
             reportScheduler: {
                 enabled: reportEnabled,
                 cron: reportJobCron,
@@ -1386,19 +1583,14 @@ app.get('/api/current-card', async (req, res) => {
 app.post('/api/sync', async (req, res) => {
     try {
         await syncNow();
-        res.json({ ok: true, message: '同步命令已发送。' });
+        res.json({ ok: true, message: '同步命令已发送。', lastSuccessAt: syncLastSuccessAt });
     } catch (error) {
         res.status(400).json({ ok: false, error: error.message });
     }
 });
 
 app.get('/api/sync-scheduler', (req, res) => {
-    res.json({
-        ok: true,
-        enabled: syncEnabled,
-        cron: syncJobCron,
-        nextRunAt: syncJob ? syncJob.nextInvocation()?.toISOString() : null,
-    });
+    res.json({ ok: true, ...getSyncSchedulerState() });
 });
 
 app.post('/api/sync-scheduler', (req, res) => {
@@ -1406,15 +1598,10 @@ app.post('/api/sync-scheduler', (req, res) => {
         const { enabled, cron } = req.body || {};
         if (enabled) {
             startSyncJob(cron || syncJobCron || settings.defaultSyncCron);
-            return res.json({
-                ok: true,
-                enabled: syncEnabled,
-                cron: syncJobCron,
-                nextRunAt: syncJob ? syncJob.nextInvocation()?.toISOString() : null,
-            });
+            return res.json({ ok: true, ...getSyncSchedulerState() });
         }
         stopSyncJob();
-        return res.json({ ok: true, enabled: false, cron: syncJobCron, nextRunAt: null });
+        return res.json({ ok: true, ...getSyncSchedulerState() });
     } catch (error) {
         return res.status(400).json({ ok: false, error: error.message });
     }
@@ -1451,7 +1638,8 @@ app.post('/api/anki-report-scheduler', (req, res) => {
 app.post('/api/anki-report/run', async (req, res) => {
     try {
         const targetDate = String(req.body?.date || '').trim() || null;
-        const result = await runAnkiReport(targetDate);
+        const days = Number(req.body?.days || settings.ankiReportDays || 10);
+        const result = await runAnkiReport(targetDate, days);
         res.json({ ok: true, ...result });
     } catch (error) {
         res.status(400).json({ ok: false, error: error.message });
@@ -1635,6 +1823,35 @@ app.post('/api/anki/capture-latest', async (req, res) => {
         res.json({
             ok: true,
             message: '截图和录音已写入最近添加卡片。',
+            ...result,
+        });
+    } catch (error) {
+        res.status(400).json({ ok: false, error: error.message });
+    }
+});
+
+app.post('/api/anki/cut-bbcnews-pic', async (req, res) => {
+    try {
+        const result = await cutCurrentCardBbcPic();
+        const message = result.updated
+            ? `已裁剪当前图片: ${result.filename}`
+            : `当前图片未裁剪: ${result.reason}`;
+        res.json({
+            ok: true,
+            message,
+            ...result,
+        });
+    } catch (error) {
+        res.status(400).json({ ok: false, error: error.message });
+    }
+});
+
+app.post('/api/anki/restore-current-bbc-pic', async (req, res) => {
+    try {
+        const result = await restoreCurrentCardBbcPic();
+        res.json({
+            ok: true,
+            message: `已恢复当前图片: ${result.filename}`,
             ...result,
         });
     } catch (error) {
