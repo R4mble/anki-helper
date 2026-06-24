@@ -20,6 +20,9 @@ const RUNTIME_DIR = path.join(APP_DIR, '.runtime');
 const WORD_FREQ_FILE = path.join(__dirname, 'public', '20000.txt');
 const BBC_NEWS_PIC_IMAGE_FIELD = '例句图片';
 const BBC_NEWS_PIC_TARGET_FIELD = '例句图片';
+const BBC_NEWS_PIC_FRONT_FIELD = '正面';
+const BBC_NEWS_PIC_WORD_AUDIO_FIELD = '单词发音';
+const BBC_NEWS_PIC_DECK = '#Listening::English::Word';
 const BBC_NEWS_PIC_TARGET_WIDTH = 2248;
 const BBC_NEWS_PIC_TARGET_HEIGHT = 1366;
 const BBC_NEWS_PIC_CROP_TOP = 720;
@@ -367,6 +370,27 @@ function extractImageFilenameFromHtml(imgHtml) {
     return matched ? matched[1].split('?')[0] : '';
 }
 
+function stripHtml(raw) {
+    return String(raw).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+async function buildGoogleTranslateUsTtsAudioFilename(frontText) {
+    const text = stripHtml(frontText);
+    const url = `https://translate.googleapis.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en-US&q=${encodeURIComponent(text)}`;
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`Google Translate TTS 请求失败: ${response.status}`);
+    }
+    const audioBuffer = Buffer.from(await response.arrayBuffer());
+    const safeText = text.toLowerCase().replace(/[^a-z0-9_-]+/gi, '_').slice(0, 48) || 'word';
+    const filename = `word_pron_${safeText}_${Date.now()}.mp3`;
+    await invoke('storeMediaFile', {
+        filename,
+        data: audioBuffer.toString('base64'),
+    });
+    return filename;
+}
+
 async function getCurrentCardImageInfo() {
     const card = await getCurrentCard();
     const cardsInfo = await invoke('cardsInfo', { cards: [card.cardId] });
@@ -378,22 +402,12 @@ async function getCurrentCardImageInfo() {
     return { noteId, imgFilename, fullImgPath };
 }
 
-async function cutCurrentCardBbcPic() {
-    const backupDirPath = path.join(BACKUP_DIR, 'pic');
-    await fs.ensureDir(backupDirPath);
-    const { noteId, imgFilename, fullImgPath } = await getCurrentCardImageInfo();
+async function cropBbcPicByFilename(noteId, imgFilename, fullImgPath, backupDirPath, strictSizeCheck = true) {
     const metadata = await sharp(fullImgPath).metadata();
-    if (metadata.width === BBC_NEWS_PIC_CROP_WIDTH && metadata.height === BBC_NEWS_PIC_CROP_HEIGHT) {
-        return {
-            noteId,
-            filename: imgFilename,
-            updated: false,
-            reason: `图片已经是裁剪后的尺寸（${BBC_NEWS_PIC_CROP_WIDTH}x${BBC_NEWS_PIC_CROP_HEIGHT}）。`,
-        };
-    }
     if (
-        metadata.width !== BBC_NEWS_PIC_TARGET_WIDTH ||
-        metadata.height !== BBC_NEWS_PIC_TARGET_HEIGHT
+        strictSizeCheck &&
+        (metadata.width !== BBC_NEWS_PIC_TARGET_WIDTH ||
+            metadata.height !== BBC_NEWS_PIC_TARGET_HEIGHT)
     ) {
         return {
             noteId,
@@ -402,12 +416,10 @@ async function cutCurrentCardBbcPic() {
             reason: `图片尺寸为 ${metadata.width}x${metadata.height}，不匹配 ${BBC_NEWS_PIC_TARGET_WIDTH}x${BBC_NEWS_PIC_TARGET_HEIGHT}`,
         };
     }
-
     const ext = path.extname(imgFilename);
     const backupFilename = `${path.basename(imgFilename, ext)}_backup${ext}`;
     const backupPath = path.join(backupDirPath, backupFilename);
     await fs.copyFile(fullImgPath, backupPath);
-
     const croppedBuffer = await sharp(fullImgPath)
         .extract({
             left: BBC_NEWS_PIC_CROP_LEFT,
@@ -432,6 +444,97 @@ async function cutCurrentCardBbcPic() {
         filename: imgFilename,
         backupPath,
         updated: true,
+    };
+}
+
+async function cutCurrentCardBbcPic() {
+    const backupDirPath = path.join(BACKUP_DIR, 'pic');
+    await fs.ensureDir(backupDirPath);
+    const { noteId, imgFilename, fullImgPath } = await getCurrentCardImageInfo();
+    return cropBbcPicByFilename(noteId, imgFilename, fullImgPath, backupDirPath, false);
+}
+
+async function cutAddedBbcPicsByDayOffset(dayOffset) {
+    const backupDirPath = path.join(BACKUP_DIR, 'pic');
+    await fs.ensureDir(backupDirPath);
+    const mediaDirPath = await invoke('getMediaDirPath');
+    const queryDays = Math.max(1, Math.abs(dayOffset) + 1);
+    const noteIds = await invoke('findNotes', {
+        query: `deck:"${BBC_NEWS_PIC_DECK}" added:${queryDays}`,
+    });
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + dayOffset).getTime();
+    const endOfDay = startOfDay + 24 * 60 * 60 * 1000;
+    const targetDayNoteIds = noteIds.filter((id) => id >= startOfDay && id < endOfDay).sort((a, b) => b - a);
+    const notesInfo = await invoke('notesInfo', { notes: targetDayNoteIds });
+    const updated = [];
+    const skipped = [];
+    const audioFilled = [];
+
+    for (const note of notesInfo) {
+        try {
+            const imageField = note.fields[BBC_NEWS_PIC_IMAGE_FIELD];
+            const wordAudioField = note.fields[BBC_NEWS_PIC_WORD_AUDIO_FIELD];
+            const frontField = note.fields[BBC_NEWS_PIC_FRONT_FIELD];
+            if (!imageField || !wordAudioField || !frontField) {
+                skipped.push({
+                    noteId: note.noteId,
+                    updated: false,
+                    reason: `缺少字段：${BBC_NEWS_PIC_IMAGE_FIELD}/${BBC_NEWS_PIC_WORD_AUDIO_FIELD}/${BBC_NEWS_PIC_FRONT_FIELD}`,
+                });
+                continue;
+            }
+
+            const wordAudioValue = String(wordAudioField.value).trim();
+            if (wordAudioValue === '') {
+                const audioFilename = await buildGoogleTranslateUsTtsAudioFilename(frontField.value);
+                await invoke('updateNoteFields', {
+                    note: {
+                        id: note.noteId,
+                        fields: {
+                            [BBC_NEWS_PIC_WORD_AUDIO_FIELD]: `[sound:${audioFilename}]`,
+                        },
+                    },
+                });
+                audioFilled.push({
+                    noteId: note.noteId,
+                    audioFilename,
+                });
+            }
+
+            const imgFilename = extractImageFilenameFromHtml(imageField.value);
+            if (imgFilename === '') {
+                skipped.push({
+                    noteId: note.noteId,
+                    updated: false,
+                    reason: `${BBC_NEWS_PIC_IMAGE_FIELD} 字段未解析到图片文件名`,
+                });
+                continue;
+            }
+            const fullImgPath = path.join(mediaDirPath, imgFilename);
+            const result = await cropBbcPicByFilename(note.noteId, imgFilename, fullImgPath, backupDirPath);
+            if (result.updated) {
+                updated.push(result);
+            } else {
+                skipped.push(result);
+            }
+        } catch (error) {
+            skipped.push({
+                noteId: note.noteId,
+                updated: false,
+                reason: error.message,
+            });
+        }
+    }
+
+    return {
+        total: targetDayNoteIds.length,
+        updatedCount: updated.length,
+        skippedCount: skipped.length,
+        audioFilledCount: audioFilled.length,
+        updated,
+        skipped,
+        audioFilled,
     };
 }
 
@@ -1718,6 +1821,32 @@ app.post('/api/anki/cut-bbcnews-pic', async (req, res) => {
         res.json({
             ok: true,
             message,
+            ...result,
+        });
+    } catch (error) {
+        res.status(400).json({ ok: false, error: error.message });
+    }
+});
+
+app.post('/api/anki/cut-bbcnews-pic-today', async (req, res) => {
+    try {
+        const result = await cutAddedBbcPicsByDayOffset(0);
+        res.json({
+            ok: true,
+            message: `今日新卡已裁剪 ${result.updatedCount} 条，跳过 ${result.skippedCount} 条，补单词发音 ${result.audioFilledCount} 条。`,
+            ...result,
+        });
+    } catch (error) {
+        res.status(400).json({ ok: false, error: error.message });
+    }
+});
+
+app.post('/api/anki/cut-bbcnews-pic-yesterday', async (req, res) => {
+    try {
+        const result = await cutAddedBbcPicsByDayOffset(-1);
+        res.json({
+            ok: true,
+            message: `昨日新卡已裁剪 ${result.updatedCount} 条，跳过 ${result.skippedCount} 条，补单词发音 ${result.audioFilledCount} 条。`,
             ...result,
         });
     } catch (error) {

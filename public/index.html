@@ -213,6 +213,8 @@
                 <button class="btn btn-red" onclick="restoreCurrentAudio()">恢复原音频</button>
                 <button id="silenceToggleBtn" class="btn btn-blue" onclick="toggleSilentAudioLoop()">开启静音音频循环</button>
                 <button id="cutBbcPicBtn" class="btn btn-orange" onclick="cutBbcNewsPic()">裁剪当前图片</button>
+                <button id="cutTodayBbcPicBtn" class="btn btn-orange" onclick="cutTodayBbcNewsPic()">一键裁剪今日新卡</button>
+                <button id="cutYesterdayBbcPicBtn" class="btn btn-orange" onclick="cutYesterdayBbcNewsPic()">一键裁剪昨日新卡</button>
                 <button id="restoreBbcPicBtn" class="btn" onclick="restoreCurrentBbcPic()">恢复当前图片</button>
             </div>
             <label>去掉开头（点击直接裁剪）</label>
@@ -719,6 +721,40 @@ fields: ${fields}`;
             log(data.message);
         } catch (error) {
             log(`恢复当前图片失败: ${error.message}`);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = oldText;
+        }
+    }
+
+    async function cutTodayBbcNewsPic() {
+        const btn = document.getElementById('cutTodayBbcPicBtn');
+        if (!btn) return;
+        const oldText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = '处理中...';
+        try {
+            const data = await api('/api/anki/cut-bbcnews-pic-today', 'POST');
+            log(data.message);
+        } catch (error) {
+            log(`一键裁剪今日新卡失败: ${error.message}`);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = oldText;
+        }
+    }
+
+    async function cutYesterdayBbcNewsPic() {
+        const btn = document.getElementById('cutYesterdayBbcPicBtn');
+        if (!btn) return;
+        const oldText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = '处理中...';
+        try {
+            const data = await api('/api/anki/cut-bbcnews-pic-yesterday', 'POST');
+            log(data.message);
+        } catch (error) {
+            log(`一键裁剪昨日新卡失败: ${error.message}`);
         } finally {
             btn.disabled = false;
             btn.textContent = oldText;
