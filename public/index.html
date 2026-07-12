@@ -212,7 +212,8 @@
                 <button class="btn btn-primary" onclick="amplifyCurrentAudio()">执行音量放大</button>
                 <button class="btn btn-red" onclick="restoreCurrentAudio()">恢复原音频</button>
                 <button id="silenceToggleBtn" class="btn btn-blue" onclick="toggleSilentAudioLoop()">开启静音音频循环</button>
-                <button id="cutBbcPicBtn" class="btn btn-orange" onclick="cutBbcNewsPic()">裁剪当前图片</button>
+                <button id="cutBbcPicBtn" class="btn btn-orange" onclick="cutBbcNewsPic()" title="全局快捷键：Ctrl+Alt+Shift+F6（失败自动换 F7/F12/F9；后台独立进程）">裁剪当前图片</button>
+                <button id="deleteBbcPicBtn" class="btn btn-red" onclick="deleteCurrentBbcPic()" title="全局快捷键：Ctrl+Alt+Shift+F5（失败自动换 F4/F8/F7；后台独立进程）">删除当前图片</button>
                 <button id="cutTodayBbcPicBtn" class="btn btn-orange" onclick="cutTodayBbcNewsPic()">一键裁剪今日新卡</button>
                 <button id="cutYesterdayBbcPicBtn" class="btn btn-orange" onclick="cutYesterdayBbcNewsPic()">一键裁剪昨日新卡</button>
                 <button id="restoreBbcPicBtn" class="btn" onclick="restoreCurrentBbcPic()">恢复当前图片</button>
@@ -452,6 +453,8 @@
     let settingsSaveTimer = null;
     let settingsSaving = false;
     let captureHotkeyEnabled = false;
+    let cutBbcNewsPicBusy = false;
+    let deleteBbcNewsPicBusy = false;
 
     function switchView(view) {
         const views = {
@@ -706,19 +709,25 @@ fields: ${fields}`;
     }
 
     async function cutBbcNewsPic() {
+        if (cutBbcNewsPicBusy) return;
+        cutBbcNewsPicBusy = true;
         const btn = document.getElementById('cutBbcPicBtn');
-        if (!btn) return;
-        const oldText = btn.textContent;
-        btn.disabled = true;
-        btn.textContent = '处理中...';
+        const oldText = btn ? btn.textContent : '';
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = '处理中...';
+        }
         try {
             const data = await api('/api/anki/cut-bbcnews-pic', 'POST');
             log(data.message);
         } catch (error) {
             log(`裁剪当前图片失败: ${error.message}`);
         } finally {
-            btn.disabled = false;
-            btn.textContent = oldText;
+            cutBbcNewsPicBusy = false;
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = oldText;
+            }
         }
     }
 
@@ -736,6 +745,29 @@ fields: ${fields}`;
         } finally {
             btn.disabled = false;
             btn.textContent = oldText;
+        }
+    }
+
+    async function deleteCurrentBbcPic() {
+        if (deleteBbcNewsPicBusy) return;
+        deleteBbcNewsPicBusy = true;
+        const btn = document.getElementById('deleteBbcPicBtn');
+        const oldText = btn ? btn.textContent : '';
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = '删除中...';
+        }
+        try {
+            const data = await api('/api/anki/delete-bbcnews-pic', 'POST');
+            log(data.message);
+        } catch (error) {
+            log(`删除当前图片失败: ${error.message}`);
+        } finally {
+            deleteBbcNewsPicBusy = false;
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = oldText;
+            }
         }
     }
 
