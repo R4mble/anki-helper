@@ -22,15 +22,22 @@ const BBC_NEWS_PIC_IMAGE_FIELD = '例句图片';
 const BBC_NEWS_PIC_TARGET_FIELD = '例句图片';
 const BBC_NEWS_PIC_FRONT_FIELD = '正面';
 const BBC_NEWS_PIC_WORD_AUDIO_FIELD = '单词发音';
+const BBC_NEWS_PIC_EXAMPLE_AUDIO_FIELD = '例句发音';
 const BBC_NEWS_PIC_DECK = '#Listening::English::Word';
 const BBC_NEWS_PIC_TARGET_WIDTH = 2248;
 const BBC_NEWS_PIC_TARGET_HEIGHT = 1366;
+const BBC_NEWS_PIC_TARGET_SIZE_LIST = [
+    { width: 2248, height: 1366 },
+    { width: 2363, height: 1419 },
+    { width: 2418, height: 1360 },
+];
 const BBC_NEWS_PIC_CROP_TOP = 720;
 const BBC_NEWS_PIC_CROP_HEIGHT = 500;
 const BBC_NEWS_PIC_CROP_LEFT = 120;
 const BBC_NEWS_PIC_CROP_RIGHT = 120;
 const BBC_NEWS_PIC_CROP_WIDTH =
     BBC_NEWS_PIC_TARGET_WIDTH - BBC_NEWS_PIC_CROP_LEFT - BBC_NEWS_PIC_CROP_RIGHT;
+const BBC_NEWS_AUDIO_NAME_KEYWORDS = ['【全网最速】【BBC新闻播客】', '【全网最速】【BBC全球新闻】'];
 const DEFAULT_SETTINGS_TEMPLATE = {
     ankiConnectUrl: 'http://127.0.0.1:8765',
     mediaDir:
@@ -494,17 +501,22 @@ async function getCurrentCardImageInfo() {
 
 async function cropBbcPicByFilename(noteId, imgFilename, fullImgPath, backupDirPath, strictSizeCheck = true) {
     const inputBuffer = await fs.readFile(fullImgPath);
-    const metadata = await sharp(inputBuffer).metadata();
+    const metadata = await sharp(fullImgPath).metadata();
+    const matchedTargetSize = BBC_NEWS_PIC_TARGET_SIZE_LIST.find(
+        (size) => metadata.width === size.width && metadata.height === size.height,
+    );
     if (
         strictSizeCheck &&
-        (metadata.width !== BBC_NEWS_PIC_TARGET_WIDTH ||
-            metadata.height !== BBC_NEWS_PIC_TARGET_HEIGHT)
+        !matchedTargetSize
     ) {
+        const targetSizeText = BBC_NEWS_PIC_TARGET_SIZE_LIST
+            .map((size) => `${size.width}x${size.height}`)
+            .join(' 或 ');
         return {
             noteId,
             filename: imgFilename,
             updated: false,
-            reason: `图片尺寸为 ${metadata.width}x${metadata.height}，不匹配 ${BBC_NEWS_PIC_TARGET_WIDTH}x${BBC_NEWS_PIC_TARGET_HEIGHT}`,
+            reason: `图片尺寸为 ${metadata.width}x${metadata.height}，不匹配 ${targetSizeText}`,
         };
     }
     const ext = path.extname(imgFilename);
@@ -891,6 +903,84 @@ async function cutAddedBbcPicsByDayOffset(dayOffset) {
         updated,
         skipped,
         audioFilled,
+    };
+}
+
+async function cutBbcPicsByAudioNameKeywords() {
+    const backupDirPath = path.join(BACKUP_DIR, 'pic');
+    await fs.ensureDir(backupDirPath);
+    const mediaDirPath = await invoke('getMediaDirPath');
+    const noteIds = await invoke('findNotes', {
+        query: `deck:"${BBC_NEWS_PIC_DECK}"`,
+    });
+    const notesInfo = await invoke('notesInfo', { notes: noteIds });
+    const updated = [];
+    const skipped = [];
+    const matched = [];
+
+    for (const note of notesInfo) {
+        try {
+            const imageField = note.fields[BBC_NEWS_PIC_IMAGE_FIELD];
+            const exampleAudioField = note.fields[BBC_NEWS_PIC_EXAMPLE_AUDIO_FIELD];
+            if (!imageField || !exampleAudioField) {
+                skipped.push({
+                    noteId: note.noteId,
+                    updated: false,
+                    reason: `缺少字段：${BBC_NEWS_PIC_IMAGE_FIELD}/${BBC_NEWS_PIC_EXAMPLE_AUDIO_FIELD}`,
+                });
+                continue;
+            }
+
+            const audioFilename = extractFilename(exampleAudioField.value);
+            const matchedByAudioName = BBC_NEWS_AUDIO_NAME_KEYWORDS.some((keyword) =>
+                audioFilename.includes(keyword),
+            );
+            if (!matchedByAudioName) {
+                skipped.push({
+                    noteId: note.noteId,
+                    updated: false,
+                    reason: `音频名不匹配关键词：${BBC_NEWS_AUDIO_NAME_KEYWORDS.join(' / ')}`,
+                });
+                continue;
+            }
+            matched.push({
+                noteId: note.noteId,
+                filename: audioFilename,
+            });
+
+            const imgFilename = extractImageFilenameFromHtml(imageField.value);
+            if (imgFilename === '') {
+                skipped.push({
+                    noteId: note.noteId,
+                    updated: false,
+                    reason: `${BBC_NEWS_PIC_IMAGE_FIELD} 字段未解析到图片文件名`,
+                });
+                continue;
+            }
+            const fullImgPath = path.join(mediaDirPath, imgFilename);
+            const result = await cropBbcPicByFilename(note.noteId, imgFilename, fullImgPath, backupDirPath, true);
+            if (result.updated) {
+                updated.push(result);
+            } else {
+                skipped.push(result);
+            }
+        } catch (error) {
+            skipped.push({
+                noteId: note.noteId,
+                updated: false,
+                reason: error.message,
+            });
+        }
+    }
+
+    return {
+        total: noteIds.length,
+        matchedCount: matched.length,
+        updatedCount: updated.length,
+        skippedCount: skipped.length,
+        updated,
+        skipped,
+        matched,
     };
 }
 
@@ -2364,6 +2454,19 @@ app.post('/api/anki/cut-bbcnews-pic-yesterday', async (req, res) => {
         res.json({
             ok: true,
             message: `昨日新卡已裁剪 ${result.updatedCount} 条，跳过 ${result.skippedCount} 条，补单词发音 ${result.audioFilledCount} 条。`,
+            ...result,
+        });
+    } catch (error) {
+        res.status(400).json({ ok: false, error: error.message });
+    }
+});
+
+app.post('/api/anki/cut-bbcnews-pic-by-audio-name', async (req, res) => {
+    try {
+        const result = await cutBbcPicsByAudioNameKeywords();
+        res.json({
+            ok: true,
+            message: `按音频名关键词匹配 ${result.matchedCount} 条，裁剪成功 ${result.updatedCount} 条，跳过 ${result.skippedCount} 条。`,
             ...result,
         });
     } catch (error) {
