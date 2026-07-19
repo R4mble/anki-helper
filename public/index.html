@@ -212,12 +212,13 @@
                 <button class="btn btn-primary" onclick="amplifyCurrentAudio()">执行音量放大</button>
                 <button class="btn btn-red" onclick="restoreCurrentAudio()">恢复原音频</button>
                 <button id="silenceToggleBtn" class="btn btn-blue" onclick="toggleSilentAudioLoop()">开启静音音频循环</button>
-                <button id="cutBbcPicBtn" class="btn btn-orange" onclick="cutBbcNewsPic()" title="全局快捷键：Ctrl+Alt+Shift+F6（失败自动换 F7/F12/F9；后台独立进程）">裁剪当前图片</button>
-                <button id="deleteBbcPicBtn" class="btn btn-red" onclick="deleteCurrentBbcPic()" title="全局快捷键：Ctrl+Alt+Shift+F5（失败自动换 F4/F8/F7；后台独立进程）">删除当前图片</button>
+                <button id="cutBbcPicBtn" class="btn btn-orange" onclick="cutBbcNewsPic()">裁剪当前图片</button>
+                <button id="deleteBbcPicBtn" class="btn btn-red" onclick="deleteCurrentBbcPic()">删除当前图片</button>
                 <button id="cutTodayBbcPicBtn" class="btn btn-orange" onclick="cutTodayBbcNewsPic()">一键裁剪今日新卡</button>
                 <button id="cutYesterdayBbcPicBtn" class="btn btn-orange" onclick="cutYesterdayBbcNewsPic()">一键裁剪昨日新卡</button>
                 <button id="cutByAudioNameBbcPicBtn" class="btn btn-orange" onclick="cutBbcNewsPicByAudioName()">按音频名裁剪</button>
                 <button id="restoreBbcPicBtn" class="btn" onclick="restoreCurrentBbcPic()">恢复当前图片</button>
+                <button id="syncSanshiBtn" class="btn btn-blue" onclick="manualSyncAnkiReport()">手动同步到 sanshi.lol</button>
             </div>
             <label>去掉开头（点击直接裁剪）</label>
             <div class="quick-buttons" style="margin-bottom: 12px;">
@@ -456,6 +457,7 @@
     let captureHotkeyEnabled = false;
     let cutBbcNewsPicBusy = false;
     let deleteBbcNewsPicBusy = false;
+    let ankiReportSyncBusy = false;
 
     function switchView(view) {
         const views = {
@@ -820,6 +822,29 @@ fields: ${fields}`;
         } finally {
             btn.disabled = false;
             btn.textContent = oldText;
+        }
+    }
+
+    async function manualSyncAnkiReport() {
+        if (ankiReportSyncBusy) return;
+        ankiReportSyncBusy = true;
+        const btn = document.getElementById('syncSanshiBtn');
+        const oldText = btn ? btn.textContent : '';
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = '同步中...';
+        }
+        try {
+            const data = await api('/api/anki-report/run', 'POST', {});
+            log(`已同步到 sanshi.lol：${data.startDate} ~ ${data.endDate}，共 ${data.rows.length} 天。`);
+        } catch (error) {
+            log(`手动同步到 sanshi.lol 失败: ${error.message}`);
+        } finally {
+            ankiReportSyncBusy = false;
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = oldText;
+            }
         }
     }
 

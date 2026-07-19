@@ -110,36 +110,6 @@ let clipboardMonitorTimer = null;
 let clipboardLastImageHash = '';
 let clipboardMonitorBusy = false;
 let wordFreqCache = null;
-let bbcPicGlobalKeyListener = null;
-let bbcPicHotkeyChild = null;
-let bbcPicHotkeyStopping = false;
-let cutBbcPicGlobalBusy = false;
-let lastCutBbcPicHotkeyAt = 0;
-const CUT_BBC_PIC_HOTKEY_COOLDOWN_MS = 800;
-/** macOS node-global-key-listener 首选组合（与 Windows 候选一致） */
-const BBC_PIC_HOTKEY_MODIFIERS = 0x0002 | 0x0004;
-const BBC_PIC_HOTKEY_VK = 0x78;
-const BBC_PIC_HOTKEY_LABEL = 'Ctrl+Alt+Shift+F6（失败则自动尝试 F7/F12/F9）';
-const BBC_PIC_HOTKEY_PID_FILE = path.join(RUNTIME_DIR, 'bbc_pic_hotkey.pid');
-const BBC_PIC_HOTKEY_STATUS_FILE = path.join(RUNTIME_DIR, 'bbc_pic_hotkey.status');
-const BBC_PIC_HOTKEY_LOG_FILE = path.join(RUNTIME_DIR, 'bbc_pic_hotkey.log');
-const BBC_PIC_DELETE_HOTKEY_LABEL = 'Ctrl+Alt+Shift+F5（失败则自动尝试 F4/F8/F7）';
-const BBC_PIC_DELETE_HOTKEY_PID_FILE = path.join(RUNTIME_DIR, 'bbc_pic_delete_hotkey.pid');
-const BBC_PIC_DELETE_HOTKEY_STATUS_FILE = path.join(RUNTIME_DIR, 'bbc_pic_delete_hotkey.status');
-const BBC_PIC_DELETE_HOTKEY_LOG_FILE = path.join(RUNTIME_DIR, 'bbc_pic_delete_hotkey.log');
-
-const HOTKEY_LOG_ENABLED = process.env.ANKI_HELPER_HOTKEY_LOG !== '0';
-
-function logHotkey(event, detail) {
-    if (!HOTKEY_LOG_ENABLED) return;
-    const payload =
-        detail !== undefined ? ` ${typeof detail === 'object' ? JSON.stringify(detail) : detail}` : '';
-    console.log(`[anki-helper:hotkey] ${new Date().toISOString()} ${event}${payload}`);
-}
-
-function summarizeDownKeys(down) {
-    return Object.keys(down).filter((key) => down[key]);
-}
 
 function pickAnkiCollectionDb(merged) {
     if (os.platform() === 'win32') {
@@ -571,7 +541,9 @@ async function cutCurrentCardBbcPic() {
 }
 
 async function refreshReviewerAfterBbcPicUpdate({ action, noteId, filename }) {
-    logHotkey('refresh-skipped', { action, noteId, filename, mode: 'none' });
+    void action;
+    void noteId;
+    void filename;
 }
 
 async function waitForBbcPicFieldSync(noteId, matcher, timeoutMessage) {
@@ -606,21 +578,8 @@ async function deleteCurrentCardBbcPic() {
     };
 }
 
-function hasCutBbcPicModifiers(down) {
-    const ctrl = down['LEFT CTRL'] || down['RIGHT CTRL'];
-    const shift = down['LEFT SHIFT'] || down['RIGHT SHIFT'];
-    return Boolean(ctrl && shift);
-}
-
-function isCutBbcPicGlobalHotkeyEvent(e, down) {
-    return (
-        e.state === 'DOWN' &&
-        (e.name === 'F9' || e.name === 'F10' || e.name === 'F11' || e.vKey === BBC_PIC_HOTKEY_VK) &&
-        hasCutBbcPicModifiers(down)
-    );
-}
-
-async function killAllBbcPicHotkeyProcesses() {
+async function stopLegacyBbcPicHotkeyProcesses() {
+    if (os.platform() !== 'win32') return;
     await new Promise((resolve) => {
         execFile(
             'powershell',
@@ -633,193 +592,18 @@ async function killAllBbcPicHotkeyProcesses() {
             () => resolve(),
         );
     });
-}
-
-async function stopOldBbcPicHotkeyProcess() {
-    await killAllBbcPicHotkeyProcesses();
-    const pidFiles = [BBC_PIC_HOTKEY_PID_FILE, BBC_PIC_DELETE_HOTKEY_PID_FILE];
-    for (const pidFile of pidFiles) {
+    const legacyPidFiles = [
+        path.join(RUNTIME_DIR, 'bbc_pic_hotkey.pid'),
+        path.join(RUNTIME_DIR, 'bbc_pic_delete_hotkey.pid'),
+    ];
+    for (const pidFile of legacyPidFiles) {
         if (!(await fs.pathExists(pidFile))) continue;
-        const pid = (await fs.readFile(pidFile, 'utf8')).trim();
+        const pid = String(await fs.readFile(pidFile, 'utf8')).trim();
         if (!pid) continue;
         await new Promise((resolve) => {
             execFile('taskkill', ['/PID', pid, '/F', '/T'], { windowsHide: true }, () => resolve());
         });
     }
-}
-
-function triggerCutBbcPicFromGlobalHotkey() {
-    const now = Date.now();
-    if (cutBbcPicGlobalBusy) {
-        logHotkey('skip-busy', { reason: '裁剪进行中' });
-        return;
-    }
-    if (now - lastCutBbcPicHotkeyAt < CUT_BBC_PIC_HOTKEY_COOLDOWN_MS) {
-        logHotkey('skip-cooldown', { msSinceLast: now - lastCutBbcPicHotkeyAt });
-        return;
-    }
-    lastCutBbcPicHotkeyAt = now;
-    cutBbcPicGlobalBusy = true;
-    logHotkey('trigger', { action: 'cutCurrentCardBbcPic' });
-    cutCurrentCardBbcPic()
-        .then((result) => {
-            let msg = result.updated
-                ? `已裁剪当前图片: ${result.filename}`
-                : `当前图片未裁剪: ${result.reason}`;
-            if (result.updated && result.fallbackReason) {
-                msg += '（原文件被占用，已写入新文件名）';
-            }
-            logHotkey('done', { ok: true, message: msg, result });
-        })
-        .catch((error) => {
-            logHotkey('done', { ok: false, error: error.message, stack: error.stack });
-            console.error('[anki-helper:hotkey] 裁剪当前图片失败:', error.message);
-        })
-        .finally(() => {
-            cutBbcPicGlobalBusy = false;
-        });
-}
-
-async function startBbcPicGlobalHotkeyWindows() {
-    if (bbcPicHotkeyChild) return;
-    const ensureCutPath = path.join(__dirname, 'scripts', 'ensure-bbc-pic-hotkey.ps1');
-    const ensureDeletePath = path.join(__dirname, 'scripts', 'ensure-delete-bbc-pic-hotkey.ps1');
-    if (!(await fs.pathExists(ensureCutPath))) throw new Error(`找不到热键安装脚本: ${ensureCutPath}`);
-    if (!(await fs.pathExists(ensureDeletePath))) throw new Error(`找不到热键安装脚本: ${ensureDeletePath}`);
-    await fs.ensureDir(RUNTIME_DIR);
-    await stopOldBbcPicHotkeyProcess();
-    await fs.remove(BBC_PIC_HOTKEY_STATUS_FILE).catch(() => {});
-    await fs.remove(BBC_PIC_DELETE_HOTKEY_STATUS_FILE).catch(() => {});
-
-    logHotkey('init', {
-        platform: 'win32',
-        backend: 'RegisterHotKey+HTTP+DirectStart',
-        script: ensureCutPath,
-        pid: process.pid,
-        port: PORT,
-    });
-
-    bbcPicHotkeyChild = { detached: true };
-    console.log(
-        `[anki-helper] 正在后台直接启动热键（裁剪: ${BBC_PIC_HOTKEY_LABEL}；删除: ${BBC_PIC_DELETE_HOTKEY_LABEL}）`,
-    );
-
-    const startScript = (ensurePath, pidFile, statusFile, logFile, tag) => {
-        execFile(
-            'powershell',
-            [
-                '-NoProfile',
-                '-ExecutionPolicy',
-                'Bypass',
-                '-File',
-                ensurePath,
-                '-Port',
-                String(PORT),
-                '-PidFile',
-                pidFile,
-                '-StatusFile',
-                statusFile,
-                '-LogFile',
-                logFile,
-            ],
-            { windowsHide: true, maxBuffer: 1024 * 1024 },
-            (error, stdout, stderr) => {
-                const lines = `${stdout}\n${stderr}`
-                    .split(/\r?\n/)
-                    .map((line) => line.trim())
-                    .filter(Boolean);
-                for (const line of lines) {
-                    if (line.startsWith('READY ') || line === 'ALREADY_READY') {
-                        logHotkey('ready', { tag, status: line });
-                        console.log(`[anki-helper:hotkey] [${tag}] ${line}`);
-                    } else if (line.startsWith('TRY_FAIL ') || line.startsWith('ERROR ')) {
-                        console.error(`[anki-helper:hotkey] [${tag}] ${line}`);
-                    }
-                }
-                if (error) {
-                    console.error(`[anki-helper:hotkey] [${tag}] 热键未就绪: ${error.message}`);
-                }
-            },
-        );
-    };
-
-    startScript(
-        ensureCutPath,
-        BBC_PIC_HOTKEY_PID_FILE,
-        BBC_PIC_HOTKEY_STATUS_FILE,
-        BBC_PIC_HOTKEY_LOG_FILE,
-        'cut',
-    );
-    startScript(
-        ensureDeletePath,
-        BBC_PIC_DELETE_HOTKEY_PID_FILE,
-        BBC_PIC_DELETE_HOTKEY_STATUS_FILE,
-        BBC_PIC_DELETE_HOTKEY_LOG_FILE,
-        'delete',
-    );
-}
-
-async function startBbcPicGlobalHotkeyNodeListener() {
-    logHotkey('init', { platform: os.platform(), backend: 'node-global-key-listener', pid: process.pid });
-    const { GlobalKeyboardListener } = require('node-global-key-listener');
-    const listener = new GlobalKeyboardListener({
-        disposeDelay: -1,
-        mac: {
-            onError: (errorCode) =>
-                console.error('[anki-helper:hotkey] macOS 键盘监听错误:', errorCode),
-        },
-    });
-    const onGlobalKey = (e, down) => {
-        if (HOTKEY_LOG_ENABLED && e.state === 'DOWN') {
-            const modsHeld = summarizeDownKeys(down);
-            if (
-                e.name === 'F9' ||
-                e.name === 'F10' ||
-                e.name === 'F11' ||
-                e.vKey === BBC_PIC_HOTKEY_VK ||
-                modsHeld.some((k) => k.includes('CTRL') || k.includes('SHIFT'))
-            ) {
-                logHotkey('key-down', {
-                    name: e.name,
-                    state: e.state,
-                    vKey: e.vKey,
-                    scanCode: e.scanCode,
-                    modsHeld,
-                });
-            }
-        }
-        if (!isCutBbcPicGlobalHotkeyEvent(e, down)) return;
-        logHotkey('match', { name: e.name, vKey: e.vKey, modsHeld: summarizeDownKeys(down) });
-        triggerCutBbcPicFromGlobalHotkey();
-    };
-    await listener.addListener(onGlobalKey);
-    bbcPicGlobalKeyListener = listener;
-    logHotkey('ready', { combo: BBC_PIC_HOTKEY_LABEL, backend: 'node-global-key-listener' });
-    console.log(`[anki-helper] 全局快捷键: ${BBC_PIC_HOTKEY_LABEL} → 裁剪当前图片（macOS/Linux）`);
-}
-
-async function startBbcPicGlobalHotkey() {
-    if (bbcPicGlobalKeyListener || bbcPicHotkeyChild) return;
-    try {
-        if (os.platform() === 'win32') {
-            await startBbcPicGlobalHotkeyWindows();
-            return;
-        }
-        await startBbcPicGlobalHotkeyNodeListener();
-    } catch (error) {
-        console.error('[anki-helper:hotkey] 全局快捷键注册失败:', error.message, error.stack);
-    }
-}
-
-function stopBbcPicGlobalHotkey() {
-    bbcPicHotkeyStopping = true;
-    stopOldBbcPicHotkeyProcess().catch((error) => {
-        console.error('[anki-helper:hotkey] 停止热键进程失败:', error.message);
-    });
-    bbcPicHotkeyChild = null;
-    if (!bbcPicGlobalKeyListener) return;
-    bbcPicGlobalKeyListener.kill();
-    bbcPicGlobalKeyListener = null;
 }
 
 async function cutAddedBbcPicsByDayOffset(dayOffset) {
@@ -1731,6 +1515,7 @@ function collectAnkiStats(collectionDb, englishDeck, targetDate) {
 
     const db = new Database(dbPath, { readonly: true, fileMustExist: true });
     try {
+        db.pragma('busy_timeout = 5000');
         const deckIds = [];
         const deckKeySep = '\x1f';
         const deckKey = englishDeck.replace(/::/g, deckKeySep);
@@ -1803,6 +1588,43 @@ function collectAnkiStats(collectionDb, englishDeck, targetDate) {
     }
 }
 
+function isSqliteLockedError(error) {
+    return /database is locked/i.test(String(error?.message || error || ''));
+}
+
+async function createCollectionDbSnapshot(collectionDb) {
+    const sourceDbPath = String(collectionDb || '').trim();
+    if (!sourceDbPath || !(await fs.pathExists(sourceDbPath))) {
+        throw new Error(`未找到 Anki collection 数据库: ${sourceDbPath}`);
+    }
+    const snapshotDir = path.join(RUNTIME_DIR, 'anki-report-snapshots');
+    await fs.ensureDir(snapshotDir);
+    const suffix = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const snapshotDbPath = path.join(snapshotDir, `collection_${suffix}.anki2`);
+    await fs.copy(sourceDbPath, snapshotDbPath, { overwrite: true });
+    return snapshotDbPath;
+}
+
+async function cleanupCollectionDbSnapshot(snapshotDbPath) {
+    if (!snapshotDbPath) return;
+    await fs.remove(snapshotDbPath).catch(() => {});
+}
+
+async function collectAnkiStatsWithRetry(collectionDb, englishDeck, targetDate) {
+    const maxAttempts = 4;
+    for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+        try {
+            return collectAnkiStats(collectionDb, englishDeck, targetDate);
+        } catch (error) {
+            if (!isSqliteLockedError(error) || attempt >= maxAttempts) {
+                throw error;
+            }
+            await new Promise((resolve) => setTimeout(resolve, attempt * 300));
+        }
+    }
+    throw new Error('读取 Anki 数据库失败。');
+}
+
 async function reportAnkiStats(baseUrl, reportPath, payload, token) {
     const url = baseUrl.replace(/\/+$/, '') + reportPath;
     const body = JSON.stringify(payload);
@@ -1845,28 +1667,51 @@ async function runAnkiReport(targetDate, days) {
     const reportDays = Math.max(1, Math.floor(Number(days) || settings.ankiReportDays || 10));
     const reportDates = buildReportDates(reportDays, targetDate || null);
     const rows = [];
+    const snapshotDbPath = await createCollectionDbSnapshot(settings.ankiCollectionDb);
 
-    for (const reportDate of reportDates) {
-        const stats = collectAnkiStats(
-            settings.ankiCollectionDb,
-            settings.ankiEnglishDeck,
-            reportDate
-        );
-        const payload = {
-            date: stats.date,
-            study_ms: stats.study_ms,
-            cards_reviewed: stats.cards_reviewed,
-            new_cards: stats.new_cards,
-            deck_total: stats.deck_total,
-            source: 'anki-helper/web_app',
-        };
-        const raw = await reportAnkiStats(
-            settings.ankiReportBaseUrl,
-            settings.ankiReportPath,
-            payload,
-            settings.ankiReportToken || null
-        );
-        rows.push({ date: reportDate, stats, response: raw });
+    try {
+        for (const reportDate of reportDates) {
+            let stats;
+            try {
+                stats = await collectAnkiStatsWithRetry(
+                    snapshotDbPath,
+                    settings.ankiEnglishDeck,
+                    reportDate
+                );
+            } catch (error) {
+                if (!isSqliteLockedError(error)) {
+                    throw error;
+                }
+                console.error(
+                    `[anki-helper] 读取 Anki 统计失败（database is locked），将使用 0 值继续上报: date=${reportDate}, error=${error.message}`
+                );
+                stats = {
+                    date: reportDate,
+                    study_ms: 0,
+                    cards_reviewed: 0,
+                    new_cards: 0,
+                    deck_total: 0,
+                    lockFallback: true,
+                };
+            }
+            const payload = {
+                date: stats.date,
+                study_ms: stats.study_ms,
+                cards_reviewed: stats.cards_reviewed,
+                new_cards: stats.new_cards,
+                deck_total: stats.deck_total,
+                source: stats.lockFallback ? 'anki-helper/web_app/lock-fallback' : 'anki-helper/web_app',
+            };
+            const raw = await reportAnkiStats(
+                settings.ankiReportBaseUrl,
+                settings.ankiReportPath,
+                payload,
+                settings.ankiReportToken || null
+            );
+            rows.push({ date: reportDate, stats, response: raw });
+        }
+    } finally {
+        await cleanupCollectionDbSnapshot(snapshotDbPath);
     }
 
     return {
@@ -2394,8 +2239,6 @@ app.post('/api/anki/capture-latest', async (req, res) => {
 
 app.post('/api/anki/cut-bbcnews-pic', async (req, res) => {
     try {
-        const startedAt = Date.now();
-        logHotkey('http-trigger', { action: 'cutCurrentCardBbcPic' });
         const result = await cutCurrentCardBbcPic();
         let message = result.updated
             ? `已裁剪当前图片: ${result.filename}`
@@ -2403,34 +2246,28 @@ app.post('/api/anki/cut-bbcnews-pic', async (req, res) => {
         if (result.updated && result.fallbackReason) {
             message += `（原文件被占用，已写入新文件名）`;
         }
-        logHotkey('http-done', { ok: true, ms: Date.now() - startedAt, message, result });
         res.json({
             ok: true,
             message,
             ...result,
         });
     } catch (error) {
-        logHotkey('http-done', { ok: false, error: error.message, stack: error.stack });
-        console.error('[anki-helper:hotkey] 热键触发裁剪失败:', error.message);
+        console.error('[anki-helper] 裁剪当前图片失败:', error.message);
         res.status(400).json({ ok: false, error: error.message });
     }
 });
 
 app.post('/api/anki/delete-bbcnews-pic', async (req, res) => {
     try {
-        const startedAt = Date.now();
-        logHotkey('http-trigger', { action: 'deleteCurrentCardBbcPic' });
         const result = await deleteCurrentCardBbcPic();
         const message = `已清空当前图片字段: ${result.filename}`;
-        logHotkey('http-done', { ok: true, ms: Date.now() - startedAt, message, result });
         res.json({
             ok: true,
             message,
             ...result,
         });
     } catch (error) {
-        logHotkey('http-done', { ok: false, error: error.message, stack: error.stack });
-        console.error('[anki-helper:hotkey] 热键触发删图失败:', error.message);
+        console.error('[anki-helper] 删除当前图片失败:', error.message);
         res.status(400).json({ ok: false, error: error.message });
     }
 });
@@ -2674,8 +2511,7 @@ async function boot() {
     } else {
         stopClipboardMonitor();
     }
-    await startBbcPicGlobalHotkey();
-
+    await stopLegacyBbcPicHotkeyProcesses();
     app.listen(PORT, HOST, () => {
         const localIp = getLocalNetworkIp();
         console.log(`Anki Helper 已启动: http://localhost:${PORT}`);
