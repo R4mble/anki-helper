@@ -245,6 +245,13 @@
                 <button id="captureToggleBtn" class="btn btn-blue" onclick="toggleCaptureHotkey()">开启音频图片录制（F4）</button>
             </div>
             <div class="tool-separator row">
+                <div style="flex:1;min-width:180px;">
+                    <label for="reviewAudioCountInput">Review 卡片个数</label>
+                    <input id="reviewAudioCountInput" type="number" min="1" step="1" value="500" />
+                </div>
+                <button id="makeReviewAudioBtn" class="btn btn-primary" onclick="makeReviewAudio()">制作Review音频</button>
+            </div>
+            <div class="tool-separator row">
                 <div style="flex:1;min-width:200px;">
                     <label for="cleanDeckInput">牌组名</label>
                     <input id="cleanDeckInput" placeholder="例如：#Listening::English::Audio" />
@@ -458,6 +465,7 @@
     let cutBbcNewsPicBusy = false;
     let deleteBbcNewsPicBusy = false;
     let ankiReportSyncBusy = false;
+    let makeReviewAudioBusy = false;
 
     function switchView(view) {
         const views = {
@@ -1145,6 +1153,37 @@ ${formatSyncSchedulerText(data.syncScheduler)}`;
             log(data.message);
         } catch (error) {
             log(`批量清理失败: ${error.message}`);
+        }
+    }
+
+    async function makeReviewAudio() {
+        if (makeReviewAudioBusy) return;
+        makeReviewAudioBusy = true;
+        const btn = document.getElementById('makeReviewAudioBtn');
+        const oldText = btn ? btn.textContent : '';
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = '制作中...';
+        }
+        try {
+            const countText = document.getElementById('reviewAudioCountInput').value.trim();
+            const cardCount = Number(countText || 500);
+            const data = await api('/api/anki/review-audio', 'POST', { cardCount });
+            const a = document.createElement('a');
+            a.href = data.downloadUrl;
+            a.download = data.outputFilename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            log(`${data.message} 已自动下载 ${data.outputFilename}。`);
+        } catch (error) {
+            log(`制作 Review 音频失败: ${error.message}`);
+        } finally {
+            makeReviewAudioBusy = false;
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = oldText;
+            }
         }
     }
 

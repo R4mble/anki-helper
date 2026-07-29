@@ -24,6 +24,7 @@ const BBC_NEWS_PIC_FRONT_FIELD = '正面';
 const BBC_NEWS_PIC_WORD_AUDIO_FIELD = '单词发音';
 const BBC_NEWS_PIC_EXAMPLE_AUDIO_FIELD = '例句发音';
 const BBC_NEWS_PIC_DECK = '#Listening::English::Word';
+const REVIEW_AUDIO_DEFAULT_COUNT = 500;
 const BBC_NEWS_PIC_TARGET_WIDTH = 2248;
 const BBC_NEWS_PIC_TARGET_HEIGHT = 1366;
 const BBC_NEWS_PIC_TARGET_SIZE_LIST = [
@@ -439,6 +440,102 @@ async function writeMediaFileReplacing(targetPath, buffer) {
 
 function stripHtml(raw) {
     return String(raw).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function shuffleArray(inputList) {
+    const result = inputList.slice();
+    for (let i = result.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = result[i];
+        result[i] = result[j];
+        result[j] = tmp;
+    }
+    return result;
+}
+
+function toFfmpegConcatPathLine(filePath) {
+    return `file '${String(filePath).replace(/'/g, "'\\''")}'`;
+}
+
+async function buildReviewAudioFromDeck(cardCount) {
+    const targetCount = Number(cardCount);
+    if (!Number.isInteger(targetCount) || targetCount <= 0) {
+        throw new Error('cardCount 必须是正整数。');
+    }
+    const noteIds = await invoke('findNotes', {
+        query: `deck:"${BBC_NEWS_PIC_DECK}"`,
+    });
+    if (!Array.isArray(noteIds) || noteIds.length === 0) {
+        throw new Error(`牌组 ${BBC_NEWS_PIC_DECK} 没有可用卡片。`);
+    }
+
+    const shuffledNoteIds = shuffleArray(noteIds);
+    const selectedNoteIds = shuffledNoteIds.slice(0, Math.min(targetCount, shuffledNoteIds.length));
+    const notes = await invoke('notesInfo', { notes: selectedNoteIds });
+    const mediaDirPath = await invoke('getMediaDirPath');
+    const audioPaths = [];
+    const skipped = [];
+    for (const note of notes) {
+        const exampleValue = note.fields?.[BBC_NEWS_PIC_EXAMPLE_AUDIO_FIELD]?.value;
+        const wordValue = note.fields?.[BBC_NEWS_PIC_WORD_AUDIO_FIELD]?.value;
+        const exampleFilename = extractFilename(exampleValue);
+        const wordFilename = extractFilename(wordValue);
+        const examplePath = path.join(mediaDirPath, exampleFilename);
+        const wordPath = path.join(mediaDirPath, wordFilename);
+        if (!exampleFilename || !wordFilename) {
+            skipped.push({
+                noteId: note.noteId,
+                reason: `缺少字段：${BBC_NEWS_PIC_EXAMPLE_AUDIO_FIELD}/${BBC_NEWS_PIC_WORD_AUDIO_FIELD}`,
+            });
+            continue;
+        }
+        if (!(await fs.pathExists(examplePath)) || !(await fs.pathExists(wordPath))) {
+            skipped.push({
+                noteId: note.noteId,
+                reason: '音频文件不存在',
+            });
+            continue;
+        }
+        audioPaths.push(examplePath, wordPath, examplePath, examplePath);
+    }
+    if (audioPaths.length === 0) {
+        throw new Error('未找到可拼接音频，请检查卡片字段和媒体文件。');
+    }
+
+    const reviewDir = path.join(RUNTIME_DIR, 'review-audio');
+    await fs.ensureDir(reviewDir);
+    const stamp = Date.now();
+    const outputFilename = `review_audio_${stamp}.mp3`;
+    const outputPath = path.join(reviewDir, outputFilename);
+    const concatListPath = path.join(reviewDir, `review_audio_${stamp}.txt`);
+    const concatText = audioPaths.map(toFfmpegConcatPathLine).join('\n');
+    await fs.writeFile(concatListPath, concatText, 'utf8');
+
+    try {
+        await new Promise((resolve, reject) => {
+            ffmpeg()
+                .input(concatListPath)
+                .inputOptions(['-f concat', '-safe 0'])
+                .outputOptions(['-vn', '-c:a libmp3lame', '-q:a 2'])
+                .output(outputPath)
+                .on('end', resolve)
+                .on('error', reject)
+                .run();
+        });
+    } finally {
+        await fs.remove(concatListPath).catch(() => {});
+    }
+
+    return {
+        outputFilename,
+        outputPath,
+        requestedCount: targetCount,
+        selectedCount: selectedNoteIds.length,
+        mergedCardCount: Math.floor(audioPaths.length / 4),
+        clipCount: audioPaths.length,
+        skippedCount: skipped.length,
+        skipped,
+    };
 }
 
 async function buildGoogleTranslateUsTtsAudioFilename(frontText) {
@@ -2358,6 +2455,39 @@ app.post('/api/anki/remove-substring', async (req, res) => {
             updatedCount,
             message: `已更新 ${updatedCount} 条笔记。`,
         });
+    } catch (error) {
+        res.status(400).json({ ok: false, error: error.message });
+    }
+});
+
+app.post('/api/anki/review-audio', async (req, res) => {
+    try {
+        const rawCardCount = req.body?.cardCount;
+        const fallback = Number.isInteger(rawCardCount) ? rawCardCount : Number(rawCardCount);
+        const cardCount = Number.isInteger(fallback) && fallback > 0 ? fallback : REVIEW_AUDIO_DEFAULT_COUNT;
+        const result = await buildReviewAudioFromDeck(cardCount);
+        res.json({
+            ok: true,
+            message: `已生成 Review 音频，抽取 ${result.selectedCount} 张卡，拼接 ${result.clipCount} 段音频。`,
+            ...result,
+            downloadUrl: `/api/anki/review-audio/download?filename=${encodeURIComponent(result.outputFilename)}`,
+        });
+    } catch (error) {
+        res.status(400).json({ ok: false, error: error.message });
+    }
+});
+
+app.get('/api/anki/review-audio/download', async (req, res) => {
+    try {
+        const filename = String(req.query?.filename || '').trim();
+        if (!/^[a-zA-Z0-9._-]+\.mp3$/.test(filename)) {
+            throw new Error('filename 非法。');
+        }
+        const filePath = path.join(RUNTIME_DIR, 'review-audio', filename);
+        if (!(await fs.pathExists(filePath))) {
+            throw new Error(`音频文件不存在: ${filename}`);
+        }
+        res.download(filePath, filename);
     } catch (error) {
         res.status(400).json({ ok: false, error: error.message });
     }
