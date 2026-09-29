@@ -2,12 +2,14 @@ const express = require('express');
 const path = require('path');
 const os = require('os');
 const fs = require('fs-extra');
+const { createServer } = require('http');
 const { execFile, execFileSync, spawn } = require('child_process');
 const crypto = require('crypto');
 const ffmpeg = require('fluent-ffmpeg');
 const schedule = require('node-schedule');
 const Database = require('better-sqlite3');
 const sharp = require('sharp');
+const screenTimeTracker = require('./screen_time_tracker');
 
 const APP_DIR = process.pkg ? path.dirname(process.execPath) : __dirname;
 const BUNDLED_DEFAULT_SETTINGS_FILE = path.join(__dirname, 'app_default_setting.json');
@@ -2642,9 +2644,12 @@ async function boot() {
         stopClipboardMonitor();
     }
     await stopLegacyBbcPicHotkeyProcesses();
-    app.listen(PORT, HOST, () => {
+    const httpServer = createServer(app);
+    screenTimeTracker.init(httpServer, app);
+    httpServer.listen(PORT, HOST, () => {
         const localIp = getLocalNetworkIp();
         console.log(`Anki Helper 已启动: http://localhost:${PORT}`);
+        console.log(`屏幕时间追踪: http://localhost:${PORT}/screen-time`);
         console.log(`手机遥控地址: http://${localIp}:${PORT}/?mode=remote`);
         console.log(`AnkiConnect: ${settings.ankiConnectUrl}`);
         console.log(`媒体库目录: ${settings.mediaDir}`);
