@@ -351,40 +351,40 @@
       "lastActive": 1790681189495
     },
     "Browser (Other)": {
-      "duration": 476,
-      "lastActive": 1790681311695
+      "duration": 512,
+      "lastActive": 1790682931314
     },
     "网易云音乐": {
       "duration": 290,
       "lastActive": 1790676673240
     },
     "微信": {
-      "duration": 792,
-      "lastActive": 1790680937361
+      "duration": 828,
+      "lastActive": 1790682703058
     },
     "Anki": {
       "duration": 2750,
       "lastActive": 1790681037440
     },
     "钉钉": {
-      "duration": 360,
-      "lastActive": 1790680921378
+      "duration": 364,
+      "lastActive": 1790682721081
     },
     "Lark": {
-      "duration": 34,
-      "lastActive": 1790680803363
+      "duration": 42,
+      "lastActive": 1790683093271
     },
     "Douyin": {
-      "duration": 506,
-      "lastActive": 1790681391734
+      "duration": 724,
+      "lastActive": 1790683255464
     },
     "Gemini": {
-      "duration": 844,
-      "lastActive": 1790681325710
+      "duration": 1088,
+      "lastActive": 1790683257504
     },
     "Bilibili": {
-      "duration": 1640,
-      "lastActive": 1790680601527
+      "duration": 1732,
+      "lastActive": 1790683259475
     },
     "迁移助理": {
       "duration": 10,
@@ -399,8 +399,8 @@
       "lastActive": 1790676725248
     },
     "loginwindow": {
-      "duration": 20,
-      "lastActive": 1790681409586
+      "duration": 128,
+      "lastActive": 1790684866426
     },
     "通知中心": {
       "duration": 14,
@@ -423,8 +423,8 @@
       "lastActive": 1790680893383
     },
     "Lark Helper": {
-      "duration": 38,
-      "lastActive": 1790679766829
+      "duration": 58,
+      "lastActive": 1790683095259
     },
     "访达": {
       "duration": 200,
@@ -433,6 +433,100 @@
     "安装器": {
       "duration": 14,
       "lastActive": 1790678286010
+    },
+    "ChatGPT": {
+      "duration": 106,
+      "lastActive": 1790683197458
+    }
+  },
+  "2026-09-30": {
+    "loginwindow": {
+      "duration": 128,
+      "lastActive": 1790749573150
+    },
+    "Bilibili": {
+      "duration": 2454,
+      "lastActive": 1790762943473
+    },
+    "提示": {
+      "duration": 62,
+      "lastActive": 1790736988132
+    },
+    "钉钉": {
+      "duration": 432,
+      "lastActive": 1790767515469
+    },
+    "Douyin": {
+      "duration": 10724,
+      "lastActive": 1790767791738
+    },
+    "localhost": {
+      "duration": 594,
+      "lastActive": 1790767061399
+    },
+    "微信": {
+      "duration": 1098,
+      "lastActive": 1790767509458
+    },
+    "Browser (Other)": {
+      "duration": 2900,
+      "lastActive": 1790766835286
+    },
+    "X": {
+      "duration": 346,
+      "lastActive": 1790760818513
+    },
+    "Gemini": {
+      "duration": 2096,
+      "lastActive": 1790767809735
+    },
+    "Anki": {
+      "duration": 84,
+      "lastActive": 1790766697063
+    },
+    "Code": {
+      "duration": 468,
+      "lastActive": 1790766629051
+    },
+    "YouTube": {
+      "duration": 162,
+      "lastActive": 1790759171769
+    },
+    "Lark": {
+      "duration": 494,
+      "lastActive": 1790767069237
+    },
+    "Lark Helper": {
+      "duration": 56,
+      "lastActive": 1790764650158
+    },
+    "系统设置": {
+      "duration": 56,
+      "lastActive": 1790737508403
+    },
+    "IntelliJ IDEA": {
+      "duration": 36,
+      "lastActive": 1790750327469
+    },
+    "dingtalk": {
+      "duration": 6,
+      "lastActive": 1790760530422
+    },
+    "终端": {
+      "duration": 2,
+      "lastActive": 1790761018470
+    },
+    "Cursor": {
+      "duration": 926,
+      "lastActive": 1790767543456
+    },
+    "UserNotificationCenter": {
+      "duration": 2,
+      "lastActive": 1790765672622
+    },
+    "计算器": {
+      "duration": 6,
+      "lastActive": 1790766072795
     }
   }
 }
