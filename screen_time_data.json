@@ -441,8 +441,8 @@
   },
   "2026-09-30": {
     "loginwindow": {
-      "duration": 128,
-      "lastActive": 1790749573150
+      "duration": 188,
+      "lastActive": 1790785453509
     },
     "Bilibili": {
       "duration": 2454,
@@ -453,32 +453,32 @@
       "lastActive": 1790736988132
     },
     "钉钉": {
-      "duration": 432,
-      "lastActive": 1790767515469
+      "duration": 448,
+      "lastActive": 1790785577187
     },
     "Douyin": {
-      "duration": 10724,
-      "lastActive": 1790767791738
+      "duration": 11262,
+      "lastActive": 1790785483296
     },
     "localhost": {
-      "duration": 594,
-      "lastActive": 1790767061399
+      "duration": 746,
+      "lastActive": 1790785802550
     },
     "微信": {
-      "duration": 1098,
-      "lastActive": 1790767509458
+      "duration": 1100,
+      "lastActive": 1790768884130
     },
     "Browser (Other)": {
-      "duration": 2900,
-      "lastActive": 1790766835286
+      "duration": 3004,
+      "lastActive": 1790785797427
     },
     "X": {
       "duration": 346,
       "lastActive": 1790760818513
     },
     "Gemini": {
-      "duration": 2096,
-      "lastActive": 1790767809735
+      "duration": 2358,
+      "lastActive": 1790768816290
     },
     "Anki": {
       "duration": 84,
@@ -493,16 +493,16 @@
       "lastActive": 1790759171769
     },
     "Lark": {
-      "duration": 494,
-      "lastActive": 1790767069237
+      "duration": 496,
+      "lastActive": 1790768886137
     },
     "Lark Helper": {
       "duration": 56,
       "lastActive": 1790764650158
     },
     "系统设置": {
-      "duration": 56,
-      "lastActive": 1790737508403
+      "duration": 78,
+      "lastActive": 1790768788056
     },
     "IntelliJ IDEA": {
       "duration": 36,
@@ -517,8 +517,8 @@
       "lastActive": 1790761018470
     },
     "Cursor": {
-      "duration": 926,
-      "lastActive": 1790767543456
+      "duration": 1110,
+      "lastActive": 1790785689232
     },
     "UserNotificationCenter": {
       "duration": 2,
@@ -527,6 +527,14 @@
     "计算器": {
       "duration": 6,
       "lastActive": 1790766072795
+    },
+    "通知中心": {
+      "duration": 2,
+      "lastActive": 1790768806115
+    },
+    "Momo": {
+      "duration": 4,
+      "lastActive": 1790785579349
     }
   }
 }
