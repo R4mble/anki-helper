@@ -536,5 +536,107 @@
       "duration": 4,
       "lastActive": 1790785579349
     }
+  },
+  "2026-10-08": {
+    "终端": {
+      "duration": 1174,
+      "lastActive": 1791458716873
+    },
+    "localhost": {
+      "duration": 64,
+      "lastActive": 1791448128728
+    },
+    "dingtalk": {
+      "duration": 1256,
+      "lastActive": 1791458731084
+    },
+    "钉钉": {
+      "duration": 4998,
+      "lastActive": 1791459009007
+    },
+    "Anki": {
+      "duration": 8,
+      "lastActive": 1791440843135
+    },
+    "Momo": {
+      "duration": 2878,
+      "lastActive": 1791458945107
+    },
+    "微信": {
+      "duration": 576,
+      "lastActive": 1791458060544
+    },
+    "Browser (Other)": {
+      "duration": 3728,
+      "lastActive": 1791458891081
+    },
+    "Lark": {
+      "duration": 1064,
+      "lastActive": 1791457986534
+    },
+    "X": {
+      "duration": 638,
+      "lastActive": 1791452614854
+    },
+    "Code": {
+      "duration": 448,
+      "lastActive": 1791456833961
+    },
+    "IntelliJ IDEA": {
+      "duration": 1150,
+      "lastActive": 1791458704863
+    },
+    "访达": {
+      "duration": 22,
+      "lastActive": 1791446751885
+    },
+    "Cursor": {
+      "duration": 10,
+      "lastActive": 1791428843155
+    },
+    "Gemini": {
+      "duration": 2944,
+      "lastActive": 1791458604962
+    },
+    "Lark Helper": {
+      "duration": 112,
+      "lastActive": 1791457914439
+    },
+    "计算器": {
+      "duration": 30,
+      "lastActive": 1791431320316
+    },
+    "网易云音乐": {
+      "duration": 12,
+      "lastActive": 1791444416786
+    },
+    "loginwindow": {
+      "duration": 62,
+      "lastActive": 1791456414531
+    },
+    "钉钉会议": {
+      "duration": 146,
+      "lastActive": 1791440765076
+    },
+    "系统信息": {
+      "duration": 4,
+      "lastActive": 1791440695064
+    },
+    "股市": {
+      "duration": 12,
+      "lastActive": 1791440711065
+    },
+    "系统设置": {
+      "duration": 2,
+      "lastActive": 1791441051180
+    },
+    "Bilibili": {
+      "duration": 2320,
+      "lastActive": 1791455073952
+    },
+    "Douyin": {
+      "duration": 346,
+      "lastActive": 1791455043955
+    }
   }
 }
