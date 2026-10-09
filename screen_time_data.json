@@ -539,8 +539,8 @@
   },
   "2026-10-08": {
     "终端": {
-      "duration": 1174,
-      "lastActive": 1791458716873
+      "duration": 1246,
+      "lastActive": 1791460413002
     },
     "localhost": {
       "duration": 64,
@@ -551,40 +551,40 @@
       "lastActive": 1791458731084
     },
     "钉钉": {
-      "duration": 4998,
-      "lastActive": 1791459009007
+      "duration": 5268,
+      "lastActive": 1791460889238
     },
     "Anki": {
       "duration": 8,
       "lastActive": 1791440843135
     },
     "Momo": {
-      "duration": 2878,
-      "lastActive": 1791458945107
+      "duration": 3038,
+      "lastActive": 1791460855382
     },
     "微信": {
-      "duration": 576,
-      "lastActive": 1791458060544
+      "duration": 596,
+      "lastActive": 1791460202864
     },
     "Browser (Other)": {
-      "duration": 3728,
-      "lastActive": 1791458891081
+      "duration": 3782,
+      "lastActive": 1791460655251
     },
     "Lark": {
-      "duration": 1064,
-      "lastActive": 1791457986534
+      "duration": 1068,
+      "lastActive": 1791460210869
     },
     "X": {
       "duration": 638,
       "lastActive": 1791452614854
     },
     "Code": {
-      "duration": 448,
-      "lastActive": 1791456833961
+      "duration": 454,
+      "lastActive": 1791460364982
     },
     "IntelliJ IDEA": {
-      "duration": 1150,
-      "lastActive": 1791458704863
+      "duration": 1260,
+      "lastActive": 1791460787185
     },
     "访达": {
       "duration": 22,
@@ -611,8 +611,8 @@
       "lastActive": 1791444416786
     },
     "loginwindow": {
-      "duration": 62,
-      "lastActive": 1791456414531
+      "duration": 188,
+      "lastActive": 1791461078777
     },
     "钉钉会议": {
       "duration": 146,
@@ -635,8 +635,86 @@
       "lastActive": 1791455073952
     },
     "Douyin": {
-      "duration": 346,
-      "lastActive": 1791455043955
+      "duration": 516,
+      "lastActive": 1791460849344
+    }
+  },
+  "2026-10-09": {
+    "loginwindow": {
+      "duration": 165.014,
+      "lastActive": 1791544343427
+    },
+    "钉钉": {
+      "duration": 2653.082000000013,
+      "lastActive": 1791543127859
+    },
+    "Momo": {
+      "duration": 1070,
+      "lastActive": 1791536869982
+    },
+    "Code": {
+      "duration": 278,
+      "lastActive": 1791533405294
+    },
+    "Browser (Other)": {
+      "duration": 3953.181000000021,
+      "lastActive": 1791543058004
+    },
+    "Douyin": {
+      "duration": 152,
+      "lastActive": 1791534537776
+    },
+    "X": {
+      "duration": 532,
+      "lastActive": 1791536200601
+    },
+    "微信": {
+      "duration": 258.002,
+      "lastActive": 1791541702606
+    },
+    "Bilibili": {
+      "duration": 3129.124000000018,
+      "lastActive": 1791544861896
+    },
+    "Lark": {
+      "duration": 1395.0199999999995,
+      "lastActive": 1791543552913
+    },
+    "股市": {
+      "duration": 16,
+      "lastActive": 1791513400245
+    },
+    "网易云音乐": {
+      "duration": 22,
+      "lastActive": 1791536286543
+    },
+    "Gemini": {
+      "duration": 4521.22400000003,
+      "lastActive": 1791544876955
+    },
+    "终端": {
+      "duration": 387.00899999999996,
+      "lastActive": 1791544496661
+    },
+    "Lark Helper": {
+      "duration": 43,
+      "lastActive": 1791543342893
+    },
+    "IntelliJ IDEA": {
+      "duration": 563.359999999999,
+      "lastActive": 1791545327126
+    },
+    "dingtalk": {
+      "duration": 114.00900000000001,
+      "lastActive": 1791543568253
+    },
+    "Cursor": {
+      "duration": 180.03100000000003,
+      "lastActive": 1791544896744
+    },
+    "活动监视器": {
+      "duration": 20.002000000000002,
+      "lastActive": 1791540717427
     }
   }
 }

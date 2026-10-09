@@ -8,7 +8,8 @@ const APP_DIR = process.pkg ? path.dirname(process.execPath) : __dirname;
 const DATA_FILE = path.join(APP_DIR, 'screen_time_data.json');
 
 const CONFIG = {
-    checkInterval: 2000,
+    checkInterval: 5000,
+    flushInterval: 30000,
     dayStartHour: 10,
     idleThreshold: 60,
 
@@ -52,6 +53,13 @@ let trackerError = null;
 let lastAnkiActiveTime = Date.now();
 let ankiReminderFired = false;
 
+let db = null;
+let dirty = false;
+let lastTick = Date.now();
+
+let cachedIdle = 0;
+let lastIdleCheck = 0;
+
 async function loadActiveWin() {
     if (activeWinFn) return activeWinFn;
     const mod = await import('active-win');
@@ -60,15 +68,17 @@ async function loadActiveWin() {
 }
 
 function getIdleTime() {
-    try {
-        if (os.platform() === 'darwin') {
-            const cmd = "ioreg -c IOHIDSystem | awk '/HIDIdleTime/ {print $NF/1000000000; exit}'";
-            return parseInt(execSync(cmd).toString().trim(), 10);
-        }
-    } catch (e) {
-        return 0;
-    }
-    return 0;
+    return new Promise(resolve => {
+        if (os.platform() !== 'darwin') return resolve(0);
+        if (Date.now() - lastIdleCheck < 5000) return resolve(cachedIdle);
+        lastIdleCheck = Date.now();
+        execFile('ioreg', ['-c', 'IOHIDSystem', '-d', '4'], (err, stdout) => {
+            if (err) return resolve(cachedIdle);
+            const m = /"HIDIdleTime" = (\d+)/.exec(stdout);
+            cachedIdle = m ? Math.floor(Number(m[1]) / 1e9) : 0;
+            resolve(cachedIdle);
+        });
+    });
 }
 
 function getLogicalDate() {
@@ -181,42 +191,49 @@ function extractErrorDetail(error) {
     return error.message;
 }
 
+function emitIfConnected(event, data) {
+    if (io.engine.clientsCount > 0) io.emit(event, data);
+}
+
 async function tick() {
     try {
         const activeWin = await loadActiveWin();
         trackerError = null;
 
-        const idleTime = getIdleTime();
+        const now = Date.now();
+        const delta = Math.min((now - lastTick) / 1000, CONFIG.checkInterval * 2 / 1000);
+        lastTick = now;
+
+        const idleTime = await getIdleTime();
 
         if (idleTime >= CONFIG.idleThreshold) {
             currentSession = { app: null, startTime: Date.now(), duration: 0 };
-            io.emit('screen_time_status', { isIdle: true, idleTime });
+            emitIfConnected('screen_time_status', { isIdle: true, idleTime });
             return;
         }
 
         const window = await activeWin();
         if (!window) {
             checkAnkiReminder(null, false);
-            io.emit('screen_time_status', { isIdle: false, noWindow: true });
+            emitIfConnected('screen_time_status', { isIdle: false, noWindow: true });
             return;
         }
 
         const appName = parseAppName(window);
         const today = getLogicalDate();
-        const data = loadData();
 
-        if (!data[today]) data[today] = {};
+        if (!db[today]) db[today] = {};
 
-        if (!data[today][appName]) {
-            data[today][appName] = { duration: 0, lastActive: Date.now() };
+        if (!db[today][appName]) {
+            db[today][appName] = { duration: 0, lastActive: Date.now() };
         }
-        if (typeof data[today][appName] === 'number') {
-            data[today][appName] = { duration: data[today][appName] * 60, lastActive: Date.now() };
+        if (typeof db[today][appName] === 'number') {
+            db[today][appName] = { duration: db[today][appName] * 60, lastActive: Date.now() };
         }
 
-        const secondsToAdd = CONFIG.checkInterval / 1000;
-        data[today][appName].duration += secondsToAdd;
-        data[today][appName].lastActive = Date.now();
+        db[today][appName].duration += delta;
+        db[today][appName].lastActive = Date.now();
+        dirty = true;
 
         if (currentSession.app === appName) {
             const sessionDuration = (Date.now() - currentSession.startTime) / 1000 / 60;
@@ -228,11 +245,9 @@ async function tick() {
 
         checkAnkiReminder(appName, false);
 
-        saveData(data);
-
-        io.emit('screen_time_update', {
+        emitIfConnected('screen_time_update', {
             todayStr: today,
-            stats: data[today],
+            stats: db[today],
             currentApp: appName,
             goals: CONFIG.goals,
             sessionSeconds,
@@ -241,15 +256,30 @@ async function tick() {
     } catch (error) {
         const detail = extractErrorDetail(error);
         trackerError = detail;
-        io.emit('screen_time_error', { error: detail });
+        emitIfConnected('screen_time_error', { error: detail });
         console.error('[screen-time] ❌ 错误:', detail);
     }
 }
 
+function flushData() {
+    if (dirty && db) {
+        saveData(db);
+        dirty = false;
+    }
+}
+
 function startTracker() {
-    console.log('[screen-time] 🚀 屏幕时间追踪已启动');
+    db = loadData();
+    lastTick = Date.now();
+    console.log('[screen-time] 🚀 屏幕时间追踪已启动 (间隔 %ds，落盘 %ds)',
+        CONFIG.checkInterval / 1000, CONFIG.flushInterval / 1000);
     tick();
     setInterval(tick, CONFIG.checkInterval);
+    setInterval(flushData, CONFIG.flushInterval);
+
+    const gracefulExit = () => { flushData(); process.exit(); };
+    process.on('SIGINT', gracefulExit);
+    process.on('SIGTERM', gracefulExit);
 }
 
 function getScreenTimeHtml() {
@@ -502,24 +532,22 @@ function init(httpServer, app) {
     });
 
     app.get('/api/screen-time/data', (req, res) => {
-        const data = loadData();
         const today = getLogicalDate();
         res.json({
             ok: true,
             today,
-            stats: data[today] || {},
-            allDays: Object.keys(data),
+            stats: (db && db[today]) || {},
+            allDays: db ? Object.keys(db) : [],
             trackerError,
         });
     });
 
     app.get('/api/screen-time/history', (req, res) => {
-        const data = loadData();
         const date = String(req.query.date || '').trim();
-        if (date && data[date]) {
-            res.json({ ok: true, date, stats: data[date] });
+        if (date && db && db[date]) {
+            res.json({ ok: true, date, stats: db[date] });
         } else {
-            res.json({ ok: true, dates: Object.keys(data) });
+            res.json({ ok: true, dates: db ? Object.keys(db) : [] });
         }
     });
 
