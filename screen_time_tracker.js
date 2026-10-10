@@ -1,14 +1,16 @@
 const { Server } = require('socket.io');
-const { execSync, execFile } = require('child_process');
+const { spawn, execSync } = require('child_process');
+const readline = require('readline');
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
 
 const APP_DIR = process.pkg ? path.dirname(process.execPath) : __dirname;
 const DATA_FILE = path.join(APP_DIR, 'screen_time_data.json');
+const HELPER_PATH = path.join(APP_DIR, 'helper');
 
 const CONFIG = {
-    checkInterval: 5000,
+    uiPushInterval: 5000,
     flushInterval: 30000,
     dayStartHour: 10,
     idleThreshold: 60,
@@ -46,40 +48,18 @@ const CONFIG = {
     browsers: ['Google Chrome', 'Microsoft Edge', 'Safari', 'Firefox', 'Arc', 'Brave Browser', 'Chrome'],
 };
 
-let activeWinFn = null;
 let io = null;
-let currentSession = { app: null, startTime: Date.now(), duration: 0 };
 let trackerError = null;
 let lastAnkiActiveTime = Date.now();
 let ankiReminderFired = false;
 
 let db = null;
 let dirty = false;
-let lastTick = Date.now();
 
-let cachedIdle = 0;
-let lastIdleCheck = 0;
-
-async function loadActiveWin() {
-    if (activeWinFn) return activeWinFn;
-    const mod = await import('active-win');
-    activeWinFn = mod.default;
-    return activeWinFn;
-}
-
-function getIdleTime() {
-    return new Promise(resolve => {
-        if (os.platform() !== 'darwin') return resolve(0);
-        if (Date.now() - lastIdleCheck < 5000) return resolve(cachedIdle);
-        lastIdleCheck = Date.now();
-        execFile('ioreg', ['-c', 'IOHIDSystem', '-d', '4'], (err, stdout) => {
-            if (err) return resolve(cachedIdle);
-            const m = /"HIDIdleTime" = (\d+)/.exec(stdout);
-            cachedIdle = m ? Math.floor(Number(m[1]) / 1e9) : 0;
-            resolve(cachedIdle);
-        });
-    });
-}
+let currentApp = null;
+let currentAppSwitchTime = Date.now();
+let isIdle = false;
+let idleSeconds = 0;
 
 function getLogicalDate() {
     const now = new Date();
@@ -107,27 +87,48 @@ function saveData(data) {
     fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
 }
 
-function parseAppName(window) {
-    let appName = window.owner.name;
-    const title = window.title ? window.title.toLowerCase() : '';
-    const url = window.url ? window.url.toLowerCase() : '';
+function resolveAppName(appName, title, url) {
+    const titleLower = title ? title.toLowerCase() : '';
+    const urlLower = url ? url.toLowerCase() : '';
 
     const isBrowser = CONFIG.browsers.some(b => appName.includes(b) || b.includes(appName));
-
     if (isBrowser) {
         for (const [key, rules] of Object.entries(CONFIG.appRules)) {
-            if (url && rules.urls && rules.urls.some(u => url.includes(String(u).toLowerCase()))) return key;
-            if (rules.titles && rules.titles.some(t => title.includes(String(t).toLowerCase()))) return key;
+            if (urlLower && rules.urls && rules.urls.some(u => urlLower.includes(String(u).toLowerCase()))) return key;
+            if (rules.titles && rules.titles.some(t => titleLower.includes(String(t).toLowerCase()))) return key;
         }
         return 'Browser (Other)';
     }
     return appName;
 }
 
-function checkLimits(appName, continuousMinutes) {
+function settlePreviousApp() {
+    if (!currentApp || isIdle) return;
+    const now = Date.now();
+    const delta = (now - currentAppSwitchTime) / 1000;
+    if (delta <= 0) return;
+
+    const today = getLogicalDate();
+    if (!db[today]) db[today] = {};
+    if (!db[today][currentApp]) {
+        db[today][currentApp] = { duration: 0, lastActive: now };
+    }
+    if (typeof db[today][currentApp] === 'number') {
+        db[today][currentApp] = { duration: db[today][currentApp] * 60, lastActive: now };
+    }
+
+    db[today][currentApp].duration += delta;
+    db[today][currentApp].lastActive = now;
+    dirty = true;
+    currentAppSwitchTime = now;
+}
+
+function checkLimits(appName) {
     const limit = CONFIG.limits[appName];
-    if (limit && continuousMinutes >= limit.maxContinuous) {
-        console.log(`[screen-time] ⚠️ 警告: ${appName} 已连续使用 ${continuousMinutes.toFixed(1)} 分钟！`);
+    if (!limit) return;
+    const sessionMinutes = (Date.now() - currentAppSwitchTime) / 1000 / 60;
+    if (sessionMinutes >= limit.maxContinuous) {
+        console.log(`[screen-time] ⚠️ 警告: ${appName} 已连续使用 ${sessionMinutes.toFixed(1)} 分钟！`);
         io.emit('screen_time_alert', {
             message: `你已经连续刷 ${appName} 超过 ${limit.maxContinuous} 分钟了！立即停止！`,
         });
@@ -154,7 +155,7 @@ function showNotification(title, message) {
     }
 }
 
-function checkAnkiReminder(appName, isIdle) {
+function checkAnkiReminder(appName, idle) {
     if (!CONFIG.ankiReminder.enabled) return;
 
     if (appName === CONFIG.ankiReminder.appName) {
@@ -163,7 +164,7 @@ function checkAnkiReminder(appName, isIdle) {
         return;
     }
 
-    if (isIdle) return;
+    if (idle) return;
 
     const idleMs = Date.now() - lastAnkiActiveTime;
     const idleMinutes = idleMs / 1000 / 60;
@@ -179,86 +180,60 @@ function checkAnkiReminder(appName, isIdle) {
     }
 }
 
-function extractErrorDetail(error) {
-    const stderr = error.stderr
-        ? (Buffer.isBuffer(error.stderr) ? error.stderr.toString() : String(error.stderr)).trim()
-        : '';
-    if (stderr) return stderr;
-    const stdout = error.stdout
-        ? (Buffer.isBuffer(error.stdout) ? error.stdout.toString() : String(error.stdout)).trim()
-        : '';
-    if (stdout) return stdout;
-    return error.message;
-}
-
 function emitIfConnected(event, data) {
     if (io.engine.clientsCount > 0) io.emit(event, data);
 }
 
-async function tick() {
-    try {
-        const activeWin = await loadActiveWin();
-        trackerError = null;
+function onAppSwitch(ev) {
+    settlePreviousApp();
 
-        const now = Date.now();
-        const delta = Math.min((now - lastTick) / 1000, CONFIG.checkInterval * 2 / 1000);
-        lastTick = now;
+    const appName = resolveAppName(ev.name, ev.title || '', ev.url || '');
+    currentApp = appName;
+    currentAppSwitchTime = Date.now();
+    isIdle = false;
 
-        const idleTime = await getIdleTime();
+    checkAnkiReminder(appName, false);
+    pushUI();
+}
 
-        if (idleTime >= CONFIG.idleThreshold) {
-            currentSession = { app: null, startTime: Date.now(), duration: 0 };
-            emitIfConnected('screen_time_status', { isIdle: true, idleTime });
-            return;
-        }
-
-        const window = await activeWin();
-        if (!window) {
-            checkAnkiReminder(null, false);
-            emitIfConnected('screen_time_status', { isIdle: false, noWindow: true });
-            return;
-        }
-
-        const appName = parseAppName(window);
-        const today = getLogicalDate();
-
-        if (!db[today]) db[today] = {};
-
-        if (!db[today][appName]) {
-            db[today][appName] = { duration: 0, lastActive: Date.now() };
-        }
-        if (typeof db[today][appName] === 'number') {
-            db[today][appName] = { duration: db[today][appName] * 60, lastActive: Date.now() };
-        }
-
-        db[today][appName].duration += delta;
-        db[today][appName].lastActive = Date.now();
-        dirty = true;
-
-        if (currentSession.app === appName) {
-            const sessionDuration = (Date.now() - currentSession.startTime) / 1000 / 60;
-            checkLimits(appName, sessionDuration);
-        } else {
-            currentSession = { app: appName, startTime: Date.now(), duration: 0 };
-        }
-        const sessionSeconds = Math.max(0, (Date.now() - currentSession.startTime) / 1000);
-
-        checkAnkiReminder(appName, false);
-
-        emitIfConnected('screen_time_update', {
-            todayStr: today,
-            stats: db[today],
-            currentApp: appName,
-            goals: CONFIG.goals,
-            sessionSeconds,
-            idleSeconds: Math.floor(idleTime),
-        });
-    } catch (error) {
-        const detail = extractErrorDetail(error);
-        trackerError = detail;
-        emitIfConnected('screen_time_error', { error: detail });
-        console.error('[screen-time] ❌ 错误:', detail);
+function onIdleChange(ev) {
+    if (ev.value) {
+        settlePreviousApp();
+        isIdle = true;
+        idleSeconds = ev.seconds || 0;
+        emitIfConnected('screen_time_status', { isIdle: true, idleTime: idleSeconds });
+    } else {
+        isIdle = false;
+        currentAppSwitchTime = Date.now();
     }
+}
+
+function pushUI() {
+    if (isIdle) {
+        emitIfConnected('screen_time_status', { isIdle: true, idleTime: idleSeconds });
+        return;
+    }
+    if (!currentApp) {
+        emitIfConnected('screen_time_status', { isIdle: false, noWindow: true });
+        return;
+    }
+
+    settlePreviousApp();
+
+    const today = getLogicalDate();
+    const sessionSeconds = Math.max(0, (Date.now() - currentAppSwitchTime) / 1000);
+
+    checkLimits(currentApp);
+    checkAnkiReminder(currentApp, false);
+
+    emitIfConnected('screen_time_update', {
+        todayStr: today,
+        stats: db[today] || {},
+        currentApp,
+        goals: CONFIG.goals,
+        sessionSeconds,
+        idleSeconds: 0,
+    });
 }
 
 function flushData() {
@@ -270,14 +245,48 @@ function flushData() {
 
 function startTracker() {
     db = loadData();
-    lastTick = Date.now();
-    console.log('[screen-time] 🚀 屏幕时间追踪已启动 (间隔 %ds，落盘 %ds)',
-        CONFIG.checkInterval / 1000, CONFIG.flushInterval / 1000);
-    tick();
-    setInterval(tick, CONFIG.checkInterval);
+    console.log('[screen-time] 🚀 屏幕时间追踪已启动 (事件驱动模式，UI推送 %ds，落盘 %ds)',
+        CONFIG.uiPushInterval / 1000, CONFIG.flushInterval / 1000);
+
+    const helper = spawn(HELPER_PATH, [], { stdio: ['ignore', 'pipe', 'pipe'] });
+
+    helper.stderr.on('data', chunk => {
+        console.error('[helper stderr]', chunk.toString().trim());
+    });
+
+    helper.on('error', err => {
+        trackerError = 'helper 启动失败: ' + err.message;
+        console.error('[screen-time] ❌', trackerError);
+        emitIfConnected('screen_time_error', { error: trackerError });
+    });
+
+    helper.on('exit', (code, signal) => {
+        trackerError = `helper 退出 (code=${code}, signal=${signal})`;
+        console.error('[screen-time] ❌', trackerError);
+        emitIfConnected('screen_time_error', { error: trackerError });
+    });
+
+    const rl = readline.createInterface({ input: helper.stdout });
+    rl.on('line', line => {
+        try {
+            const ev = JSON.parse(line);
+            trackerError = null;
+            if (ev.type === 'app') onAppSwitch(ev);
+            else if (ev.type === 'idle') onIdleChange(ev);
+        } catch (e) {
+            console.error('[screen-time] helper 输出解析失败:', line);
+        }
+    });
+
+    setInterval(pushUI, CONFIG.uiPushInterval);
     setInterval(flushData, CONFIG.flushInterval);
 
-    const gracefulExit = () => { flushData(); process.exit(); };
+    const gracefulExit = () => {
+        settlePreviousApp();
+        flushData();
+        helper.kill();
+        process.exit();
+    };
     process.on('SIGINT', gracefulExit);
     process.on('SIGTERM', gracefulExit);
 }

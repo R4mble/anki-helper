@@ -641,24 +641,24 @@
   },
   "2026-10-09": {
     "loginwindow": {
-      "duration": 165.014,
-      "lastActive": 1791544343427
+      "duration": 275.0300000000001,
+      "lastActive": 1791548046091
     },
     "钉钉": {
-      "duration": 2653.082000000013,
-      "lastActive": 1791543127859
+      "duration": 2663.0840000000135,
+      "lastActive": 1791546921712
     },
     "Momo": {
       "duration": 1070,
       "lastActive": 1791536869982
     },
     "Code": {
-      "duration": 278,
-      "lastActive": 1791533405294
+      "duration": 363.01599999999985,
+      "lastActive": 1791546596645
     },
     "Browser (Other)": {
-      "duration": 3953.181000000021,
-      "lastActive": 1791543058004
+      "duration": 4328.262000000033,
+      "lastActive": 1791546956881
     },
     "Douyin": {
       "duration": 152,
@@ -673,12 +673,12 @@
       "lastActive": 1791541702606
     },
     "Bilibili": {
-      "duration": 3129.124000000018,
-      "lastActive": 1791544861896
+      "duration": 3149.1280000000183,
+      "lastActive": 1791546962025
     },
     "Lark": {
-      "duration": 1395.0199999999995,
-      "lastActive": 1791543552913
+      "duration": 1430.0269999999994,
+      "lastActive": 1791546846709
     },
     "股市": {
       "duration": 16,
@@ -689,8 +689,8 @@
       "lastActive": 1791536286543
     },
     "Gemini": {
-      "duration": 4521.22400000003,
-      "lastActive": 1791544876955
+      "duration": 4751.27100000004,
+      "lastActive": 1791547016884
     },
     "终端": {
       "duration": 387.00899999999996,
@@ -701,12 +701,12 @@
       "lastActive": 1791543342893
     },
     "IntelliJ IDEA": {
-      "duration": 563.359999999999,
-      "lastActive": 1791545327126
+      "duration": 573.360999999999,
+      "lastActive": 1791546216593
     },
     "dingtalk": {
-      "duration": 114.00900000000001,
-      "lastActive": 1791543568253
+      "duration": 154.01600000000002,
+      "lastActive": 1791546926855
     },
     "Cursor": {
       "duration": 180.03100000000003,
@@ -715,6 +715,100 @@
     "活动监视器": {
       "duration": 20.002000000000002,
       "lastActive": 1791540717427
+    }
+  },
+  "2026-10-10": {
+    "loginwindow": {
+      "duration": 6308.044000000004,
+      "lastActive": 1791631786736
+    },
+    "Gemini": {
+      "duration": 4578.534000000051,
+      "lastActive": 1791625954353
+    },
+    "dingtalk": {
+      "duration": 2647.995000000007,
+      "lastActive": 1791629181337
+    },
+    "钉钉": {
+      "duration": 3292.1940000000136,
+      "lastActive": 1791630106893
+    },
+    "微信": {
+      "duration": 994.9269999999979,
+      "lastActive": 1791630483734
+    },
+    "Browser (Other)": {
+      "duration": 2513.2970000000055,
+      "lastActive": 1791630410508
+    },
+    "Lark": {
+      "duration": 767.1239999999988,
+      "lastActive": 1791630519138
+    },
+    "Code": {
+      "duration": 246.52000000000004,
+      "lastActive": 1791630411295
+    },
+    "Momo": {
+      "duration": 2176.907999999997,
+      "lastActive": 1791631348845
+    },
+    "X": {
+      "duration": 424.2319999999997,
+      "lastActive": 1791629943804
+    },
+    "Bilibili": {
+      "duration": 1161.2029999999966,
+      "lastActive": 1791625399014
+    },
+    "终端": {
+      "duration": 907.3329999999982,
+      "lastActive": 1791630213367
+    },
+    "Cursor": {
+      "duration": 1201.1379999999974,
+      "lastActive": 1791631752779
+    },
+    "Lark Helper": {
+      "duration": 288.25300000000016,
+      "lastActive": 1791630505330
+    },
+    "Anki": {
+      "duration": 9.016,
+      "lastActive": 1791604765529
+    },
+    "活动监视器": {
+      "duration": 20.649000000000004,
+      "lastActive": 1791628457500
+    },
+    "IntelliJ IDEA": {
+      "duration": 1283.335999999997,
+      "lastActive": 1791631700473
+    },
+    "访达": {
+      "duration": 4.592,
+      "lastActive": 1791621039321
+    },
+    "股市": {
+      "duration": 27.452999999999996,
+      "lastActive": 1791627217397
+    },
+    "网易云音乐": {
+      "duration": 1.4580000000000002,
+      "lastActive": 1791630413702
+    },
+    "系统设置": {
+      "duration": 6.501,
+      "lastActive": 1791626184831
+    },
+    "UserNotificationCenter": {
+      "duration": 1.599,
+      "lastActive": 1791627276897
+    },
+    "localhost": {
+      "duration": 33.341,
+      "lastActive": 1791628814739
     }
   }
 }
