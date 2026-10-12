@@ -845,8 +845,8 @@
       "lastActive": 1791695579563
     },
     "loginwindow": {
-      "duration": 5404.7180000000035,
-      "lastActive": 1791705376964
+      "duration": 5464.716000000006,
+      "lastActive": 1791730982034
     },
     "IntelliJ IDEA": {
       "duration": 108.643,
@@ -863,6 +863,32 @@
     "Douyin": {
       "duration": 291.028,
       "lastActive": 1791705312695
+    }
+  },
+  "2026-10-12": {
+    "loginwindow": {
+      "duration": 780.304,
+      "lastActive": 1791788045049
+    },
+    "Momo": {
+      "duration": 4.952,
+      "lastActive": 1791788050003
+    },
+    "钉钉": {
+      "duration": 40.838,
+      "lastActive": 1791788090841
+    },
+    "IntelliJ IDEA": {
+      "duration": 8.945,
+      "lastActive": 1791788099786
+    },
+    "活动监视器": {
+      "duration": 4.37,
+      "lastActive": 1791788104156
+    },
+    "终端": {
+      "duration": 9.141,
+      "lastActive": 1791788113297
     }
   }
 }
